@@ -11,6 +11,7 @@ import javax.annotation.Nonnull;
 
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.Position;
+import org.planit.cost.physical.BPRLinkTravelTimeCost;
 import org.planit.demands.Demands;
 import org.planit.event.CreatedProjectComponentEvent;
 import org.planit.exceptions.PlanItException;
@@ -117,8 +118,13 @@ public class Tntp extends InputBuilderListener {
   public static final int ONE_WAY_AB = 1;
   public static final int ONE_WAY_BA = 2;
   public static final int TWO_WAY = 3;
-  public static final double bprAlpha = 0.87;
-  public static final double bprBeta = 4.0;
+  //public static final double bprAlpha = 0.87;
+  //public static final double bprBeta = 4.0;
+
+  public static final String NUMBER_OF_ZONES_INDICATOR = "<NUMBER OF ZONES>";
+  public static final String NUMBER_OF_NODES_INDICATOR = "<NUMBER OF NODES>";
+  public static final String NUMBER_OF_LINKS_INDICATOR = "<NUMBER OF LINKS>";
+  public static final String END_OF_METADATA_INDICATOR = "<END OF METADATA>";
 
   /**
    * Create and register a new node if it does not already exist
@@ -183,9 +189,10 @@ public class Tntp extends InputBuilderListener {
    * @param maxSpeed the maximum speed for this link
    * @param capacityPerLane the capacity per lane for this link
    * @param externalId external Id of this link segment
+   * @return the macroscopic link segment which has been created
    * @throws PlanItException thrown if there is an error
    */
-  private void createAndRegisterLinkSegment(@Nonnull final PhysicalNetwork network, @Nonnull final Link link, final double maxSpeed,
+  private MacroscopicLinkSegment createAndRegisterLinkSegment(@Nonnull final PhysicalNetwork network, @Nonnull final Link link, final double maxSpeed,
       final double capacityPerLane, final long externalId)
       throws PlanItException {
     final MacroscopicLinkSegment linkSegment = (MacroscopicLinkSegment) network.linkSegments.createDirectionalLinkSegment(
@@ -202,6 +209,7 @@ public class Tntp extends InputBuilderListener {
         Double.POSITIVE_INFINITY, externalId, macroscopicLinkSegmentTypeModeProperties).getFirst();
     linkSegment.setLinkSegmentType(macroscopicLinkSegmentType);
     network.linkSegments.registerLinkSegment(link, linkSegment, true);
+    return linkSegment;
   }
 
   /**
@@ -240,12 +248,12 @@ public class Tntp extends InputBuilderListener {
    * @throws Exception thrown if the contents of the header cannot be parsed into an integer
    */
   private void readNetworkMetadata(final String line) throws Exception {
-    if (line.startsWith("<NUMBER OF ZONES>")) {
-      noZones = parseFromHeader(line, "<NUMBER OF ZONES>");
-    } else if (line.startsWith("<NUMBER OF NODES>")) {
-      noPhysicalNodes = parseFromHeader(line, "<NUMBER OF NODES>");
-    } else if (line.startsWith("<NUMBER OF LINKS>")) {
-      noLinks = parseFromHeader(line, "<NUMBER OF LINKS>");
+    if (line.startsWith(NUMBER_OF_ZONES_INDICATOR)) {
+      noZones = parseFromHeader(line, NUMBER_OF_ZONES_INDICATOR);
+    } else if (line.startsWith(NUMBER_OF_NODES_INDICATOR)) {
+      noPhysicalNodes = parseFromHeader(line, NUMBER_OF_NODES_INDICATOR);
+    } else if (line.startsWith(NUMBER_OF_LINKS_INDICATOR)) {
+      noLinks = parseFromHeader(line, NUMBER_OF_LINKS_INDICATOR);
     }
   }
 
@@ -282,7 +290,22 @@ public class Tntp extends InputBuilderListener {
       maxSpeed = MacroscopicModeProperties.DEFAULT_MAXIMUM_SPEED;
     }
     final double capacityPerLane = Integer.parseInt(cols[networkFileColumns.get(NetworkFileColumns.CAPACITY_PER_LANE)]) + capacityPeriod.getMultiplier();
-    createAndRegisterLinkSegment(network, link, maxSpeed, capacityPerLane, linkSegmentExternalId);
+    final MacroscopicLinkSegment linkSegment = createAndRegisterLinkSegment(network, link, maxSpeed, capacityPerLane, linkSegmentExternalId);
+    double alpha = BPRLinkTravelTimeCost.DEFAULT_ALPHA;
+    double beta = BPRLinkTravelTimeCost.DEFAULT_BETA;
+    boolean settingAlpha = false;
+    if (networkFileColumns.keySet().contains(NetworkFileColumns.B)) {
+      alpha = Double.parseDouble(cols[networkFileColumns.get(NetworkFileColumns.B)]);
+      settingAlpha = true;
+    }
+    boolean settingBeta = false;
+    if (networkFileColumns.keySet().contains(NetworkFileColumns.POWER)) {
+      beta = Double.parseDouble(cols[networkFileColumns.get(NetworkFileColumns.POWER)]);
+      settingBeta = true;
+    }
+    if (settingAlpha || settingBeta) {
+      ((MacroscopicNetwork) network).addBprParametersForLinkSegmentAndMode(linkSegment, mode, alpha, beta);
+    }
   }
 
   /**
@@ -300,7 +323,7 @@ public class Tntp extends InputBuilderListener {
       while (scanner.hasNextLine()) {
         final String line = scanner.nextLine().trim();
         final char firstChar = (line.isEmpty()) ? 'x' : line.charAt(0);
-        final boolean atEndOfMetadata = line.equals("<END OF METADATA>");
+        final boolean atEndOfMetadata = line.equals(END_OF_METADATA_INDICATOR);
         if (atEndOfMetadata) {
           readingMetadata = false;
         }
@@ -354,8 +377,8 @@ public class Tntp extends InputBuilderListener {
           readingMetadata = false;
         }
         if (readingMetadata) {
-          if (line.startsWith("<NUMBER OF ZONES>")) {
-            final String subLine = line.substring("<NUMBER OF ZONES>".length()).trim();
+          if (line.startsWith(NUMBER_OF_ZONES_INDICATOR)) {
+            final String subLine = line.substring(NUMBER_OF_ZONES_INDICATOR.length()).trim();
             if (noZones != Integer.parseInt(subLine)) {
               throw new PlanItException("Network file indicates there are " + noZones
                   + " but demand file indicates there are " + Integer.parseInt(subLine) + " zones.");

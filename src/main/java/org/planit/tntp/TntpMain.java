@@ -8,10 +8,9 @@ import org.planit.cost.virtual.FixedConnectoidTravelTimeCost;
 import org.planit.demands.Demands;
 import org.planit.exceptions.PlanItException;
 import org.planit.logging.PlanItLogger;
+import org.planit.network.physical.LinkSegment;
+import org.planit.network.physical.macroscopic.MacroscopicLinkSegment;
 import org.planit.network.physical.macroscopic.MacroscopicNetwork;
-import org.planit.utils.ArgumentParser;
-import org.planit.utils.IdGenerator;
-import org.planit.zoning.Zoning;
 import org.planit.output.configuration.LinkOutputTypeConfiguration;
 import org.planit.output.configuration.OriginDestinationOutputTypeConfiguration;
 import org.planit.output.configuration.OutputConfiguration;
@@ -26,17 +25,22 @@ import org.planit.tntp.enums.LengthUnits;
 import org.planit.tntp.enums.NetworkFileColumns;
 import org.planit.tntp.enums.SpeedUnits;
 import org.planit.tntp.enums.TimeUnits;
+import org.planit.tntp.output.formatter.CSVOutputFormatter;
 import org.planit.tntp.project.TntpProject;
 import org.planit.trafficassignment.TraditionalStaticAssignment;
 import org.planit.trafficassignment.builder.CapacityRestrainedTrafficAssignmentBuilder;
-import org.planit.tntp.output.formatter.CSVOutputFormatter;
+import org.planit.userclass.Mode;
+import org.planit.utils.ArgumentParser;
+import org.planit.utils.IdGenerator;
+import org.planit.utils.Pair;
+import org.planit.zoning.Zoning;
 
 public class TntpMain {
 
   private static final int DEFAULT_MAX_ITERATIONS = 1;
   private static final double DEFAULT_CONVERGENCE_EPSILON = 0.01;
 
-  public static void main(String[] args) {
+  public static void main(final String[] args) {
     String networkFileLocation = null;
     String demandFileLocation = null;
     String nodeCoordinateFileLocation = null;
@@ -49,16 +53,16 @@ public class TntpMain {
     int maxIterations = DEFAULT_MAX_ITERATIONS;
     double epsilon = DEFAULT_CONVERGENCE_EPSILON;
     try {
-      TntpMain tntpMain = new TntpMain();
-      Map<String, String> argsMap = ArgumentParser.convertArgsToMap(args);
+      final TntpMain tntpMain = new TntpMain();
+      final Map<String, String> argsMap = ArgumentParser.convertArgsToMap(args);
       if (!argsMap.keySet().contains("NETWORK")) {
         throw new PlanItException("No Network input file defined");
       }
       if (!argsMap.keySet().contains("DEMANDS")) {
         throw new PlanItException("No Demands input file defined");
       }
-      for (String inputFileType : argsMap.keySet()) {
-        String argValue = argsMap.get(inputFileType);
+      for (final String inputFileType : argsMap.keySet()) {
+        final String argValue = argsMap.get(inputFileType);
         switch (inputFileType) {
           case "NETWORK":
             networkFileLocation = argValue;
@@ -98,7 +102,7 @@ public class TntpMain {
         PlanItLogger.setLogging(logfileLocation, TntpMain.class);
       }
       if (outputTimeUnitValue != null) {
-        String outputSelection = outputTimeUnitValue.substring(0, 1).toUpperCase();
+        final String outputSelection = outputTimeUnitValue.substring(0, 1).toUpperCase();
         switch (outputSelection) {
           case "H":
             outputTimeUnit = OutputTimeUnit.HOURS;
@@ -116,23 +120,23 @@ public class TntpMain {
       tntpMain.execute(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, linkOutputFilename, odOutputFilename,
           odPathOutputFilename, maxIterations, epsilon, outputTimeUnit);
       PlanItLogger.close();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
 
-  public void execute(String networkFileLocation, String demandFileLocation, String nodeCoordinateFileLocation, String linkOutputFilename,
-      String odOutputFilename, String odPathOutputFilename, int maxIterations, double epsilon,
-      OutputTimeUnit outputTimeUnit) throws PlanItException {
+  public void execute(final String networkFileLocation, final String demandFileLocation, final String nodeCoordinateFileLocation, final String linkOutputFilename,
+      final String odOutputFilename, final String odPathOutputFilename, final int maxIterations, final double epsilon,
+      final OutputTimeUnit outputTimeUnit) throws PlanItException {
 
-    boolean isLinkOutputActive = (linkOutputFilename != null);
-    boolean isOdOutputActive = (odOutputFilename != null);
-    boolean isOdPathOutputActive = (odPathOutputFilename != null);
+    final boolean isLinkOutputActive = (linkOutputFilename != null);
+    final boolean isOdOutputActive = (odOutputFilename != null);
+    final boolean isOdPathOutputActive = (odPathOutputFilename != null);
 
     // SET UP INPUT SCANNER AND PROJECT
     IdGenerator.reset();
 
-    Map<NetworkFileColumns, Integer> networkFileColumns = new HashMap<NetworkFileColumns, Integer>();
+    final Map<NetworkFileColumns, Integer> networkFileColumns = new HashMap<NetworkFileColumns, Integer>();
     networkFileColumns.put(NetworkFileColumns.UPSTREAM_NODE_ID, 0);
     networkFileColumns.put(NetworkFileColumns.DOWNSTREAM_NODE_ID, 1);
     networkFileColumns.put(NetworkFileColumns.CAPACITY_PER_LANE, 2);
@@ -144,30 +148,39 @@ public class TntpMain {
     networkFileColumns.put(NetworkFileColumns.TOLL, 8);
     networkFileColumns.put(NetworkFileColumns.LINK_TYPE, 9);
 
-    SpeedUnits speedUnits = SpeedUnits.MILES_H;
-    LengthUnits lengthUnits = LengthUnits.MILES;
-    TimeUnits timeUnits = TimeUnits.MINUTES;
-    CapacityPeriod capacityPeriod = CapacityPeriod.DAY;
+    final SpeedUnits speedUnits = SpeedUnits.MILES_H;
+    final LengthUnits lengthUnits = LengthUnits.MILES;
+    final TimeUnits timeUnits = TimeUnits.MINUTES;
+    final CapacityPeriod capacityPeriod = CapacityPeriod.DAY;
 
-    TntpProject project = new TntpProject(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, networkFileColumns, speedUnits,
+    final TntpProject project = new TntpProject(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, networkFileColumns, speedUnits,
         lengthUnits, timeUnits, capacityPeriod);
 
     // RAW INPUT START --------------------------------
-    MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) project
+    final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) project
         .createAndRegisterPhysicalNetwork(MacroscopicNetwork.class.getCanonicalName());
-    Zoning zoning = project.createAndRegisterZoning(macroscopicNetwork);
-    Demands demands = project.createAndRegisterDemands(zoning);
+    final Zoning zoning = project.createAndRegisterZoning(macroscopicNetwork);
+    final Demands demands = project.createAndRegisterDemands(zoning);
 
     // RAW INPUT END -----------------------------------
 
     // TRAFFIC ASSIGNMENT START------------------------
-    CapacityRestrainedTrafficAssignmentBuilder taBuilder = (CapacityRestrainedTrafficAssignmentBuilder) project
+    final CapacityRestrainedTrafficAssignmentBuilder taBuilder = (CapacityRestrainedTrafficAssignmentBuilder) project
         .createAndRegisterDeterministicAssignment(TraditionalStaticAssignment.class.getCanonicalName());
 
     // SUPPLY SIDE
     taBuilder.registerPhysicalNetwork(macroscopicNetwork);
     // SUPPLY-DEMAND INTERACTIONS
-    taBuilder.createAndRegisterPhysicalCost(BPRLinkTravelTimeCost.class.getCanonicalName());
+    final BPRLinkTravelTimeCost bprLinkTravelTimeCost = (BPRLinkTravelTimeCost) taBuilder.createAndRegisterPhysicalCost(BPRLinkTravelTimeCost.class.getCanonicalName());
+    if (macroscopicNetwork.getBprParametersForLinkSegmentAndMode() != null) {
+      for (final LinkSegment linkSegment :  macroscopicNetwork.linkSegments.toList()) {
+        final MacroscopicLinkSegment macroscopicLinkSegment = (MacroscopicLinkSegment) linkSegment;
+        for (final Mode mode : Mode.getAllModes()) {
+          final Pair<Double, Double> alphaBeta = macroscopicNetwork.getBprParametersForLinkSegmentAndMode().get(macroscopicLinkSegment).get(mode);
+          bprLinkTravelTimeCost.setParameters(macroscopicLinkSegment, mode, alphaBeta.getFirst(), alphaBeta.getSecond());
+        }
+      }
+    }
     taBuilder
         .createAndRegisterVirtualTravelTimeCostFunction(FixedConnectoidTravelTimeCost.class.getCanonicalName());
     taBuilder.createAndRegisterSmoothing(MSASmoothing.class.getCanonicalName());
@@ -177,13 +190,13 @@ public class TntpMain {
 
     // DATA OUTPUT CONFIGURATION
     taBuilder.activateOutput(OutputType.LINK);
-    OutputConfiguration outputConfiguration = taBuilder.getOutputConfiguration();
+    final OutputConfiguration outputConfiguration = taBuilder.getOutputConfiguration();
     outputConfiguration.setPersistOnlyFinalIteration(true); // option to only persist the final
                                                             // iteration
 
     // OUTPUT FORMAT CONFIGURATION - LINKS
     if (isLinkOutputActive) {
-      LinkOutputTypeConfiguration linkOutputTypeConfiguration = (LinkOutputTypeConfiguration) taBuilder
+      final LinkOutputTypeConfiguration linkOutputTypeConfiguration = (LinkOutputTypeConfiguration) taBuilder
           .activateOutput(OutputType.LINK);
       linkOutputTypeConfiguration.addProperty(OutputProperty.RUN_ID);
       linkOutputTypeConfiguration.addProperty(OutputProperty.VC_RATIO);
@@ -200,7 +213,7 @@ public class TntpMain {
     }
     // OUTPUT FORMAT CONFIGURATION - ORIGIN-DESTINATION
     if (isOdOutputActive) {
-      OriginDestinationOutputTypeConfiguration originDestinationOutputTypeConfiguration =
+      final OriginDestinationOutputTypeConfiguration originDestinationOutputTypeConfiguration =
           (OriginDestinationOutputTypeConfiguration) taBuilder
               .activateOutput(OutputType.OD);
       originDestinationOutputTypeConfiguration.removeProperty(OutputProperty.RUN_ID);
@@ -209,7 +222,7 @@ public class TntpMain {
     }
     // OUTPUT FORMAT CONFIGURATION - PATH
     if (isOdPathOutputActive) {
-      PathOutputTypeConfiguration pathOutputTypeConfiguration = (PathOutputTypeConfiguration) taBuilder
+      final PathOutputTypeConfiguration pathOutputTypeConfiguration = (PathOutputTypeConfiguration) taBuilder
           .activateOutput(OutputType.PATH);
       pathOutputTypeConfiguration.removeProperty(OutputProperty.RUN_ID);
       pathOutputTypeConfiguration.addProperty(OutputProperty.ORIGIN_ZONE_ID);
@@ -218,7 +231,7 @@ public class TntpMain {
     }
 
     // CSVOutputFormatter - Links
-    CSVOutputFormatter csvOutputFormatter = (CSVOutputFormatter) project.createAndRegisterOutputFormatter(
+    final CSVOutputFormatter csvOutputFormatter = (CSVOutputFormatter) project.createAndRegisterOutputFormatter(
         CSVOutputFormatter.class.getCanonicalName());
     if (outputTimeUnit != null) {
       csvOutputFormatter.setOutputTimeUnit(outputTimeUnit);
@@ -238,9 +251,9 @@ public class TntpMain {
     taBuilder.getGapFunction().getStopCriterion().setMaxIterations(maxIterations);
     taBuilder.getGapFunction().getStopCriterion().setEpsilon(epsilon);
 
-    Map<Long, PlanItException> exceptionMap = project.executeAllTrafficAssignments();
+    final Map<Long, PlanItException> exceptionMap = project.executeAllTrafficAssignments();
     if (!exceptionMap.keySet().isEmpty()) {
-      for (long id : exceptionMap.keySet()) {
+      for (final long id : exceptionMap.keySet()) {
         throw exceptionMap.get(id);
       }
     }
