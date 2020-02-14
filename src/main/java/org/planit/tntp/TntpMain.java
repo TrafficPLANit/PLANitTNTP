@@ -8,16 +8,15 @@ import org.planit.cost.virtual.FixedConnectoidTravelTimeCost;
 import org.planit.demands.Demands;
 import org.planit.exceptions.PlanItException;
 import org.planit.logging.PlanItLogger;
-import org.planit.network.physical.LinkSegment;
-import org.planit.network.physical.macroscopic.MacroscopicLinkSegment;
 import org.planit.network.physical.macroscopic.MacroscopicNetwork;
+import org.planit.network.virtual.Zoning;
 import org.planit.output.configuration.LinkOutputTypeConfiguration;
 import org.planit.output.configuration.OriginDestinationOutputTypeConfiguration;
 import org.planit.output.configuration.OutputConfiguration;
 import org.planit.output.configuration.PathOutputTypeConfiguration;
 import org.planit.output.enums.OutputTimeUnit;
 import org.planit.output.enums.OutputType;
-import org.planit.output.enums.PathIdType;
+import org.planit.output.enums.RouteIdType;
 import org.planit.output.property.OutputProperty;
 import org.planit.sdinteraction.smoothing.MSASmoothing;
 import org.planit.tntp.enums.CapacityPeriod;
@@ -28,12 +27,13 @@ import org.planit.tntp.enums.TimeUnits;
 import org.planit.tntp.output.formatter.CSVOutputFormatter;
 import org.planit.tntp.project.TntpProject;
 import org.planit.trafficassignment.TraditionalStaticAssignment;
-import org.planit.trafficassignment.builder.CapacityRestrainedTrafficAssignmentBuilder;
-import org.planit.userclass.Mode;
+import org.planit.trafficassignment.builder.TraditionalStaticAssignmentBuilder;
 import org.planit.utils.ArgumentParser;
-import org.planit.utils.IdGenerator;
-import org.planit.utils.Pair;
-import org.planit.zoning.Zoning;
+import org.planit.utils.misc.IdGenerator;
+import org.planit.utils.misc.Pair;
+import org.planit.utils.network.physical.LinkSegment;
+import org.planit.utils.network.physical.Mode;
+import org.planit.utils.network.physical.macroscopic.MacroscopicLinkSegment;
 
 public class TntpMain {
 
@@ -157,26 +157,24 @@ public class TntpMain {
         lengthUnits, timeUnits, capacityPeriod);
 
     // RAW INPUT START --------------------------------
-    final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) project
-        .createAndRegisterPhysicalNetwork(MacroscopicNetwork.class.getCanonicalName());
+    final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) project.createAndRegisterPhysicalNetwork(MacroscopicNetwork.class.getCanonicalName());
     final Zoning zoning = project.createAndRegisterZoning(macroscopicNetwork);
     final Demands demands = project.createAndRegisterDemands(zoning);
 
     // RAW INPUT END -----------------------------------
 
     // TRAFFIC ASSIGNMENT START------------------------
-    final CapacityRestrainedTrafficAssignmentBuilder taBuilder = (CapacityRestrainedTrafficAssignmentBuilder) project
-        .createAndRegisterDeterministicAssignment(TraditionalStaticAssignment.class.getCanonicalName());
+    final TraditionalStaticAssignmentBuilder taBuilder =
+                (TraditionalStaticAssignmentBuilder) project.createAndRegisterTrafficAssignment(
+                    TraditionalStaticAssignment.class.getCanonicalName(), demands, zoning, macroscopicNetwork);
 
-    // SUPPLY SIDE
-    taBuilder.registerPhysicalNetwork(macroscopicNetwork);
     // SUPPLY-DEMAND INTERACTIONS
     final BPRLinkTravelTimeCost bprLinkTravelTimeCost = (BPRLinkTravelTimeCost) taBuilder.createAndRegisterPhysicalCost(BPRLinkTravelTimeCost.class.getCanonicalName());
-    if (macroscopicNetwork.getBprParametersForLinkSegmentAndMode() != null) {
+    if (macroscopicNetwork.isBprParametersDefinedForLinkSegments()) {
       for (final LinkSegment linkSegment :  macroscopicNetwork.linkSegments.toList()) {
         final MacroscopicLinkSegment macroscopicLinkSegment = (MacroscopicLinkSegment) linkSegment;
-        for (final Mode mode : Mode.getAllModes()) {
-          final Pair<Double, Double> alphaBeta = macroscopicNetwork.getBprParametersForLinkSegmentAndMode().get(macroscopicLinkSegment).get(mode);
+        for (final Mode mode : macroscopicNetwork.modes.toList()) {
+          final Pair<Double, Double> alphaBeta = macroscopicNetwork.getBprParametersForLinkSegmentAndMode(macroscopicLinkSegment, mode);
           bprLinkTravelTimeCost.setParameters(macroscopicLinkSegment, mode, alphaBeta.getFirst(), alphaBeta.getSecond());
         }
       }
@@ -184,9 +182,6 @@ public class TntpMain {
     taBuilder
         .createAndRegisterVirtualTravelTimeCostFunction(FixedConnectoidTravelTimeCost.class.getCanonicalName());
     taBuilder.createAndRegisterSmoothing(MSASmoothing.class.getCanonicalName());
-
-    // SUPPLY-DEMAND INTERFACE
-    taBuilder.registerDemandsAndZoning(demands, zoning);
 
     // DATA OUTPUT CONFIGURATION
     taBuilder.activateOutput(OutputType.LINK);
@@ -227,7 +222,7 @@ public class TntpMain {
       pathOutputTypeConfiguration.removeProperty(OutputProperty.RUN_ID);
       pathOutputTypeConfiguration.addProperty(OutputProperty.ORIGIN_ZONE_ID);
       pathOutputTypeConfiguration.addProperty(OutputProperty.DESTINATION_ZONE_ID);
-      pathOutputTypeConfiguration.setPathIdType(PathIdType.LINK_SEGMENT_EXTERNAL_ID);
+      pathOutputTypeConfiguration.setPathIdType(RouteIdType.LINK_SEGMENT_EXTERNAL_ID);
     }
 
     // CSVOutputFormatter - Links

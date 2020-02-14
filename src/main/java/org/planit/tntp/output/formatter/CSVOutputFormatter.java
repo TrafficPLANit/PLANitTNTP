@@ -11,7 +11,6 @@ import java.util.SortedSet;
 import org.apache.commons.csv.CSVPrinter;
 import org.planit.exceptions.PlanItException;
 import org.planit.logging.PlanItLogger;
-import org.planit.network.physical.LinkSegment;
 import org.planit.output.adapter.LinkOutputTypeAdapter;
 import org.planit.output.adapter.OutputAdapter;
 import org.planit.output.configuration.OutputTypeConfiguration;
@@ -22,8 +21,9 @@ import org.planit.output.formatter.CsvTextFileOutputFormatter;
 import org.planit.output.property.BaseOutputProperty;
 import org.planit.output.property.OutputProperty;
 import org.planit.time.TimePeriod;
-import org.planit.userclass.Mode;
 import org.planit.utils.OutputUtils;
+import org.planit.utils.network.physical.LinkSegment;
+import org.planit.utils.network.physical.Mode;
 
 /**
  * Output formatter for CSV output, i.e. this class is capable of persisting

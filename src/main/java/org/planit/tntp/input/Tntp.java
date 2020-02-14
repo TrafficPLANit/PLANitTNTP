@@ -1,7 +1,7 @@
 package org.planit.tntp.input;
 
 import java.io.File;
-import java.math.BigInteger;
+import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,24 +9,20 @@ import java.util.Scanner;
 
 import javax.annotation.Nonnull;
 
+import org.djutils.event.EventInterface;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.Position;
 import org.planit.cost.physical.BPRLinkTravelTimeCost;
 import org.planit.demands.Demands;
-import org.planit.event.CreatedProjectComponentEvent;
 import org.planit.exceptions.PlanItException;
 import org.planit.geo.PlanitGeoUtils;
 import org.planit.input.InputBuilderListener;
 import org.planit.logging.PlanItLogger;
-import org.planit.network.physical.Link;
-import org.planit.network.physical.Node;
+import org.planit.network.physical.NodeImpl;
 import org.planit.network.physical.PhysicalNetwork;
-import org.planit.network.physical.macroscopic.MacroscopicLinkSegment;
-import org.planit.network.physical.macroscopic.MacroscopicLinkSegmentType;
-import org.planit.network.physical.macroscopic.MacroscopicLinkSegmentTypeModeProperties;
-import org.planit.network.physical.macroscopic.MacroscopicModeProperties;
+import org.planit.network.physical.macroscopic.MacroscopicModePropertiesImpl;
 import org.planit.network.physical.macroscopic.MacroscopicNetwork;
-import org.planit.network.virtual.Centroid;
+import org.planit.network.virtual.Zoning;
 import org.planit.od.odmatrix.demand.ODDemandMatrix;
 import org.planit.time.TimePeriod;
 import org.planit.tntp.enums.CapacityPeriod;
@@ -34,9 +30,15 @@ import org.planit.tntp.enums.LengthUnits;
 import org.planit.tntp.enums.NetworkFileColumns;
 import org.planit.tntp.enums.SpeedUnits;
 import org.planit.tntp.enums.TimeUnits;
-import org.planit.userclass.Mode;
-import org.planit.zoning.Zone;
-import org.planit.zoning.Zoning;
+import org.planit.trafficassignment.TrafficAssignmentComponentFactory;
+import org.planit.utils.network.physical.Link;
+import org.planit.utils.network.physical.Mode;
+import org.planit.utils.network.physical.Node;
+import org.planit.utils.network.physical.macroscopic.MacroscopicLinkSegment;
+import org.planit.utils.network.physical.macroscopic.MacroscopicLinkSegmentType;
+import org.planit.utils.network.physical.macroscopic.MacroscopicModeProperties;
+import org.planit.utils.network.virtual.Centroid;
+import org.planit.utils.network.virtual.Zone;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -47,6 +49,9 @@ import com.vividsolutions.jts.geom.Coordinate;
  *
  */
 public class Tntp extends InputBuilderListener {
+
+  /** generated UID */
+  private static final long serialVersionUID = 1L;
 
   private PlanitGeoUtils planitGeoUtils;
 
@@ -93,7 +98,7 @@ public class Tntp extends InputBuilderListener {
   /**
    * TNTP only has one mode
    */
-  private final Mode mode;
+  private Mode mode;
 
   /**
    * TNTP only has one time period
@@ -118,8 +123,6 @@ public class Tntp extends InputBuilderListener {
   public static final int ONE_WAY_AB = 1;
   public static final int ONE_WAY_BA = 2;
   public static final int TWO_WAY = 3;
-  //public static final double bprAlpha = 0.87;
-  //public static final double bprBeta = 4.0;
 
   public static final String NUMBER_OF_ZONES_INDICATOR = "<NUMBER OF ZONES>";
   public static final String NUMBER_OF_NODES_INDICATOR = "<NUMBER OF NODES>";
@@ -135,7 +138,8 @@ public class Tntp extends InputBuilderListener {
    * @param nodeExternalId the external Id of the node to be created
    * @return the node corresponding to this external ID
    */
-  private Node createAndRegisterNode(final PhysicalNetwork network, final String[] cols, final NetworkFileColumns networkFileColumn)
+  private Node createAndRegisterNode(final PhysicalNetwork network, final String[] cols,
+      final NetworkFileColumns networkFileColumn)
       throws PlanItException {
     final long nodeExternalId = Long.parseLong(cols[networkFileColumns.get(networkFileColumn)]);
     if (nodeExternalId > noPhysicalNodes) {
@@ -144,7 +148,7 @@ public class Tntp extends InputBuilderListener {
     }
     Node node = network.nodes.findNodeByExternalIdentifier(nodeExternalId);
     if (node == null) {
-      node = new Node();
+      node = new NodeImpl();
       node.setExternalId(nodeExternalId);
       network.nodes.registerNode(node);
     }
@@ -173,7 +177,8 @@ public class Tntp extends InputBuilderListener {
    * @param originZone the origin zone for all the demand values
    * @param odDemandMatrix the ODDemandMatrix object to be updated
    */
-  private void updateOdDemandMatrix(final Map<Integer, Double> demandToDestination, final Zoning zoning, final Zone originZone,
+  private void updateOdDemandMatrix(final Map<Integer, Double> demandToDestination, final Zoning zoning,
+      final Zone originZone,
       final ODDemandMatrix odDemandMatrix) {
     for (final Integer destinationZoneId : demandToDestination.keySet()) {
       final Zone destinationZone = zoning.zones.getZoneByExternalId(destinationZoneId);
@@ -192,21 +197,23 @@ public class Tntp extends InputBuilderListener {
    * @return the macroscopic link segment which has been created
    * @throws PlanItException thrown if there is an error
    */
-  private MacroscopicLinkSegment createAndRegisterLinkSegment(@Nonnull final PhysicalNetwork network, @Nonnull final Link link, final double maxSpeed,
+  private MacroscopicLinkSegment createAndRegisterLinkSegment(@Nonnull final PhysicalNetwork network,
+      @Nonnull final Link link, final double maxSpeed,
       final double capacityPerLane, final long externalId)
       throws PlanItException {
-    final MacroscopicLinkSegment linkSegment = (MacroscopicLinkSegment) network.linkSegments.createDirectionalLinkSegment(
-        link, true);
+    final MacroscopicLinkSegment linkSegment = (MacroscopicLinkSegment) network.linkSegments
+        .createDirectionalLinkSegment(
+            link, true);
     linkSegment.setMaximumSpeed(mode, maxSpeed);
     linkSegment.setExternalId(externalId);
     final String capacityBasedName = String.valueOf(capacityPerLane);
-    final MacroscopicModeProperties modeProperties = new MacroscopicModeProperties();
-    final MacroscopicLinkSegmentTypeModeProperties macroscopicLinkSegmentTypeModeProperties =
-        new MacroscopicLinkSegmentTypeModeProperties(mode, modeProperties);
+    final MacroscopicModeProperties modeProperties = new MacroscopicModePropertiesImpl();
+    final Map<Mode, MacroscopicModeProperties> modePropertiesMap = new HashMap<Mode, MacroscopicModeProperties>();
+    modePropertiesMap.put(mode, modeProperties);
     final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) network;
     final MacroscopicLinkSegmentType macroscopicLinkSegmentType = macroscopicNetwork.registerNewLinkSegmentType(
         capacityBasedName, capacityPerLane,
-        Double.POSITIVE_INFINITY, externalId, macroscopicLinkSegmentTypeModeProperties).getFirst();
+        Double.POSITIVE_INFINITY, externalId, modePropertiesMap).getFirst();
     linkSegment.setLinkSegmentType(macroscopicLinkSegmentType);
     network.linkSegments.registerLinkSegment(link, linkSegment, true);
     return linkSegment;
@@ -220,9 +227,9 @@ public class Tntp extends InputBuilderListener {
    */
   private void updateNodeCoordinatesFromFile(final PhysicalNetwork network) throws PlanItException {
     try (Scanner scanner = new Scanner(nodeCoordinateFile)) {
-       while (scanner.hasNextLine()) {
+      while (scanner.hasNextLine()) {
         final String line = scanner.nextLine().trim();
-         line.replaceAll(";", "");
+        line.replaceAll(";", "");
         final char firstChar = line.charAt(0);
         if (Character.isDigit(firstChar)) {
           final String[] cols = line.split("\\s+");
@@ -266,7 +273,8 @@ public class Tntp extends InputBuilderListener {
    * @param linkSegmentExternalId the external Id for the current line segment
    * @throws PlanItException thrown if there is an error
    */
-  private void readLinkData(final PhysicalNetwork network, final String line, final long linkSegmentExternalId) throws PlanItException {
+  private void readLinkData(final PhysicalNetwork network, final String line, final long linkSegmentExternalId)
+      throws PlanItException {
     final String[] cols = line.split("\\s+");
 
     final Node upstreamNode = createAndRegisterNode(network, cols, NetworkFileColumns.UPSTREAM_NODE_ID);
@@ -274,7 +282,7 @@ public class Tntp extends InputBuilderListener {
 
     final double length = Double.parseDouble(cols[networkFileColumns.get(NetworkFileColumns.LENGTH)])
         * lengthUnits.getMultiplier();
-    final Link link = network.links.registerNewLink(upstreamNode, downstreamNode, length);
+    final Link link = network.links.registerNewLink(upstreamNode, downstreamNode, length, "" + linkSegmentExternalId);
     double maxSpeed = 0.0;
     final double speed = Double.parseDouble(cols[networkFileColumns.get(NetworkFileColumns.MAXIMUM_SPEED)]);
     if (speed == 0.0) {
@@ -289,8 +297,10 @@ public class Tntp extends InputBuilderListener {
     if (maxSpeed == 0.0) {
       maxSpeed = MacroscopicModeProperties.DEFAULT_MAXIMUM_SPEED;
     }
-    final double capacityPerLane = Integer.parseInt(cols[networkFileColumns.get(NetworkFileColumns.CAPACITY_PER_LANE)]) + capacityPeriod.getMultiplier();
-    final MacroscopicLinkSegment linkSegment = createAndRegisterLinkSegment(network, link, maxSpeed, capacityPerLane, linkSegmentExternalId);
+    final double capacityPerLane = Integer.parseInt(cols[networkFileColumns.get(NetworkFileColumns.CAPACITY_PER_LANE)])
+        + capacityPeriod.getMultiplier();
+    final MacroscopicLinkSegment linkSegment = createAndRegisterLinkSegment(network, link, maxSpeed, capacityPerLane,
+        linkSegmentExternalId);
     double alpha = BPRLinkTravelTimeCost.DEFAULT_ALPHA;
     double beta = BPRLinkTravelTimeCost.DEFAULT_BETA;
     boolean settingAlpha = false;
@@ -316,6 +326,10 @@ public class Tntp extends InputBuilderListener {
    */
   protected void populatePhysicalNetwork(@Nonnull final PhysicalNetwork network) throws PlanItException {
     PlanItLogger.info("Populating Physical Network");
+
+    // TNTP only has one mode, define it here
+    mode = network.modes.registerNewMode(1, "Base Mode", 1.0);
+
     try (Scanner scanner = new Scanner(networkFile)) {
       boolean readingMetadata = true;
       boolean readingLinkData = false;
@@ -433,8 +447,7 @@ public class Tntp extends InputBuilderListener {
       final Node node = physicalNetwork.nodes.findNodeByExternalIdentifier(zoneExternalId);
       // TODO - calculate connectoid length
       final double connectoidLength = 1.0;
-      zoning.getVirtualNetwork().connectoids.registerNewConnectoid(centroid, node, connectoidLength, BigInteger.valueOf(
-          zoneExternalId));
+      zoning.getVirtualNetwork().connectoids.registerNewConnectoid(centroid, node, connectoidLength, zoneExternalId);
     }
   }
 
@@ -450,10 +463,12 @@ public class Tntp extends InputBuilderListener {
    * @throws PlanItException
    */
   public Tntp(final String networkFileLocation, final String demandFileLocation,
-      final Map<NetworkFileColumns, Integer> networkFileColumns, final SpeedUnits speedUnits, final LengthUnits lengthUnits,
+      final Map<NetworkFileColumns, Integer> networkFileColumns, final SpeedUnits speedUnits,
+      final LengthUnits lengthUnits,
       final TimeUnits timeUnits, final CapacityPeriod capacityPeriod)
       throws PlanItException {
-    this(networkFileLocation, demandFileLocation, null, networkFileColumns, speedUnits, lengthUnits, timeUnits, capacityPeriod);
+    this(networkFileLocation, demandFileLocation, null, networkFileColumns, speedUnits, lengthUnits, timeUnits,
+        capacityPeriod);
   }
 
   /**
@@ -467,7 +482,8 @@ public class Tntp extends InputBuilderListener {
    * @throws PlanItException
    */
   public Tntp(final String networkFileLocation, final String demandFileLocation,
-      final Map<NetworkFileColumns, Integer> networkFileColumns, final SpeedUnits speedUnits, final LengthUnits lengthUnits,
+      final Map<NetworkFileColumns, Integer> networkFileColumns, final SpeedUnits speedUnits,
+      final LengthUnits lengthUnits,
       final TimeUnits timeUnits)
       throws PlanItException {
     this(networkFileLocation, demandFileLocation, null, networkFileColumns, speedUnits, lengthUnits, timeUnits, null);
@@ -485,11 +501,14 @@ public class Tntp extends InputBuilderListener {
    * @param timeUnits time units for the free flow travel time
    * @throws PlanItException
    */
-  public Tntp(final String networkFileLocation, final String demandFileLocation, final String nodeCoordinateFileLocation,
-      final Map<NetworkFileColumns, Integer> networkFileColumns, final SpeedUnits speedUnits, final LengthUnits lengthUnits,
+  public Tntp(final String networkFileLocation, final String demandFileLocation,
+      final String nodeCoordinateFileLocation,
+      final Map<NetworkFileColumns, Integer> networkFileColumns, final SpeedUnits speedUnits,
+      final LengthUnits lengthUnits,
       final TimeUnits timeUnits)
       throws PlanItException {
-    this(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, networkFileColumns, speedUnits, lengthUnits, timeUnits, null);
+    this(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, networkFileColumns, speedUnits,
+        lengthUnits, timeUnits, null);
   }
 
   /**
@@ -505,13 +524,12 @@ public class Tntp extends InputBuilderListener {
    * @param capacityPeriod time period for link capacity
    * @throws PlanItException
    */
-  public Tntp(final String networkFileLocation, final String demandFileLocation, final String nodeCoordinateFileLocation,
-      final Map<NetworkFileColumns, Integer> networkFileColumns, final SpeedUnits speedUnits, final LengthUnits lengthUnits,
+  public Tntp(final String networkFileLocation, final String demandFileLocation,
+      final String nodeCoordinateFileLocation,
+      final Map<NetworkFileColumns, Integer> networkFileColumns, final SpeedUnits speedUnits,
+      final LengthUnits lengthUnits,
       final TimeUnits timeUnits, final CapacityPeriod capacityPeriod)
       throws PlanItException {
-
-    // TNTP only has one mode, define it here
-    mode = new Mode(1, "Base Mode", 1.0);
 
     // TNTP only has one time period, define it here
     timePeriod = new TimePeriod(1, "All Day", "0000", 24.0);
@@ -535,20 +553,31 @@ public class Tntp extends InputBuilderListener {
    * Whenever a project component is created this method will be invoked
    *
    * @param event event containing the created (and empty) project component
-   * @throws PlanItException thrown if there is an error
+   * @throws RemoteException thrown if there is an error
    */
   @Override
-  public void onCreateProjectComponent(final CreatedProjectComponentEvent<?> event) throws PlanItException {
-    final Object projectComponent = event.getProjectComponent();
-    if (projectComponent instanceof PhysicalNetwork) {
-      populatePhysicalNetwork((PhysicalNetwork) projectComponent);
-    } else if (projectComponent instanceof Zoning) {
-      populateZoning((Zoning) projectComponent, event.getParameter1());
-    } else if (projectComponent instanceof Demands) {
-      populateDemands((Demands) projectComponent, event.getParameter1());
-    } else {
-      PlanItLogger.info("Event component is " + projectComponent.getClass().getCanonicalName()
-          + " which is not handled by PlanIt.");
+  public void notify(final EventInterface event) throws RemoteException {
+    // registered for create notifications
+    if (event.getType() == TrafficAssignmentComponentFactory.TRAFFICCOMPONENT_CREATE) {
+      final Object[] content = (Object[]) event.getContent();
+      final Object projectComponent = content[0];
+      // the content consists of the actual traffic assignment component and an array of object
+      // parameters (second parameter)
+      final Object[] parameters = (Object[]) content[1];
+      try {
+        if (projectComponent instanceof PhysicalNetwork) {
+          populatePhysicalNetwork((PhysicalNetwork) projectComponent);
+        } else if (projectComponent instanceof Zoning) {
+          populateZoning((Zoning) projectComponent, parameters[0]);
+        } else if (projectComponent instanceof Demands) {
+          populateDemands((Demands) projectComponent, parameters[0]);
+        } else {
+          PlanItLogger.info("Event component is " + projectComponent.getClass().getCanonicalName()
+              + " which is not handled by PlanItInputBuilder.");
+        }
+      } catch (final PlanItException e) {
+        throw new RemoteException(e.toString());
+      }
     }
   }
 
