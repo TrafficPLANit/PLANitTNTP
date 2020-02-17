@@ -29,7 +29,6 @@ import org.planit.tntp.enums.CapacityPeriod;
 import org.planit.tntp.enums.LengthUnits;
 import org.planit.tntp.enums.NetworkFileColumns;
 import org.planit.tntp.enums.SpeedUnits;
-import org.planit.tntp.enums.TimeUnits;
 import org.planit.trafficassignment.TrafficAssignmentComponentFactory;
 import org.planit.utils.network.physical.Link;
 import org.planit.utils.network.physical.Mode;
@@ -86,11 +85,6 @@ public class Tntp extends InputBuilderListener {
   private LengthUnits lengthUnits;
 
   /**
-   * Units of time used for free flow travel time in network input file
-   */
-  private TimeUnits timeUnits;
-
-  /**
    * Time period for link capacity
    */
   private CapacityPeriod capacityPeriod;
@@ -119,6 +113,11 @@ public class Tntp extends InputBuilderListener {
    * The number of links in the network
    */
   private int noLinks;
+
+  /**
+   * Default maximum speed across links
+   */
+  private double defaultMaximumSpeed;
 
   public static final int ONE_WAY_AB = 1;
   public static final int ONE_WAY_BA = 2;
@@ -189,31 +188,48 @@ public class Tntp extends InputBuilderListener {
   /**
    * Create and register a new link segment
    *
+   * February 2020: We do not understand how the flow times for link types 1 and 2 are calculated.  Link type
+   * 3 is the only one for which our results match the published results.
+   *
    * @param network the current physical network
    * @param link the current link
    * @param maxSpeed the maximum speed for this link
    * @param capacityPerLane the capacity per lane for this link
+   * @param linkSegmentType the type of this link segment
    * @param externalId external Id of this link segment
    * @return the macroscopic link segment which has been created
    * @throws PlanItException thrown if there is an error
    */
   private MacroscopicLinkSegment createAndRegisterLinkSegment(@Nonnull final PhysicalNetwork network,
-      @Nonnull final Link link, final double maxSpeed,
-      final double capacityPerLane, final long externalId)
+      @Nonnull final Link link, final double maxSpeed, final double capacityPerLane, final int linkSegmentType,
+      final long externalId, final double length, final double freeFlowTravelTime)
       throws PlanItException {
+    MacroscopicModeProperties macroscopicModeProperties = null;
+    switch (linkSegmentType) {
+      case 1:
+        macroscopicModeProperties = new MacroscopicModePropertiesImpl((length / freeFlowTravelTime) * speedUnits
+            .getMultiplier(), (length / freeFlowTravelTime) * speedUnits.getMultiplier());
+        break;
+      case 2:
+        macroscopicModeProperties = new MacroscopicModePropertiesImpl((length / freeFlowTravelTime) * speedUnits
+            .getMultiplier(), (length / freeFlowTravelTime) * speedUnits.getMultiplier());
+        break;
+      case 3:
+        macroscopicModeProperties = new MacroscopicModePropertiesImpl(defaultMaximumSpeed * speedUnits.getMultiplier(), defaultMaximumSpeed
+            * speedUnits.getMultiplier());
+        break;
+    }
+    final Map<Mode, MacroscopicModeProperties> modePropertiesMap = new HashMap<Mode, MacroscopicModeProperties>();
+    modePropertiesMap.put(mode, macroscopicModeProperties);
+
     final MacroscopicLinkSegment linkSegment = (MacroscopicLinkSegment) network.linkSegments
-        .createDirectionalLinkSegment(
-            link, true);
+        .createDirectionalLinkSegment(link, true);
     linkSegment.setMaximumSpeed(mode, maxSpeed);
     linkSegment.setExternalId(externalId);
-    final String capacityBasedName = String.valueOf(capacityPerLane);
-    final MacroscopicModeProperties modeProperties = new MacroscopicModePropertiesImpl();
-    final Map<Mode, MacroscopicModeProperties> modePropertiesMap = new HashMap<Mode, MacroscopicModeProperties>();
-    modePropertiesMap.put(mode, modeProperties);
     final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) network;
-    final MacroscopicLinkSegmentType macroscopicLinkSegmentType = macroscopicNetwork.registerNewLinkSegmentType(
-        capacityBasedName, capacityPerLane,
-        Double.POSITIVE_INFINITY, externalId, modePropertiesMap).getFirst();
+
+    final MacroscopicLinkSegmentType macroscopicLinkSegmentType = macroscopicNetwork.registerNewLinkSegmentType(""
+        + linkSegmentType, capacityPerLane, maxSpeed, externalId, modePropertiesMap).getFirst();
     linkSegment.setLinkSegmentType(macroscopicLinkSegmentType);
     network.linkSegments.registerLinkSegment(link, linkSegment, true);
     return linkSegment;
@@ -280,27 +296,25 @@ public class Tntp extends InputBuilderListener {
     final Node upstreamNode = createAndRegisterNode(network, cols, NetworkFileColumns.UPSTREAM_NODE_ID);
     final Node downstreamNode = createAndRegisterNode(network, cols, NetworkFileColumns.DOWNSTREAM_NODE_ID);
 
-    final double length = Double.parseDouble(cols[networkFileColumns.get(NetworkFileColumns.LENGTH)])
-        * lengthUnits.getMultiplier();
+    final double length = Double.parseDouble(cols[networkFileColumns.get(NetworkFileColumns.LENGTH)]) * lengthUnits
+        .getMultiplier();
+    final double freeFlowTravelTime = Double.parseDouble(cols[networkFileColumns.get(
+        NetworkFileColumns.FREE_FLOW_TRAVEL_TIME)]);
     final Link link = network.links.registerNewLink(upstreamNode, downstreamNode, length, "" + linkSegmentExternalId);
     double maxSpeed = 0.0;
     final double speed = Double.parseDouble(cols[networkFileColumns.get(NetworkFileColumns.MAXIMUM_SPEED)]);
     if (speed == 0.0) {
-      final double freeFlowTravelTime = Double.parseDouble(cols[networkFileColumns.get(
-          NetworkFileColumns.FREE_FLOW_TRAVEL_TIME)]) * timeUnits.getMultiplier();
-      if (freeFlowTravelTime > 0.0) {
-        maxSpeed = length / freeFlowTravelTime;
-      }
-    } else {
       maxSpeed = speed * speedUnits.getMultiplier();
     }
     if (maxSpeed == 0.0) {
-      maxSpeed = MacroscopicModeProperties.DEFAULT_MAXIMUM_SPEED;
+      maxSpeed = Double.POSITIVE_INFINITY;
     }
     final double capacityPerLane = Integer.parseInt(cols[networkFileColumns.get(NetworkFileColumns.CAPACITY_PER_LANE)])
-        + capacityPeriod.getMultiplier();
+        * capacityPeriod.getMultiplier();
+    final int linkSegmentType = Integer.parseInt(cols[networkFileColumns.get(NetworkFileColumns.LINK_TYPE)]);
     final MacroscopicLinkSegment linkSegment = createAndRegisterLinkSegment(network, link, maxSpeed, capacityPerLane,
-        linkSegmentExternalId);
+        linkSegmentType, linkSegmentExternalId, length, freeFlowTravelTime);
+
     double alpha = BPRLinkTravelTimeCost.DEFAULT_ALPHA;
     double beta = BPRLinkTravelTimeCost.DEFAULT_BETA;
     boolean settingAlpha = false;
@@ -460,15 +474,16 @@ public class Tntp extends InputBuilderListener {
    * @param speedUnits speed units being used
    * @param lengthUnits length units being used
    * @param capacityPeriod time period for link capacity
+   * @param defaultMaximumSpeed default maximum speed along a link
    * @throws PlanItException
    */
   public Tntp(final String networkFileLocation, final String demandFileLocation,
       final Map<NetworkFileColumns, Integer> networkFileColumns, final SpeedUnits speedUnits,
       final LengthUnits lengthUnits,
-      final TimeUnits timeUnits, final CapacityPeriod capacityPeriod)
+      final CapacityPeriod capacityPeriod, final double defaultMaximumSpeed)
       throws PlanItException {
-    this(networkFileLocation, demandFileLocation, null, networkFileColumns, speedUnits, lengthUnits, timeUnits,
-        capacityPeriod);
+    this(networkFileLocation, demandFileLocation, null, networkFileColumns, speedUnits, lengthUnits,
+        capacityPeriod, defaultMaximumSpeed);
   }
 
   /**
@@ -479,14 +494,15 @@ public class Tntp extends InputBuilderListener {
    * @param networkFileColumns Map specifying which columns in the network file contain which values
    * @param speedUnits speed units being used
    * @param lengthUnits length units being used
+   * @param defaultMaximumSpeed default maximum speed along a link
    * @throws PlanItException
    */
   public Tntp(final String networkFileLocation, final String demandFileLocation,
       final Map<NetworkFileColumns, Integer> networkFileColumns, final SpeedUnits speedUnits,
       final LengthUnits lengthUnits,
-      final TimeUnits timeUnits)
+      final double defaultMaximumSpeed)
       throws PlanItException {
-    this(networkFileLocation, demandFileLocation, null, networkFileColumns, speedUnits, lengthUnits, timeUnits, null);
+    this(networkFileLocation, demandFileLocation, null, networkFileColumns, speedUnits, lengthUnits, null, defaultMaximumSpeed);
   }
 
   /**
@@ -498,17 +514,17 @@ public class Tntp extends InputBuilderListener {
    * @param networkFileColumns Map specifying which columns in the network file contain which values
    * @param speedUnits speed units being used
    * @param lengthUnits length units being used
-   * @param timeUnits time units for the free flow travel time
+   * @param defaultMaximumSpeed default maximum speed along a link
    * @throws PlanItException
    */
   public Tntp(final String networkFileLocation, final String demandFileLocation,
       final String nodeCoordinateFileLocation,
       final Map<NetworkFileColumns, Integer> networkFileColumns, final SpeedUnits speedUnits,
       final LengthUnits lengthUnits,
-      final TimeUnits timeUnits)
+      final double defaultMaximumSpeed)
       throws PlanItException {
     this(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, networkFileColumns, speedUnits,
-        lengthUnits, timeUnits, null);
+        lengthUnits, null, defaultMaximumSpeed);
   }
 
   /**
@@ -520,15 +536,15 @@ public class Tntp extends InputBuilderListener {
    * @param networkFileColumns Map specifying which columns in the network file contain which values
    * @param speedUnits speed units being used
    * @param lengthUnits length units being used
-   * @param timeUnits time units for the free flow travel time
    * @param capacityPeriod time period for link capacity
+   * @param defaultMaximumSpeed default maximum speed along links
    * @throws PlanItException
    */
   public Tntp(final String networkFileLocation, final String demandFileLocation,
-      final String nodeCoordinateFileLocation,
-      final Map<NetworkFileColumns, Integer> networkFileColumns, final SpeedUnits speedUnits,
+      final String nodeCoordinateFileLocation, final Map<NetworkFileColumns, Integer> networkFileColumns,
+      final SpeedUnits speedUnits,
       final LengthUnits lengthUnits,
-      final TimeUnits timeUnits, final CapacityPeriod capacityPeriod)
+      final CapacityPeriod capacityPeriod, final double defaultMaximumSpeed)
       throws PlanItException {
 
     // TNTP only has one time period, define it here
@@ -541,8 +557,8 @@ public class Tntp extends InputBuilderListener {
       this.networkFileColumns = networkFileColumns;
       this.speedUnits = speedUnits;
       this.lengthUnits = lengthUnits;
-      this.timeUnits = timeUnits;
       this.capacityPeriod = (capacityPeriod == null) ? CapacityPeriod.HOUR : capacityPeriod;
+      this.defaultMaximumSpeed = defaultMaximumSpeed;
       planitGeoUtils = new PlanitGeoUtils();
     } catch (final Exception ex) {
       throw new PlanItException(ex);

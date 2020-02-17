@@ -23,7 +23,6 @@ import org.planit.tntp.enums.CapacityPeriod;
 import org.planit.tntp.enums.LengthUnits;
 import org.planit.tntp.enums.NetworkFileColumns;
 import org.planit.tntp.enums.SpeedUnits;
-import org.planit.tntp.enums.TimeUnits;
 import org.planit.tntp.output.formatter.CSVOutputFormatter;
 import org.planit.tntp.project.TntpProject;
 import org.planit.trafficassignment.TraditionalStaticAssignment;
@@ -37,8 +36,8 @@ import org.planit.utils.network.physical.macroscopic.MacroscopicLinkSegment;
 
 public class TntpMain {
 
-  private static final int DEFAULT_MAX_ITERATIONS = 1;
-  private static final double DEFAULT_CONVERGENCE_EPSILON = 0.01;
+  public static final int DEFAULT_MAX_ITERATIONS = 1;
+  public static final double DEFAULT_CONVERGENCE_EPSILON = 0.01;
 
   public static void main(final String[] args) {
     String networkFileLocation = null;
@@ -149,12 +148,12 @@ public class TntpMain {
     networkFileColumns.put(NetworkFileColumns.LINK_TYPE, 9);
 
     final SpeedUnits speedUnits = SpeedUnits.MILES_H;
-    final LengthUnits lengthUnits = LengthUnits.MILES;
-    final TimeUnits timeUnits = TimeUnits.MINUTES;
-    final CapacityPeriod capacityPeriod = CapacityPeriod.DAY;
+    final LengthUnits lengthUnits = LengthUnits.MILES; //Both Chicago-Sketch and Philadelphia use miles
+    final CapacityPeriod capacityPeriod = CapacityPeriod.HOUR; //Chicago-Sketch only - for Philadelphia use hours
 
+    final double defaultMaximumSpeed = 25.0; //Chicago-Sketch only
     final TntpProject project = new TntpProject(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, networkFileColumns, speedUnits,
-        lengthUnits, timeUnits, capacityPeriod);
+        lengthUnits,capacityPeriod, defaultMaximumSpeed);
 
     // RAW INPUT START --------------------------------
     final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) project.createAndRegisterPhysicalNetwork(MacroscopicNetwork.class.getCanonicalName());
@@ -193,8 +192,10 @@ public class TntpMain {
     if (isLinkOutputActive) {
       final LinkOutputTypeConfiguration linkOutputTypeConfiguration = (LinkOutputTypeConfiguration) taBuilder
           .activateOutput(OutputType.LINK);
-      linkOutputTypeConfiguration.addProperty(OutputProperty.RUN_ID);
+      linkOutputTypeConfiguration.addProperty(OutputProperty.LINK_TYPE);
       linkOutputTypeConfiguration.addProperty(OutputProperty.VC_RATIO);
+      linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_ID);
+      linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_EXTERNAL_ID);
       linkOutputTypeConfiguration.removeProperty(OutputProperty.DOWNSTREAM_NODE_LOCATION);
       linkOutputTypeConfiguration.removeProperty(OutputProperty.DOWNSTREAM_NODE_ID);
       linkOutputTypeConfiguration.removeProperty(OutputProperty.UPSTREAM_NODE_LOCATION);
@@ -205,6 +206,7 @@ public class TntpMain {
       linkOutputTypeConfiguration.removeProperty(OutputProperty.TIME_PERIOD_ID);
       linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_ID);
       linkOutputTypeConfiguration.removeProperty(OutputProperty.DENSITY);
+      linkOutputTypeConfiguration.removeProperty(OutputProperty.MAXIMUM_SPEED);
     }
     // OUTPUT FORMAT CONFIGURATION - ORIGIN-DESTINATION
     if (isOdOutputActive) {
