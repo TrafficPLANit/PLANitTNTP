@@ -5,6 +5,8 @@ PLANit Interface for TNTP format files
 The input files for this format can be found at https://github.com/bstabler/TransportationNetworks
 
 February 2020: So far we have got the standard files for Philadelphia and Chicago-Sketch to run.  The test case for Philadelphia runs using this code but we have not validated the outputs.
+The contents and format of the input data files is different for some data sets which we have not yet used.  
+For example, the GoldCoast network file (https://github.com/bstabler/TransportationNetworks/blob/master/GoldCoast/Goldcoast_network_2016_01.tntp) has a different format from that described below.  We have not yet written code which could run the Gold Coast data set.
 
 # Data Files 
 
@@ -33,7 +35,7 @@ Row information, columns for each link (values required unless stated):-
 * Power - beta value used in BPR function
 * Speed Limit - units may be given in the header or the project notes, assume kilometres otherwise.  ChicagoSketch uses default of 25 mph instead of this value for Type 3 links
 * Toll - Not currently used
-* Link Type
+* Link Type (an integer)
 
 Each row defines a link which is one-way and single-lane.  In many cases one line defines a link in one direction and a later line defines another link between the same two nodes but in the other direction, but TNTP does not use a directionality property.
 
