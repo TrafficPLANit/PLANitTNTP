@@ -33,11 +33,14 @@ Row information, columns for each link (values required unless stated):-
 * Free Flow Travel Time - Not currently used
 * B - alpha value used in BPR function
 * Power - beta value used in BPR function
-* Speed Limit - units may be given in the header or the project notes, assume kilometres otherwise.  ChicagoSketch uses default of 25 mph instead of this value for Type 3 links
+* Speed Limit - units may be given in the header or the project notes, assume km/h otherwise.  ChicagoSketch uses default of 25 m/h instead of this value for Type 3 links
 * Toll - Not currently used
 * Link Type (an integer)
 
-Each row defines a link which is one-way and single-lane.  In many cases one line defines a link in one direction and a later line defines another link between the same two nodes but in the other direction, but TNTP does not use a directionality property.
+For ChicagoSketch and Philadelphia, each row defines a link which is one-way and single-lane.  In many cases one line defines a link in one direction and a later line defines another link between the same two nodes but in the other direction, but TNTP does not use a directionality property.
+Gold Coast has columns 'critical_speed' and 'lanes'.  Values corresponding to these have been included in the Java enumeration, but these are not yet used.
+
+A Java enumeration NetworkFileColumns has been defined to specify the possible roles of each column in the network input file.  In the TntpMain.execute() method, these are used as keys to a Map whose values are the corresponding columns.
 
 Trips File (required, name ends _trips.tntp)
 
@@ -95,7 +98,7 @@ The Tntp class, which extends InputBuilderListener, contains the notify(), popul
 The TntpMain class contains a main() method and can be run as a standalone program, with the locations of the input files used a run-time arguments.  But it also contains a public method execute() which calls the TntpProject, populates the components and executes the traffic assignment.
 The TntpMain class can be instantiated and its execute() method run from another class.  The unit test TNTPTest does this.
 
-if a standard results file has been specifed, TntpMain.execute() returns a Map with the standard flow and cost for the upstream and downstream nodes for each link.  TntpProject has a method createStandardResultsFile() which returns this Map.  
+If a standard results file has been specifed, TntpMain.execute() returns a Map with the standard flow and cost for the upstream and downstream nodes for each link.  TntpProject has a method createStandardResultsFile() which returns this Map.  
 If the null is given for the parameter value of the standardResultsFileLocation argument to TntpMain.execute(), meaning there is no standard results file, the execute() method returns a null.  This is convenient for unit testing.  
 
 # Test Cases
