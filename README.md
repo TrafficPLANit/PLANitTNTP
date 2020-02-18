@@ -8,4 +8,6 @@ February 2020: So far we have got the standard files for Philadelphia and Chicag
 
 # Test Cases
 
-February 2020:  We have been able to replicate the link cost modelling for Type 3 links.  These use a BPR cost function with a standard maximum speed of 25 miles per hour.  We have not been able to determine how the costs for links of types 1 and 2 are calculated.
+February 2020:  We use ChicagoSketch for the unit tests.  We compare our results against the ChicagoSketch_flow.tntp file.
+
+We have been able to replicate the link cost modelling for Type 3 links in the Chicago Sketch data files.  These use a BPR cost function with a standard maximum speed of 25 miles per hour.  We have not been able to determine how the costs for links of types 1 and 2 are calculated.
