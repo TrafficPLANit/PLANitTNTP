@@ -1,6 +1,9 @@
 package org.planit.tntp.project;
 
+import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 import org.planit.exceptions.PlanItException;
 import org.planit.project.CustomPlanItProject;
@@ -53,4 +56,32 @@ public class TntpProject extends CustomPlanItProject {
     super(new Tntp(networkFileLocation, demandFileLocation, null, networkFileColumns, speedUnits, lengthUnits, capacityPeriod, defaultMaximumSpeed));
   }
 
+
+/**
+ * Store the standard results given for testing
+ *
+ * @param standardResultsFileLocation location of file containing standard results
+ * @return Map of containing flow and cost values for each upstream and downstream node
+ * @throws PlanItException thrown if there is an error
+ */
+  public Map<Long, Map<Long, double[]>> createStandardResultsFile(final String standardResultsFileLocation) throws PlanItException  {
+    final Map<Long, Map<Long, double[]>> resultsMap = new HashMap<Long, Map<Long, double[]>>();
+    try (Scanner scanner = new Scanner(new File(standardResultsFileLocation).getCanonicalFile())) {
+      String line = scanner.nextLine();
+      while (scanner.hasNextLine()) {
+        line = scanner.nextLine().trim();
+        final String[] cols = line.split("\\s+");
+        final long upstreamNodeExternalId = Long.parseLong(cols[0]);
+        if (!resultsMap.containsKey(upstreamNodeExternalId)) {
+          resultsMap.put(upstreamNodeExternalId, new HashMap<Long, double[]>());
+        }
+        final long downstreamNodeExternalId = Long.parseLong(cols[1]);
+        final double[] flowCost = {Double.parseDouble(cols[2]), Double.parseDouble(cols[3])};
+        resultsMap.get(upstreamNodeExternalId).put(downstreamNodeExternalId, flowCost);
+      }
+   } catch (final Exception ex) {
+      throw new PlanItException(ex);
+    }
+    return resultsMap;
+  }
 }

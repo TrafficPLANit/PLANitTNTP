@@ -8,8 +8,7 @@ import java.io.Reader;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.Map;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -17,9 +16,11 @@ import org.apache.commons.csv.CSVRecord;
 import org.junit.Test;
 import org.planit.logging.PlanItLogger;
 import org.planit.output.enums.OutputTimeUnit;
+import org.planit.output.property.DownstreamNodeExternalIdOutputProperty;
 import org.planit.output.property.FlowOutputProperty;
 import org.planit.output.property.LinkCostOutputProperty;
 import org.planit.output.property.LinkTypeOutputProperty;
+import org.planit.output.property.UpstreamNodeExternalIdOutputProperty;
 import org.planit.tntp.TntpMain;
 import org.planit.utils.misc.IdGenerator;
 
@@ -45,53 +46,38 @@ public class TNTPTest {
     final String demandFileLocation = "src\\test\\resources\\ChicagoSketch\\ChicagoSketch_trips.tntp";
     final String nodeCoordinateFileLocation = "src\\test\\resources\\ChicagoSketch\\ChicagoSketch_node.tntp";
     final String runResultsFileName = "src\\test\\resources\\ChicagoSketch\\testResults.csv";
-    final String standardResultsFileName = "src\\test\\resources\\ChicagoSketch\\ChicagoSketchLink100iterations.csv";
+    final String standardResultsFileLocation = "src\\test\\resources\\ChicagoSketch\\ChicagoSketch_flow.tntp";
     final OutputTimeUnit outputTimeUnit = null;
     final String odOutputFileName = null;
     final String odPathOutputFileName = null;
     final String logfileLocation = "logs\\ChicagoSketchTest.log";
     final int maxIterations = 100;
     final double epsilon = TntpMain.DEFAULT_CONVERGENCE_EPSILON;
+    final double defaultMaximumSpeed = 25.0;
     IdGenerator.reset();
 
     try {
       PlanItLogger.setLogging(logfileLocation, TNTPTest.class);
-      tntpMain.execute(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, runResultsFileName,
-          odOutputFileName, odPathOutputFileName, maxIterations, epsilon, outputTimeUnit);
-      final Reader standardResults = new FileReader(standardResultsFileName);
-      final CSVParser standardResultsParser = CSVParser.parse(standardResults, CSVFormat.DEFAULT
-          .withFirstRecordAsHeader());
+      final Map<Long, Map<Long, double[]>> resultsMap = tntpMain.execute(networkFileLocation, demandFileLocation,
+          nodeCoordinateFileLocation, standardResultsFileLocation, runResultsFileName,
+          odOutputFileName, odPathOutputFileName, maxIterations, epsilon, outputTimeUnit, defaultMaximumSpeed);
       final Reader runResults = new FileReader(runResultsFileName);
       final CSVParser runResultsParser = CSVParser.parse(runResults, CSVFormat.DEFAULT.withFirstRecordAsHeader());
-      final String costHeader = LinkCostOutputProperty.LINK_COST;
-      final String flowHeader = FlowOutputProperty.FLOW;
-      final String typeHeader = LinkTypeOutputProperty.LINK_TYPE;
-      final Iterator<CSVRecord> standardResultsIterator = standardResultsParser.iterator();
       for (final CSVRecord runRecord : runResultsParser) {
-        final double runFlow = Double.parseDouble(runRecord.get(flowHeader));
-        final double runCost = Double.parseDouble(runRecord.get(costHeader));
-        final int runLinkType = Integer.parseInt(runRecord.get(typeHeader));
-        try {
-          final CSVRecord standardResultsRecord = standardResultsIterator.next();
-          final double standardResultsFlow = Double.parseDouble(standardResultsRecord.get(flowHeader));
-          final double standardResultsCost = Double.parseDouble(standardResultsRecord.get(costHeader));
-          final int standardResultsLinkType = Integer.parseInt(standardResultsRecord.get(typeHeader));
-          assertEquals(runLinkType, standardResultsLinkType);
-          if (runLinkType == 3) {
-            assertEquals(runFlow, standardResultsFlow, 0.0001);
-            assertEquals(runCost, standardResultsCost, 0.0001);
-          }
-        } catch (final NoSuchElementException nsee) {
-          fail(runResultsFileName + "has more records than " + standardResultsFileName);
-          break;
+        final long upstreamNodeExternalId = Long.parseLong(runRecord.get(UpstreamNodeExternalIdOutputProperty.NAME));
+        final long downstreamNodeExternalId = Long.parseLong(runRecord.get(DownstreamNodeExternalIdOutputProperty.NAME));
+        final double runFlow = Double.parseDouble(runRecord.get(FlowOutputProperty.NAME));
+        final double runCost = Double.parseDouble(runRecord.get(LinkCostOutputProperty.NAME));
+        final int runLinkType = Integer.parseInt(runRecord.get(LinkTypeOutputProperty.NAME));
+        if (runLinkType == 3) {
+          final double standardResultsFlow = resultsMap.get(upstreamNodeExternalId).get(downstreamNodeExternalId)[0];
+          final double standardResultsCost = resultsMap.get(upstreamNodeExternalId).get(downstreamNodeExternalId)[1];
+          assertEquals(runFlow, standardResultsFlow, 0.001);
+          assertEquals(runCost, standardResultsCost, 0.001);
         }
-      }
-      if (standardResultsIterator.hasNext()) {
-        fail(standardResultsFileName + " has more records than " + runResultsFileName);
       }
       PlanItLogger.close();
       runResultsParser.close();
-      standardResultsParser.close();
       final String rootPath = System.getProperty("user.dir");
       Path path = FileSystems.getDefault().getPath(rootPath + "\\" + runResultsFileName);
       Files.delete(path);

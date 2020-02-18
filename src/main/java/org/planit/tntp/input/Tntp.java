@@ -188,7 +188,8 @@ public class Tntp extends InputBuilderListener {
   /**
    * Create and register a new link segment
    *
-   * February 2020: We do not understand how the flow times for link types 1 and 2 are calculated.  Link type
+   * February 2020: We do not understand how the flow times for link types 1 and 2 are calculated.
+   * Link type
    * 3 is the only one for which our results match the published results.
    *
    * @param network the current physical network
@@ -215,8 +216,9 @@ public class Tntp extends InputBuilderListener {
             .getMultiplier(), (length / freeFlowTravelTime) * speedUnits.getMultiplier());
         break;
       case 3:
-        macroscopicModeProperties = new MacroscopicModePropertiesImpl(defaultMaximumSpeed * speedUnits.getMultiplier(), defaultMaximumSpeed
-            * speedUnits.getMultiplier());
+        macroscopicModeProperties = new MacroscopicModePropertiesImpl(defaultMaximumSpeed * speedUnits.getMultiplier(),
+            defaultMaximumSpeed
+                * speedUnits.getMultiplier());
         break;
     }
     final Map<Mode, MacroscopicModeProperties> modePropertiesMap = new HashMap<Mode, MacroscopicModeProperties>();
@@ -502,7 +504,8 @@ public class Tntp extends InputBuilderListener {
       final LengthUnits lengthUnits,
       final double defaultMaximumSpeed)
       throws PlanItException {
-    this(networkFileLocation, demandFileLocation, null, networkFileColumns, speedUnits, lengthUnits, null, defaultMaximumSpeed);
+    this(networkFileLocation, demandFileLocation, null, networkFileColumns, speedUnits, lengthUnits, null,
+        defaultMaximumSpeed);
   }
 
   /**
@@ -518,11 +521,9 @@ public class Tntp extends InputBuilderListener {
    * @throws PlanItException
    */
   public Tntp(final String networkFileLocation, final String demandFileLocation,
-      final String nodeCoordinateFileLocation,
-      final Map<NetworkFileColumns, Integer> networkFileColumns, final SpeedUnits speedUnits,
-      final LengthUnits lengthUnits,
-      final double defaultMaximumSpeed)
-      throws PlanItException {
+      final String nodeCoordinateFileLocation, final String standardResultsFileLocation, final Map<NetworkFileColumns, Integer> networkFileColumns,
+      final SpeedUnits speedUnits,
+      final LengthUnits lengthUnits, final double defaultMaximumSpeed) throws PlanItException {
     this(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, networkFileColumns, speedUnits,
         lengthUnits, null, defaultMaximumSpeed);
   }
@@ -542,18 +543,16 @@ public class Tntp extends InputBuilderListener {
    */
   public Tntp(final String networkFileLocation, final String demandFileLocation,
       final String nodeCoordinateFileLocation, final Map<NetworkFileColumns, Integer> networkFileColumns,
-      final SpeedUnits speedUnits,
-      final LengthUnits lengthUnits,
-      final CapacityPeriod capacityPeriod, final double defaultMaximumSpeed)
-      throws PlanItException {
+      final SpeedUnits speedUnits, final LengthUnits lengthUnits, final CapacityPeriod capacityPeriod,
+      final double defaultMaximumSpeed) throws PlanItException {
 
     // TNTP only has one time period, define it here
     timePeriod = new TimePeriod(1, "All Day", "0000", 24.0);
     try {
       networkFile = new File(networkFileLocation).getCanonicalFile();
       demandFile = new File(demandFileLocation).getCanonicalFile();
-      nodeCoordinateFile = (nodeCoordinateFileLocation == null) ? null : new File(nodeCoordinateFileLocation)
-          .getCanonicalFile();
+      nodeCoordinateFile =
+          (nodeCoordinateFileLocation == null) ? null : new File(nodeCoordinateFileLocation).getCanonicalFile();
       this.networkFileColumns = networkFileColumns;
       this.speedUnits = speedUnits;
       this.lengthUnits = lengthUnits;

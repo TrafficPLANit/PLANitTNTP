@@ -38,11 +38,13 @@ public class TntpMain {
 
   public static final int DEFAULT_MAX_ITERATIONS = 1;
   public static final double DEFAULT_CONVERGENCE_EPSILON = 0.01;
+  public static final double DEFAULT_MAXIMUM_SPEED = 25.0; //this is the default for Chicago Sketch Type 3 links
 
   public static void main(final String[] args) {
     String networkFileLocation = null;
     String demandFileLocation = null;
     String nodeCoordinateFileLocation = null;
+    String standardResultsFileLocation = null;
     String linkOutputFilename = null;
     String logfileLocation = null;
     String outputTimeUnitValue = null;
@@ -51,6 +53,7 @@ public class TntpMain {
     String odPathOutputFilename = null;
     int maxIterations = DEFAULT_MAX_ITERATIONS;
     double epsilon = DEFAULT_CONVERGENCE_EPSILON;
+    double defaultMaximumSpeed = DEFAULT_MAXIMUM_SPEED;
     try {
       final TntpMain tntpMain = new TntpMain();
       final Map<String, String> argsMap = ArgumentParser.convertArgsToMap(args);
@@ -93,6 +96,11 @@ public class TntpMain {
           case "ODPATHOUTPUT":
             odPathOutputFilename = argValue;
             break;
+          case "STANDARDRESULTS":
+            standardResultsFileLocation = argValue;
+            break;
+          case "DEFAULTMAXIMUMSPEED":
+            defaultMaximumSpeed = Double.parseDouble(argValue);
         }
       }
       if (logfileLocation == null) {
@@ -116,17 +124,33 @@ public class TntpMain {
             throw new PlanItException("Argument OutputTimeUnit included but does not start with h, m or s.");
         }
       }
-      tntpMain.execute(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, linkOutputFilename, odOutputFilename,
-          odPathOutputFilename, maxIterations, epsilon, outputTimeUnit);
+      tntpMain.execute(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, standardResultsFileLocation, linkOutputFilename, odOutputFilename,
+          odPathOutputFilename, maxIterations, epsilon, outputTimeUnit, defaultMaximumSpeed);
       PlanItLogger.close();
     } catch (final Exception e) {
       e.printStackTrace();
     }
   }
 
-  public void execute(final String networkFileLocation, final String demandFileLocation, final String nodeCoordinateFileLocation, final String linkOutputFilename,
-      final String odOutputFilename, final String odPathOutputFilename, final int maxIterations, final double epsilon,
-      final OutputTimeUnit outputTimeUnit) throws PlanItException {
+  /**
+   *  Top-level method which runs PLANit for TNTP format input
+   *
+   * @param networkFileLocation the input network file (required)
+   * @param demandFileLocation the input trips file (required)
+   * @param nodeCoordinateFileLocation the node coordinate file (null if not included)
+   * @param standardResultsFileLocation the standard results file used to check output results (null if not included)
+   * @param linkOutputFilename the link output CSV file
+   * @param odOutputFilename the OD output CSV file
+   * @param odPathOutputFilename the OD path output CSV file
+   * @param maxIterations the maximum number of iterations
+   * @param epsilon the epsilon used for convergence
+   * @param outputTimeUnit the output time units
+   * @param defaultMaximumSpeed the default maximum speed along links
+   * @return Map of standard results for each link (null if the standardResultsFileLocation is not included)
+   * @throws PlanItException thrown if there is an error
+   */
+  public Map<Long, Map<Long, double[]>> execute(final String networkFileLocation, final String demandFileLocation, final String nodeCoordinateFileLocation, final String standardResultsFileLocation, final String linkOutputFilename,
+      final String odOutputFilename, final String odPathOutputFilename, final int maxIterations, final double epsilon, final OutputTimeUnit outputTimeUnit, final double defaultMaximumSpeed) throws PlanItException {
 
     final boolean isLinkOutputActive = (linkOutputFilename != null);
     final boolean isOdOutputActive = (odOutputFilename != null);
@@ -149,16 +173,16 @@ public class TntpMain {
 
     final SpeedUnits speedUnits = SpeedUnits.MILES_H;
     final LengthUnits lengthUnits = LengthUnits.MILES; //Both Chicago-Sketch and Philadelphia use miles
-    final CapacityPeriod capacityPeriod = CapacityPeriod.HOUR; //Chicago-Sketch only - for Philadelphia use hours
+    final CapacityPeriod capacityPeriod = CapacityPeriod.HOUR; //Chicago-Sketch only - for Philadelphia use days
 
-    final double defaultMaximumSpeed = 25.0; //Chicago-Sketch only
-    final TntpProject project = new TntpProject(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, networkFileColumns, speedUnits,
+     final TntpProject project = new TntpProject(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, networkFileColumns, speedUnits,
         lengthUnits,capacityPeriod, defaultMaximumSpeed);
 
     // RAW INPUT START --------------------------------
     final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) project.createAndRegisterPhysicalNetwork(MacroscopicNetwork.class.getCanonicalName());
     final Zoning zoning = project.createAndRegisterZoning(macroscopicNetwork);
     final Demands demands = project.createAndRegisterDemands(zoning);
+    final Map<Long, Map<Long, double[]>> standardResults = (standardResultsFileLocation == null) ? null : project.createStandardResultsFile(standardResultsFileLocation);
 
     // RAW INPUT END -----------------------------------
 
@@ -178,8 +202,7 @@ public class TntpMain {
         }
       }
     }
-    taBuilder
-        .createAndRegisterVirtualTravelTimeCostFunction(FixedConnectoidTravelTimeCost.class.getCanonicalName());
+    taBuilder.createAndRegisterVirtualTravelTimeCostFunction(FixedConnectoidTravelTimeCost.class.getCanonicalName());
     taBuilder.createAndRegisterSmoothing(MSASmoothing.class.getCanonicalName());
 
     // DATA OUTPUT CONFIGURATION
@@ -190,8 +213,8 @@ public class TntpMain {
 
     // OUTPUT FORMAT CONFIGURATION - LINKS
     if (isLinkOutputActive) {
-      final LinkOutputTypeConfiguration linkOutputTypeConfiguration = (LinkOutputTypeConfiguration) taBuilder
-          .activateOutput(OutputType.LINK);
+      final LinkOutputTypeConfiguration linkOutputTypeConfiguration =
+          (LinkOutputTypeConfiguration) taBuilder.activateOutput(OutputType.LINK);
       linkOutputTypeConfiguration.addProperty(OutputProperty.LINK_TYPE);
       linkOutputTypeConfiguration.addProperty(OutputProperty.VC_RATIO);
       linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_ID);
@@ -211,16 +234,15 @@ public class TntpMain {
     // OUTPUT FORMAT CONFIGURATION - ORIGIN-DESTINATION
     if (isOdOutputActive) {
       final OriginDestinationOutputTypeConfiguration originDestinationOutputTypeConfiguration =
-          (OriginDestinationOutputTypeConfiguration) taBuilder
-              .activateOutput(OutputType.OD);
+          (OriginDestinationOutputTypeConfiguration) taBuilder.activateOutput(OutputType.OD);
       originDestinationOutputTypeConfiguration.removeProperty(OutputProperty.RUN_ID);
       originDestinationOutputTypeConfiguration.addProperty(OutputProperty.ORIGIN_ZONE_ID);
       originDestinationOutputTypeConfiguration.addProperty(OutputProperty.DESTINATION_ZONE_ID);
     }
     // OUTPUT FORMAT CONFIGURATION - PATH
     if (isOdPathOutputActive) {
-      final PathOutputTypeConfiguration pathOutputTypeConfiguration = (PathOutputTypeConfiguration) taBuilder
-          .activateOutput(OutputType.PATH);
+      final PathOutputTypeConfiguration pathOutputTypeConfiguration =
+          (PathOutputTypeConfiguration) taBuilder.activateOutput(OutputType.PATH);
       pathOutputTypeConfiguration.removeProperty(OutputProperty.RUN_ID);
       pathOutputTypeConfiguration.addProperty(OutputProperty.ORIGIN_ZONE_ID);
       pathOutputTypeConfiguration.addProperty(OutputProperty.DESTINATION_ZONE_ID);
@@ -228,8 +250,8 @@ public class TntpMain {
     }
 
     // CSVOutputFormatter - Links
-    final CSVOutputFormatter csvOutputFormatter = (CSVOutputFormatter) project.createAndRegisterOutputFormatter(
-        CSVOutputFormatter.class.getCanonicalName());
+    final CSVOutputFormatter csvOutputFormatter =
+        (CSVOutputFormatter) project.createAndRegisterOutputFormatter(CSVOutputFormatter.class.getCanonicalName());
     if (outputTimeUnit != null) {
       csvOutputFormatter.setOutputTimeUnit(outputTimeUnit);
     }
@@ -254,5 +276,6 @@ public class TntpMain {
         throw exceptionMap.get(id);
       }
     }
+    return standardResults;
   }
 }
