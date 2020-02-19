@@ -13,6 +13,7 @@ import org.djutils.event.EventInterface;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.Position;
 import org.planit.cost.physical.BPRLinkTravelTimeCost;
+import org.planit.cost.physical.PhysicalCost;
 import org.planit.demands.Demands;
 import org.planit.exceptions.PlanItException;
 import org.planit.geo.PlanitGeoUtils;
@@ -30,7 +31,9 @@ import org.planit.tntp.enums.LengthUnits;
 import org.planit.tntp.enums.NetworkFileColumns;
 import org.planit.tntp.enums.SpeedUnits;
 import org.planit.trafficassignment.TrafficAssignmentComponentFactory;
+import org.planit.utils.misc.Pair;
 import org.planit.utils.network.physical.Link;
+import org.planit.utils.network.physical.LinkSegment;
 import org.planit.utils.network.physical.Mode;
 import org.planit.utils.network.physical.Node;
 import org.planit.utils.network.physical.macroscopic.MacroscopicLinkSegment;
@@ -113,6 +116,17 @@ public class Tntp extends InputBuilderListener {
    * The number of links in the network
    */
   private int noLinks;
+
+  /**
+   * Map containing the BPR parameters for each link segment, if these are specified in the
+   * network file (null if default values are being used)
+   */
+  private Map<LinkSegment, Pair<Double, Double>> bprParametersForLinkSegmentAndMode;
+
+  /**
+   * List of link segments in the network
+   */
+  private List<LinkSegment> linkSegments;
 
   /**
    * Default maximum speed across links
@@ -230,8 +244,9 @@ public class Tntp extends InputBuilderListener {
     linkSegment.setExternalId(externalId);
     final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) network;
 
-    final MacroscopicLinkSegmentType macroscopicLinkSegmentType = macroscopicNetwork.registerNewLinkSegmentType(""
-        + linkSegmentType, capacityPerLane, maxSpeed, externalId, modePropertiesMap).getFirst();
+    final MacroscopicLinkSegmentType macroscopicLinkSegmentType =
+        macroscopicNetwork.registerNewLinkSegmentType("" + linkSegmentType, capacityPerLane, maxSpeed, externalId,
+            modePropertiesMap).getFirst();
     linkSegment.setLinkSegmentType(macroscopicLinkSegmentType);
     network.linkSegments.registerLinkSegment(link, linkSegment, true);
     return linkSegment;
@@ -330,8 +345,23 @@ public class Tntp extends InputBuilderListener {
       settingBeta = true;
     }
     if (settingAlpha || settingBeta) {
-      ((MacroscopicNetwork) network).addBprParametersForLinkSegmentAndMode(linkSegment, mode, alpha, beta);
+      addBprParametersForLinkSegmentAndMode(linkSegment, alpha, beta);
     }
+  }
+
+  /**
+   * Add BPR parameters for a specified link segmen
+   *
+   * @param linkSegment the specified link segment
+    * @param alpha the BPR alpha parameter
+   * @param beta the BPR beta parameter
+   */
+  private void addBprParametersForLinkSegmentAndMode(final LinkSegment linkSegment, final double alpha,  final double beta) {
+    if (bprParametersForLinkSegmentAndMode == null) {
+      bprParametersForLinkSegmentAndMode = new HashMap<LinkSegment, Pair<Double, Double>>();
+    }
+    final Pair<Double, Double> alphaBeta = new Pair<Double, Double>(alpha, beta);
+    bprParametersForLinkSegmentAndMode.put(linkSegment, alphaBeta);
   }
 
   /**
@@ -382,6 +412,7 @@ public class Tntp extends InputBuilderListener {
     if (nodeCoordinateFile != null) {
       updateNodeCoordinatesFromFile(network);
     }
+    linkSegments = network.linkSegments.toList();
   }
 
   /**
@@ -468,6 +499,27 @@ public class Tntp extends InputBuilderListener {
   }
 
   /**
+   * Populate the BPR parameters
+   *
+   * @param costComponent the BPRLinkTravelTimeCost to be populated
+   * @throws PlanItException thrown if there is an error
+   */
+  protected void populatePhysicalCost(@Nonnull final PhysicalCost costComponent) throws PlanItException {
+    PlanItLogger.info("Populating BPR link costs");
+    if (bprParametersForLinkSegmentAndMode != null) {
+      final BPRLinkTravelTimeCost bprLinkTravelTimeCost = (BPRLinkTravelTimeCost) costComponent;
+      for (final LinkSegment linkSegment : linkSegments) {
+        if (bprParametersForLinkSegmentAndMode.containsKey(linkSegment)) {
+          final Pair<Double, Double> alphaBeta = bprParametersForLinkSegmentAndMode.get(linkSegment);
+          final MacroscopicLinkSegment macroscopicLinkSegment = (MacroscopicLinkSegment) linkSegment;
+          bprLinkTravelTimeCost.setParameters(macroscopicLinkSegment, mode, alphaBeta.getFirst(), alphaBeta
+              .getSecond());
+        }
+      }
+    }
+  }
+
+  /**
    * Constructor
    *
    * @param networkFileLocation network file location
@@ -521,7 +573,8 @@ public class Tntp extends InputBuilderListener {
    * @throws PlanItException
    */
   public Tntp(final String networkFileLocation, final String demandFileLocation,
-      final String nodeCoordinateFileLocation, final String standardResultsFileLocation, final Map<NetworkFileColumns, Integer> networkFileColumns,
+      final String nodeCoordinateFileLocation, final String standardResultsFileLocation,
+      final Map<NetworkFileColumns, Integer> networkFileColumns,
       final SpeedUnits speedUnits,
       final LengthUnits lengthUnits, final double defaultMaximumSpeed) throws PlanItException {
     this(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, networkFileColumns, speedUnits,
@@ -551,8 +604,8 @@ public class Tntp extends InputBuilderListener {
     try {
       networkFile = new File(networkFileLocation).getCanonicalFile();
       demandFile = new File(demandFileLocation).getCanonicalFile();
-      nodeCoordinateFile =
-          (nodeCoordinateFileLocation == null) ? null : new File(nodeCoordinateFileLocation).getCanonicalFile();
+      nodeCoordinateFile = (nodeCoordinateFileLocation == null) ? null : new File(nodeCoordinateFileLocation)
+          .getCanonicalFile();
       this.networkFileColumns = networkFileColumns;
       this.speedUnits = speedUnits;
       this.lengthUnits = lengthUnits;
@@ -586,6 +639,8 @@ public class Tntp extends InputBuilderListener {
           populateZoning((Zoning) projectComponent, parameters[0]);
         } else if (projectComponent instanceof Demands) {
           populateDemands((Demands) projectComponent, parameters[0]);
+        } else if (projectComponent instanceof PhysicalCost) {
+          populatePhysicalCost((PhysicalCost) projectComponent);
         } else {
           PlanItLogger.info("Event component is " + projectComponent.getClass().getCanonicalName()
               + " which is not handled by PlanItInputBuilder.");

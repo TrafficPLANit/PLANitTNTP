@@ -29,16 +29,13 @@ import org.planit.trafficassignment.TraditionalStaticAssignment;
 import org.planit.trafficassignment.builder.TraditionalStaticAssignmentBuilder;
 import org.planit.utils.ArgumentParser;
 import org.planit.utils.misc.IdGenerator;
-import org.planit.utils.misc.Pair;
-import org.planit.utils.network.physical.LinkSegment;
-import org.planit.utils.network.physical.Mode;
-import org.planit.utils.network.physical.macroscopic.MacroscopicLinkSegment;
 
 public class TntpMain {
 
   public static final int DEFAULT_MAX_ITERATIONS = 1;
   public static final double DEFAULT_CONVERGENCE_EPSILON = 0.01;
-  public static final double DEFAULT_MAXIMUM_SPEED = 25.0; //this is the default for Chicago Sketch Type 3 links
+  public static final double DEFAULT_MAXIMUM_SPEED = 25.0; // this is the default for Chicago Sketch
+                                                           // Type 3 links
 
   public static void main(final String[] args) {
     String networkFileLocation = null;
@@ -124,7 +121,8 @@ public class TntpMain {
             throw new PlanItException("Argument OutputTimeUnit included but does not start with h, m or s.");
         }
       }
-      tntpMain.execute(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, standardResultsFileLocation, linkOutputFilename, odOutputFilename,
+      tntpMain.execute(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, standardResultsFileLocation,
+          linkOutputFilename, odOutputFilename,
           odPathOutputFilename, maxIterations, epsilon, outputTimeUnit, defaultMaximumSpeed);
       PlanItLogger.close();
     } catch (final Exception e) {
@@ -133,12 +131,13 @@ public class TntpMain {
   }
 
   /**
-   *  Top-level method which runs PLANit for TNTP format input
+   * Top-level method which runs PLANit for TNTP format input
    *
    * @param networkFileLocation the input network file (required)
    * @param demandFileLocation the input trips file (required)
    * @param nodeCoordinateFileLocation the node coordinate file (null if not included)
-   * @param standardResultsFileLocation the standard results file used to check output results (null if not included)
+   * @param standardResultsFileLocation the standard results file used to check output results (null
+   *          if not included)
    * @param linkOutputFilename the link output CSV file
    * @param odOutputFilename the OD output CSV file
    * @param odPathOutputFilename the OD path output CSV file
@@ -146,11 +145,15 @@ public class TntpMain {
    * @param epsilon the epsilon used for convergence
    * @param outputTimeUnit the output time units
    * @param defaultMaximumSpeed the default maximum speed along links
-   * @return Map of standard results for each link (null if the standardResultsFileLocation is not included)
+   * @return Map of standard results for each link (null if the standardResultsFileLocation is not
+   *         included)
    * @throws PlanItException thrown if there is an error
    */
-  public Map<Long, Map<Long, double[]>> execute(final String networkFileLocation, final String demandFileLocation, final String nodeCoordinateFileLocation, final String standardResultsFileLocation, final String linkOutputFilename,
-      final String odOutputFilename, final String odPathOutputFilename, final int maxIterations, final double epsilon, final OutputTimeUnit outputTimeUnit, final double defaultMaximumSpeed) throws PlanItException {
+  public Map<Long, Map<Long, double[]>> execute(final String networkFileLocation, final String demandFileLocation,
+      final String nodeCoordinateFileLocation, final String standardResultsFileLocation,
+      final String linkOutputFilename,
+      final String odOutputFilename, final String odPathOutputFilename, final int maxIterations, final double epsilon,
+      final OutputTimeUnit outputTimeUnit, final double defaultMaximumSpeed) throws PlanItException {
 
     final boolean isLinkOutputActive = (linkOutputFilename != null);
     final boolean isOdOutputActive = (odOutputFilename != null);
@@ -172,36 +175,32 @@ public class TntpMain {
     networkFileColumns.put(NetworkFileColumns.LINK_TYPE, 9);
 
     final SpeedUnits speedUnits = SpeedUnits.MILES_H;
-    final LengthUnits lengthUnits = LengthUnits.MILES; //Both Chicago-Sketch and Philadelphia use miles
-    final CapacityPeriod capacityPeriod = CapacityPeriod.HOUR; //Chicago-Sketch only - for Philadelphia use days
+    final LengthUnits lengthUnits = LengthUnits.MILES; // Both Chicago-Sketch and Philadelphia use
+                                                       // miles
+    final CapacityPeriod capacityPeriod = CapacityPeriod.HOUR; // Chicago-Sketch only - for
+                                                               // Philadelphia use days
 
-     final TntpProject project = new TntpProject(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, networkFileColumns, speedUnits,
-        lengthUnits,capacityPeriod, defaultMaximumSpeed);
+    final TntpProject project = new TntpProject(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation,
+        networkFileColumns, speedUnits,
+        lengthUnits, capacityPeriod, defaultMaximumSpeed);
 
     // RAW INPUT START --------------------------------
-    final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) project.createAndRegisterPhysicalNetwork(MacroscopicNetwork.class.getCanonicalName());
+    final MacroscopicNetwork macroscopicNetwork =
+        (MacroscopicNetwork) project.createAndRegisterPhysicalNetwork(MacroscopicNetwork.class.getCanonicalName());
     final Zoning zoning = project.createAndRegisterZoning(macroscopicNetwork);
     final Demands demands = project.createAndRegisterDemands(zoning);
-    final Map<Long, Map<Long, double[]>> standardResults = (standardResultsFileLocation == null) ? null : project.createStandardResultsFile(standardResultsFileLocation);
+    final Map<Long, Map<Long, double[]>> standardResults =
+        (standardResultsFileLocation == null) ? null : project.createStandardResultsFile(standardResultsFileLocation);
 
     // RAW INPUT END -----------------------------------
 
     // TRAFFIC ASSIGNMENT START------------------------
     final TraditionalStaticAssignmentBuilder taBuilder =
-                (TraditionalStaticAssignmentBuilder) project.createAndRegisterTrafficAssignment(
-                    TraditionalStaticAssignment.class.getCanonicalName(), demands, zoning, macroscopicNetwork);
+        (TraditionalStaticAssignmentBuilder) project.createAndRegisterTrafficAssignment(
+            TraditionalStaticAssignment.class.getCanonicalName(), demands, zoning, macroscopicNetwork);
 
     // SUPPLY-DEMAND INTERACTIONS
-    final BPRLinkTravelTimeCost bprLinkTravelTimeCost = (BPRLinkTravelTimeCost) taBuilder.createAndRegisterPhysicalCost(BPRLinkTravelTimeCost.class.getCanonicalName());
-    if (macroscopicNetwork.isBprParametersDefinedForLinkSegments()) {
-      for (final LinkSegment linkSegment :  macroscopicNetwork.linkSegments.toList()) {
-        final MacroscopicLinkSegment macroscopicLinkSegment = (MacroscopicLinkSegment) linkSegment;
-        for (final Mode mode : macroscopicNetwork.modes.toList()) {
-          final Pair<Double, Double> alphaBeta = macroscopicNetwork.getBprParametersForLinkSegmentAndMode(macroscopicLinkSegment, mode);
-          bprLinkTravelTimeCost.setParameters(macroscopicLinkSegment, mode, alphaBeta.getFirst(), alphaBeta.getSecond());
-        }
-      }
-    }
+    taBuilder.createAndRegisterPhysicalCost(BPRLinkTravelTimeCost.class.getCanonicalName());
     taBuilder.createAndRegisterVirtualTravelTimeCostFunction(FixedConnectoidTravelTimeCost.class.getCanonicalName());
     taBuilder.createAndRegisterSmoothing(MSASmoothing.class.getCanonicalName());
 
@@ -213,8 +212,8 @@ public class TntpMain {
 
     // OUTPUT FORMAT CONFIGURATION - LINKS
     if (isLinkOutputActive) {
-      final LinkOutputTypeConfiguration linkOutputTypeConfiguration =
-          (LinkOutputTypeConfiguration) taBuilder.activateOutput(OutputType.LINK);
+      final LinkOutputTypeConfiguration linkOutputTypeConfiguration = (LinkOutputTypeConfiguration) taBuilder
+          .activateOutput(OutputType.LINK);
       linkOutputTypeConfiguration.addProperty(OutputProperty.LINK_TYPE);
       linkOutputTypeConfiguration.addProperty(OutputProperty.VC_RATIO);
       linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_ID);
