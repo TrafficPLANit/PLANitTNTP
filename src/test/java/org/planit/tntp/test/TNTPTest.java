@@ -56,13 +56,13 @@ public class TNTPTest {
     try {
       PlanItLogger.setLogging(logfileLocation, TNTPTest.class);
       final Pair<MemoryOutputFormatter, TntpProject> testOutput =
-          TNTPTestHelper.execute(networkFileLocation, demandFileLocation, standardResultsFileLocation,
-              maxIterations, epsilon, outputTimeUnit, defaultMaximumSpeed);
+          TNTPTestHelper.execute(networkFileLocation, demandFileLocation, maxIterations, epsilon, outputTimeUnit,
+              defaultMaximumSpeed);
       final MemoryOutputFormatter memoryOutputFormatter = testOutput.getFirst();
       final TntpProject project = testOutput.getSecond();
 
       final Map<Long, Map<Long, double[]>> resultsMap =
-          TNTPTestHelper.createStandardResultsFile(standardResultsFileLocation);
+          TNTPTestHelper.parseStandardResultsFile(standardResultsFileLocation);
       final TimePeriod timePeriod = TimePeriod.getByExternalId(1);
       final int iterationIndex = memoryOutputFormatter.getLastIteration();
       final Mode mode = project.physicalNetworks.getFirstNetwork().modes.findModeByExternalIdentifier(1);

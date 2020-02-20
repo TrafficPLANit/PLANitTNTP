@@ -48,7 +48,7 @@ public class TNTPTestHelper {
    * @return Map of containing flow and cost values for each upstream and downstream node
    * @throws PlanItException thrown if there is an error
    */
-  public static Map<Long, Map<Long, double[]>> createStandardResultsFile(final String standardResultsFileLocation)
+  public static Map<Long, Map<Long, double[]>> parseStandardResultsFile(final String standardResultsFileLocation)
       throws PlanItException {
     final Map<Long, Map<Long, double[]>> resultsMap = new HashMap<Long, Map<Long, double[]>>();
     try (Scanner scanner = new Scanner(new File(standardResultsFileLocation).getCanonicalFile())) {
@@ -77,7 +77,6 @@ public class TNTPTestHelper {
    *
    * @param networkFileLocation the input network file (required)
    * @param demandFileLocation the input trips file (required)
-   * @param standardResultsFileLocation the standard results file used to check output results
    * @param maxIterations the maximum number of iterations
    * @param epsilon the epsilon used for convergence
    * @param outputTimeUnit the output time units
@@ -85,7 +84,8 @@ public class TNTPTestHelper {
    * @throws PlanItException thrown if there is an error
    */
   public static Pair<MemoryOutputFormatter, TntpProject> execute(final String networkFileLocation,
-      final String demandFileLocation, final String standardResultsFileLocation, final int maxIterations,
+      final String demandFileLocation,
+      final int maxIterations,
       final double epsilon, final OutputTimeUnit outputTimeUnit, final double defaultMaximumSpeed) throws PlanItException {
 
     // SET UP INPUT SCANNER AND PROJECT
