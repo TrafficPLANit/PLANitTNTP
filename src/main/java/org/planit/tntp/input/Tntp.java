@@ -601,6 +601,7 @@ public class Tntp extends InputBuilderListener {
 
     // TNTP only has one time period, define it here
     timePeriod = new TimePeriod(1, "All Day", "0000", 24.0);
+
     try {
       networkFile = new File(networkFileLocation).getCanonicalFile();
       demandFile = new File(demandFileLocation).getCanonicalFile();

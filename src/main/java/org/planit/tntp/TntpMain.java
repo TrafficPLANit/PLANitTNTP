@@ -30,6 +30,12 @@ import org.planit.trafficassignment.builder.TraditionalStaticAssignmentBuilder;
 import org.planit.utils.ArgumentParser;
 import org.planit.utils.misc.IdGenerator;
 
+/**
+ * Main class for running TNTP models
+ *
+ * @author gman6028
+ *
+ */
 public class TntpMain {
 
   public static final int DEFAULT_MAX_ITERATIONS = 1;
@@ -37,11 +43,15 @@ public class TntpMain {
   public static final double DEFAULT_MAXIMUM_SPEED = 25.0; // this is the default for Chicago Sketch
                                                            // Type 3 links
 
+ /**
+  * Top-level class for running TNTP models
+  *
+  * @param args Command-line arguments for TNTP model
+  */
   public static void main(final String[] args) {
     String networkFileLocation = null;
     String demandFileLocation = null;
     String nodeCoordinateFileLocation = null;
-    String standardResultsFileLocation = null;
     String linkOutputFilename = null;
     String logfileLocation = null;
     String outputTimeUnitValue = null;
@@ -93,11 +103,9 @@ public class TntpMain {
           case "ODPATHOUTPUT":
             odPathOutputFilename = argValue;
             break;
-          case "STANDARDRESULTS":
-            standardResultsFileLocation = argValue;
-            break;
           case "DEFAULTMAXIMUMSPEED":
             defaultMaximumSpeed = Double.parseDouble(argValue);
+            break;
         }
       }
       if (logfileLocation == null) {
@@ -121,7 +129,7 @@ public class TntpMain {
             throw new PlanItException("Argument OutputTimeUnit included but does not start with h, m or s.");
         }
       }
-      tntpMain.execute(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, standardResultsFileLocation,
+      tntpMain.execute(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation,
           linkOutputFilename, odOutputFilename,
           odPathOutputFilename, maxIterations, epsilon, outputTimeUnit, defaultMaximumSpeed);
       PlanItLogger.close();
@@ -136,8 +144,6 @@ public class TntpMain {
    * @param networkFileLocation the input network file (required)
    * @param demandFileLocation the input trips file (required)
    * @param nodeCoordinateFileLocation the node coordinate file (null if not included)
-   * @param standardResultsFileLocation the standard results file used to check output results (null
-   *          if not included)
    * @param linkOutputFilename the link output CSV file
    * @param odOutputFilename the OD output CSV file
    * @param odPathOutputFilename the OD path output CSV file
@@ -145,13 +151,10 @@ public class TntpMain {
    * @param epsilon the epsilon used for convergence
    * @param outputTimeUnit the output time units
    * @param defaultMaximumSpeed the default maximum speed along links
-   * @return Map of standard results for each link (null if the standardResultsFileLocation is not
-   *         included)
    * @throws PlanItException thrown if there is an error
    */
-  public Map<Long, Map<Long, double[]>> execute(final String networkFileLocation, final String demandFileLocation,
-      final String nodeCoordinateFileLocation, final String standardResultsFileLocation,
-      final String linkOutputFilename,
+  public void execute(final String networkFileLocation, final String demandFileLocation,
+      final String nodeCoordinateFileLocation, final String linkOutputFilename,
       final String odOutputFilename, final String odPathOutputFilename, final int maxIterations, final double epsilon,
       final OutputTimeUnit outputTimeUnit, final double defaultMaximumSpeed) throws PlanItException {
 
@@ -162,6 +165,7 @@ public class TntpMain {
     // SET UP INPUT SCANNER AND PROJECT
     IdGenerator.reset();
 
+    //TODO - The following arrangement of columns is correct for Chicago Sketch and Philadelphia.  For some other cities the arrangement is different.
     final Map<NetworkFileColumns, Integer> networkFileColumns = new HashMap<NetworkFileColumns, Integer>();
     networkFileColumns.put(NetworkFileColumns.UPSTREAM_NODE_ID, 0);
     networkFileColumns.put(NetworkFileColumns.DOWNSTREAM_NODE_ID, 1);
@@ -189,8 +193,6 @@ public class TntpMain {
         (MacroscopicNetwork) project.createAndRegisterPhysicalNetwork(MacroscopicNetwork.class.getCanonicalName());
     final Zoning zoning = project.createAndRegisterZoning(macroscopicNetwork);
     final Demands demands = project.createAndRegisterDemands(zoning);
-    final Map<Long, Map<Long, double[]>> standardResults =
-        (standardResultsFileLocation == null) ? null : project.createStandardResultsFile(standardResultsFileLocation);
 
     // RAW INPUT END -----------------------------------
 
@@ -275,6 +277,5 @@ public class TntpMain {
         throw exceptionMap.get(id);
       }
     }
-    return standardResults;
   }
 }
