@@ -8,6 +8,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
+import org.apache.commons.collections4.MapIterator;
+import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.junit.Test;
 import org.planit.logging.PlanItLogger;
 import org.planit.output.enums.OutputTimeUnit;
@@ -61,31 +63,30 @@ public class TNTPTest {
       final MemoryOutputFormatter memoryOutputFormatter = testOutput.getFirst();
       final TntpProject project = testOutput.getSecond();
 
-      final Map<Long, Map<Long, double[]>> resultsMap =
-          TNTPTestHelper.parseStandardResultsFile(standardResultsFileLocation);
+      final Map<Long, Map<Long, double[]>> resultsMap = TNTPTestHelper.parseStandardResultsFile(standardResultsFileLocation);
       final TimePeriod timePeriod = TimePeriod.getByExternalId(1);
       final int iterationIndex = memoryOutputFormatter.getLastIteration();
       final Mode mode = project.physicalNetworks.getFirstNetwork().modes.findModeByExternalIdentifier(1);
-
-      final OutputProperty[] outputKeyProperties = memoryOutputFormatter.getOutputKeyProperties(OutputType.LINK);
-      final Object[] keyValues = new Object[outputKeyProperties.length];
-
-      for (final long upstreamNodeExternalId : resultsMap.keySet()) {
-        for (final long downstreamNodeExternalId : resultsMap.get(upstreamNodeExternalId).keySet()) {
-          keyValues[0] = downstreamNodeExternalId;
-          keyValues[1] = upstreamNodeExternalId;
-          final double runFlow = (Double) memoryOutputFormatter.getOutputDataValue(mode, timePeriod, iterationIndex,
-              OutputType.LINK, OutputProperty.FLOW, keyValues);
-          final double runCost = (Double) memoryOutputFormatter.getOutputDataValue(mode, timePeriod, iterationIndex,
-              OutputType.LINK, OutputProperty.LINK_COST, keyValues);
-          final String runLinkType = (String) memoryOutputFormatter.getOutputDataValue(mode, timePeriod, iterationIndex,
-              OutputType.LINK, OutputProperty.LINK_TYPE, keyValues);
-          if (runLinkType.equals("3")) {
-            final double standardResultsFlow = resultsMap.get(upstreamNodeExternalId).get(downstreamNodeExternalId)[0];
-            final double standardResultsCost = resultsMap.get(upstreamNodeExternalId).get(downstreamNodeExternalId)[1];
-            assertEquals(runFlow, standardResultsFlow, 0.001);
-            assertEquals(runCost, standardResultsCost, 0.001);
-          }
+      final int flowPosition = memoryOutputFormatter.getPositionOfOutputValueProperty(mode, timePeriod, iterationIndex, OutputType.LINK, OutputProperty.FLOW);
+      final int costPosition = memoryOutputFormatter.getPositionOfOutputValueProperty(mode, timePeriod, iterationIndex, OutputType.LINK, OutputProperty.LINK_COST);
+      final int linkTypePosition = memoryOutputFormatter.getPositionOfOutputValueProperty(mode, timePeriod, iterationIndex, OutputType.LINK, OutputProperty.LINK_TYPE);
+      final int downstreamNodeExternalIdPosition = memoryOutputFormatter.getPositionOfOutputKeyProperty(mode, timePeriod, iterationIndex, OutputType.LINK, OutputProperty.DOWNSTREAM_NODE_EXTERNAL_ID);
+      final int upstreamNodeExternalIdPosition = memoryOutputFormatter.getPositionOfOutputKeyProperty(mode, timePeriod, iterationIndex, OutputType.LINK, OutputProperty.UPSTREAM_NODE_EXTERNAL_ID);
+      final MapIterator<MultiKey<? extends Object>, Object[]> resultsIterator = memoryOutputFormatter.getResultsIterator(mode, timePeriod, iterationIndex, OutputType.LINK);
+      while (resultsIterator.hasNext()) {
+        final MultiKey<? extends Object> multiKey = resultsIterator.next();
+        final Object[] results = resultsIterator.getValue();
+        final String runLinkType = (String) results[linkTypePosition];
+        if (runLinkType.equals("3")) {
+          final Object[] keys = multiKey.getKeys();
+          final long downstreamNodeExternalId = (Long) keys[downstreamNodeExternalIdPosition];
+          final long upstreamNodeExternalId = (Long) keys[upstreamNodeExternalIdPosition];
+          final double runFlow = (Double) results[flowPosition];
+          final double runCost = (Double) results[costPosition];
+          final double standardResultsFlow = resultsMap.get(upstreamNodeExternalId).get(downstreamNodeExternalId)[0];
+          final double standardResultsCost = resultsMap.get(upstreamNodeExternalId).get(downstreamNodeExternalId)[1];
+          assertEquals(runFlow, standardResultsFlow, 0.001);
+          assertEquals(runCost, standardResultsCost, 0.001);
         }
       }
 

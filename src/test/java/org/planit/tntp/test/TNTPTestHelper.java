@@ -142,7 +142,6 @@ public class TNTPTestHelper {
     final LinkOutputTypeConfiguration linkOutputTypeConfiguration = (LinkOutputTypeConfiguration) taBuilder
         .activateOutput(OutputType.LINK);
     linkOutputTypeConfiguration.addProperty(OutputProperty.LINK_TYPE);
-    linkOutputTypeConfiguration.addProperty(OutputProperty.VC_RATIO);
     linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_ID);
     linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_EXTERNAL_ID);
     linkOutputTypeConfiguration.removeProperty(OutputProperty.DOWNSTREAM_NODE_LOCATION);
@@ -158,9 +157,8 @@ public class TNTPTestHelper {
     linkOutputTypeConfiguration.removeProperty(OutputProperty.MAXIMUM_SPEED);
 
     // MemoryOutputFormatter - Links
-    final MemoryOutputFormatter memoryOutputFormatter =
-        (MemoryOutputFormatter) project.createAndRegisterOutputFormatter(MemoryOutputFormatter.class
-            .getCanonicalName());
+    final MemoryOutputFormatter memoryOutputFormatter = (MemoryOutputFormatter)
+        project.createAndRegisterOutputFormatter(MemoryOutputFormatter.class.getCanonicalName());
     if (outputTimeUnit != null) {
       memoryOutputFormatter.setOutputTimeUnit(outputTimeUnit);
     }
