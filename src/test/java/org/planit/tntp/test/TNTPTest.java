@@ -8,13 +8,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
-import org.apache.commons.collections4.MapIterator;
-import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.junit.Test;
 import org.planit.logging.PlanItLogger;
 import org.planit.output.enums.OutputTimeUnit;
 import org.planit.output.enums.OutputType;
 import org.planit.output.formatter.MemoryOutputFormatter;
+import org.planit.output.formatter.MemoryOutputIterator;
 import org.planit.output.property.OutputProperty;
 import org.planit.time.TimePeriod;
 import org.planit.tntp.project.TntpProject;
@@ -72,22 +71,21 @@ public class TNTPTest {
       final int linkTypePosition = memoryOutputFormatter.getPositionOfOutputValueProperty(mode, timePeriod, iterationIndex, OutputType.LINK, OutputProperty.LINK_TYPE);
       final int downstreamNodeExternalIdPosition = memoryOutputFormatter.getPositionOfOutputKeyProperty(mode, timePeriod, iterationIndex, OutputType.LINK, OutputProperty.DOWNSTREAM_NODE_EXTERNAL_ID);
       final int upstreamNodeExternalIdPosition = memoryOutputFormatter.getPositionOfOutputKeyProperty(mode, timePeriod, iterationIndex, OutputType.LINK, OutputProperty.UPSTREAM_NODE_EXTERNAL_ID);
-      final MapIterator<MultiKey<? extends Object>, Object[]> resultsIterator = memoryOutputFormatter.getResultsIterator(mode, timePeriod, iterationIndex, OutputType.LINK);
-      while (resultsIterator.hasNext()) {
-        final MultiKey<? extends Object> multiKey = resultsIterator.next();
-        final Object[] results = resultsIterator.getValue();
-        final String runLinkType = (String) results[linkTypePosition];
-        if (runLinkType.equals("3")) {
-          final Object[] keys = multiKey.getKeys();
-          final long downstreamNodeExternalId = (Long) keys[downstreamNodeExternalIdPosition];
-          final long upstreamNodeExternalId = (Long) keys[upstreamNodeExternalIdPosition];
-          final double runFlow = (Double) results[flowPosition];
-          final double runCost = (Double) results[costPosition];
-          final double standardResultsFlow = resultsMap.get(upstreamNodeExternalId).get(downstreamNodeExternalId)[0];
-          final double standardResultsCost = resultsMap.get(upstreamNodeExternalId).get(downstreamNodeExternalId)[1];
-          assertEquals(runFlow, standardResultsFlow, 0.001);
-          assertEquals(runCost, standardResultsCost, 0.001);
-        }
+      final MemoryOutputIterator memoryOutputIterator = memoryOutputFormatter.getIterator(mode, timePeriod, iterationIndex, OutputType.LINK);
+      while (memoryOutputIterator.hasNext()) {
+          final Object[] results = memoryOutputIterator.getValues();
+          final String runLinkType = (String) results[linkTypePosition];
+          if (runLinkType.equals("3")) {
+            final Object[] keys = memoryOutputIterator.getKeys();
+            final long downstreamNodeExternalId = (Long) keys[downstreamNodeExternalIdPosition];
+            final long upstreamNodeExternalId = (Long) keys[upstreamNodeExternalIdPosition];
+            final double runFlow = (Double) results[flowPosition];
+            final double runCost = (Double) results[costPosition];
+            final double standardResultsFlow = resultsMap.get(upstreamNodeExternalId).get(downstreamNodeExternalId)[0];
+            final double standardResultsCost = resultsMap.get(upstreamNodeExternalId).get(downstreamNodeExternalId)[1];
+            assertEquals(runFlow, standardResultsFlow, 0.001);
+            assertEquals(runCost, standardResultsCost, 0.001);
+          }
       }
 
       PlanItLogger.close();
