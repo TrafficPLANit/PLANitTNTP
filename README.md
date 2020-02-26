@@ -101,6 +101,37 @@ The TntpMain class can be instantiated and its execute() method run from another
 If a standard results file has been specifed, TntpMain.execute() returns a Map with the standard flow and cost for the upstream and downstream nodes for each link.  TntpProject has a method createStandardResultsFile() which returns this Map.  
 If the null is given for the parameter value of the standardResultsFileLocation argument to TntpMain.execute(), meaning there is no standard results file, the execute() method returns a null.  This is convenient for unit testing.  
 
+## Command Line Arguments
+
+The command line arguments specify the parameters used during the assignment run, particularly the input and output files.  Each argument is defined using a "name=value" format, where "name" is one from a list of possible argument types and "value" is a string containing the argument value.
+  
+The arguments are given in a space-separated list.  There are ten possible arguments, six of which are required.  The full list of possible arguments is:
+
+|Name|Meaning|
+|---| ---|
+|network|Location of _net.tntp file (required)| 
+|demands|Location of _trips.tntp file (required)| 
+|nodecoordinates|Location of _node.tntp (optional)|
+|linkoutput|Location where generated output CSV links file is to be placed (optional)|
+|odoutput|Location where generated output CSV origin-destination skim matrix file is to be placed (optional)|
+|odpathoutput|Location where generated output CSV OD path file is to be placed(optional)|
+|logfile|Location where generated log file is to be placed (optional, no log file created if this argument omitted)| 
+|maxiterations|Maximum number of iterations to be used in the assignment (optional, defaults to 1 if not present)|
+|defaultmaximumspeed|Default maximum speed on links where 0 is given in the file (optional, defaults to 25 m/h if not present)
+|epsilon|Epsilon used in convergence criterion (optional, defaults to 0.01 if not present)|
+|outputtimeunit|Time unit to be used when writing link cost times to output file  - one from hour, minute, second (or h ,m ,s), not case-sensitive (optional, defaults to hours)
+
+If a required file is missing from the argument list an error message is displayed.  The arguments can be given in any order provided they are separated by spaces.
+
+The following is an example of a correct run call:
+
+java -jar Tntp-x.y.z.jar NETWORK=src\test\resources\ChicagoSketch\ChicagoSketch_net.tntp DEMANDS=src\test\resources\ChicagoSketch\ChicagoSketch_trips.tntp LOGFILE=logs\ChicagoSketch100iterations.log MAXITERATIONS=100 LINKOUTPUT=src\test\resources\ChicagoSketch\ChicagoSketchLink100iterations.csv ODOUTPUT=src\test\resources\ChicagoSketch\ChicagoSketchOD100iterations.csv  ODPATHOUTPUT=src\test\resources\ChicagoSketch\ChicagoSketchPath100iterations.csv NODECOORDINATES=src\test\resources\ChicagoSketch\ChicagoSketch_node.tntp
+
+The "name" values above are not case-sensitive, so "NETWORK" works as well as "network".  Also ":" and "-" can also be used as separators, so "logfile:logs/tntp.log" works as well as "logfile=logs/tntp.log".
+
+All types of output (link, OD and OD path) are optional.  You may choose to include any combination of these, including none at all.  If you include none, the program will run but not generate any results file.
+
+
 # Test Cases
 
 February 2020:  We use ChicagoSketch for the unit tests.  We compare our results against the ChicagoSketch_flow.tntp file.  This file was created on 13 March 2016 (https://github.com/bstabler/TransportationNetworks/blob/master/Chicago-Sketch/ChicagoSketch_flow.tntp)

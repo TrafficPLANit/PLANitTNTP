@@ -179,14 +179,11 @@ public class TntpMain {
     networkFileColumns.put(NetworkFileColumns.LINK_TYPE, 9);
 
     final SpeedUnits speedUnits = SpeedUnits.MILES_H;
-    final LengthUnits lengthUnits = LengthUnits.MILES; // Both Chicago-Sketch and Philadelphia use
-                                                       // miles
-    final CapacityPeriod capacityPeriod = CapacityPeriod.HOUR; // Chicago-Sketch only - for
-                                                               // Philadelphia use days
+    final LengthUnits lengthUnits = LengthUnits.MILES; // Both Chicago-Sketch and Philadelphia use miles
+    final CapacityPeriod capacityPeriod = CapacityPeriod.HOUR; // Chicago-Sketch only - for Philadelphia use days
 
     final TntpProject project = new TntpProject(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation,
-        networkFileColumns, speedUnits,
-        lengthUnits, capacityPeriod, defaultMaximumSpeed);
+        networkFileColumns, speedUnits, lengthUnits, capacityPeriod, defaultMaximumSpeed);
 
     // RAW INPUT START --------------------------------
     final MacroscopicNetwork macroscopicNetwork =
