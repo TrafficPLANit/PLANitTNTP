@@ -125,11 +125,18 @@ If a required file is missing from the argument list an error message is display
 
 The following is an example of a correct run call:
 
-java -jar Tntp-x.y.z.jar NETWORK=src\test\resources\ChicagoSketch\ChicagoSketch_net.tntp DEMANDS=src\test\resources\ChicagoSketch\ChicagoSketch_trips.tntp LOGFILE=logs\ChicagoSketch100iterations.log MAXITERATIONS=100 LINKOUTPUT=src\test\resources\ChicagoSketch\ChicagoSketchLink100iterations.csv ODOUTPUT=src\test\resources\ChicagoSketch\ChicagoSketchOD100iterations.csv  ODPATHOUTPUT=src\test\resources\ChicagoSketch\ChicagoSketchPath100iterations.csv NODECOORDINATES=src\test\resources\ChicagoSketch\ChicagoSketch_node.tntp
+java -jar PLANitTNTP-x.y.z.jar NETWORK=src\test\resources\ChicagoSketch\ChicagoSketch_net.tntp DEMANDS=src\test\resources\ChicagoSketch\ChicagoSketch_trips.tntp LOGFILE=logs\ChicagoSketch100iterations.log MAXITERATIONS=100 LINKOUTPUT=src\test\resources\ChicagoSketch\ChicagoSketchLink100iterations.csv ODOUTPUT=src\test\resources\ChicagoSketch\ChicagoSketchOD100iterations.csv  ODPATHOUTPUT=src\test\resources\ChicagoSketch\ChicagoSketchPath100iterations.csv NODECOORDINATES=src\test\resources\ChicagoSketch\ChicagoSketch_node.tntp
 
 The "name" values above are not case-sensitive, so "NETWORK" works as well as "network".  Also ":" and "-" can also be used as separators, so "logfile:logs/tntp.log" works as well as "logfile=logs/tntp.log".
 
 All types of output (link, OD and OD path) are optional.  You may choose to include any combination of these, including none at all.  If you include none, the program will run but not generate any results file.
+
+## Location of Input and Output Files
+
+The above example works provided all the input files are in the same directory as the the PLANitTNTP-x.y.z.jar file, and it is run from this directory in the command prompt window.  It is also possible to specify file locations in the following ways:-
+
+* Relative Location e.g "./inputs/ChicagoSketch_net.tntp";
+* Absolute Location e.g. "C:/MetroScan/inputs/ChicagoSketch_net.tntp".
 
 ## Format of CSV Links Output File
 
