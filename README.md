@@ -131,6 +131,88 @@ The "name" values above are not case-sensitive, so "NETWORK" works as well as "n
 
 All types of output (link, OD and OD path) are optional.  You may choose to include any combination of these, including none at all.  If you include none, the program will run but not generate any results file.
 
+## Format of CSV Links Output File
+
+The generated output CSV file for links can contain the following columns:-
+
+|Column|Meaning|
+|---|---|
+|Run Id|Id of the assignment run|
+|Time Period Id|Id of time period|
+|Time Period External Id*|External Id of time period|
+|Mode Id|Id of mode|
+|Mode External Id*|External Id of mode|
+|Iteration Index|Index of the current iteration|
+|Upstream Node External Id*|Id of start node of link (as specified in the network supply JSON input file)|
+|Upstream Node Id|Id of start node of link|
+|Upstream Node Location|Coordinates of the start node of the link|
+|Downstream Node External Id*|Id of end node of link (as specified in the network supply JSON input file)|
+|Downstream Node Id|Id of start node of link|
+|Downstream Node Location|Coordinates of the start node of the link|
+|Link Segment External Id|External Id of the link|
+|Link Segment Id|Id of the link|
+|Flow*|Flow of vehicles of the specified mode through this link (vehicles/hr)|
+|Length*|Length of the current link (m)|
+|Maximum Speed|Maximum speed of the current link (km/h)|
+|Number of Lanes*|Number of lanes on the link|
+|Calculated Speed*|Calculated speed along the current link (km/h)|
+|Capacity per Lane*|Capacity per lane along the current link (vehicles/hr)|
+|Density|Flow density of the current link (vehicles/km)|
+|Cost*|Travel time on link (h)|
+
+Properties marked with an asterisk are included by default.  Developers can add or remove properties in the code.
+
+External Ids of links and nodes correspond to values used in the input files, whereas (internal) Ids are generated internally by PlanIt.  This means that most users will find external Ids more useful.
+
+The default units for Cost are hours.  However this is configurable within the code.  The developer can set this to minutes or seconds.
+
+By default links with zero flow are not included.  The developer can change this default within the code.
+
+The file results.csv contains the results generated from the above example call.
+
+## Format of CSV Origin-Destination Skim Matrix Output File
+
+The generated output CSV file for the origin-destination skim matrix can contain the following columns:-
+
+|Column|Meaning|
+|---|---|
+|Run Id|Id of the assignment run|
+|Time Period Id|Id of time period|
+|Time Period External Id*|External Id of time period|
+|Mode Id|Id of mode|
+|Mode External Id*|External Id of mode|
+|Iteration Index|Index of the current iteration|
+|Destination Zone External Id*|External Id of the Destination Zone|
+|Destination Zone Id|Id of the Destination Zone|
+|Origin Zone External Id*|External Id of the Origin Zone|
+|Origin Zone Id|Id of the Origin Zone|
+|Cost*|Cost of travel from the Origin to the Destination (h)|
+
+Properties marked with an asterisk are included by default.  Developers can add or remove properties in the code.
+
+External Ids of links and nodes correspond to values used in the input files, whereas (internal) Ids are generated internally by PlanIt.  This means that most users will find external Ids more useful.
+
+The default units for Cost are hours.  However this is configurable within the code.  The developer can set this to minutes or seconds.
+
+## Format of the CSV Origin-Destination Path Output File
+
+This file is similar to the origin-destination skim matrix file described above, but instead on the "Cost" column it has a comma-separated list of node external Ids.
+
+So the full list of column headers is:-
+
+|Column|Meaning|
+|---|---|
+|Run Id|Id of the assignment run|
+|Time Period Id|Id of time period|
+|Time Period External Id*|External Id of time period|
+|Mode Id|Id of mode|
+|Mode External Id*|External Id of mode|
+|Iteration Index|Index of the current iteration|
+|Destination Zone External Id*|External Id of the Destination Zone|
+|Destination Zone Id|Id of the Destination Zone|
+|Origin Zone External Id*|External Id of the Origin Zone|
+|Origin Zone Id|Id of the Origin Zone|
+|Path*|Comma-separated list of the external Id of nodes in the path|
 
 # Test Cases
 
