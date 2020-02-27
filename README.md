@@ -14,7 +14,7 @@ Comment lines in files begin with the tilda symbol '~' and are ignored.
 
 Data files use columns which are separated by one or more spaces.  The number of spaces used to separate columns varies from row to row, so the columns in a file do not always line up in a manner which is neat to humans.  
 
-Network File (required, name ends _net.tntp)
+### Network File (required, name ends _net.tntp)
 
 Metadata Information at top of file:
 
@@ -42,7 +42,7 @@ Gold Coast has columns 'critical_speed' and 'lanes'.  Values corresponding to th
 
 A Java enumeration NetworkFileColumns has been defined to specify the possible roles of each column in the network input file.  In the TntpMain.execute() method, these are used as keys to a Map whose values are the corresponding columns.
 
-Trips File (required, name ends _trips.tntp)
+### Trips File (required, name ends _trips.tntp)
 
 This is the equivalent of the Demands file used in other input formats.
 
@@ -66,7 +66,7 @@ Sometimes a destination-demand pair is not defined for an origin, in this case t
 
 The default units are trips/hr, but Philadelphia uses trips/day.
 
-Node Locations File (optional, name ends _node.tntp)
+### Node Locations File (optional, name ends _node.tntp)
 
 After the first line which is a header, all lines have three columns:-
 
