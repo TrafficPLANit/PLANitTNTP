@@ -76,7 +76,7 @@ After the first line which is a header, all lines have three columns:-
 
 If this file is present, it is read and used to create coordinate pairs for each node.  But link lengths are not derived from these coordinates, the lengths given in the network file are used instead.
 
-Standard Results File (optional, name ends _flow.tntp);
+### Standard Results File (optional, name ends _flow.tntp);
 
 After the first line which is a header, all lines have four columns:-
 
