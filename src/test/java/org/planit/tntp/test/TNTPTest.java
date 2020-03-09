@@ -16,7 +16,7 @@ import org.planit.output.formatter.MemoryOutputFormatter;
 import org.planit.output.formatter.MemoryOutputIterator;
 import org.planit.output.property.OutputProperty;
 import org.planit.time.TimePeriod;
-import org.planit.tntp.project.TntpProject;
+import org.planit.tntp.input.Tntp;
 import org.planit.utils.misc.IdGenerator;
 import org.planit.utils.misc.Pair;
 import org.planit.utils.network.physical.Mode;
@@ -56,16 +56,16 @@ public class TNTPTest {
 
     try {
       PlanItLogger.setLogging(logfileLocation, TNTPTest.class);
-      final Pair<MemoryOutputFormatter, TntpProject> testOutput =
+      final Pair<MemoryOutputFormatter, Tntp> testOutput =
           TNTPTestHelper.execute(networkFileLocation, demandFileLocation, maxIterations, epsilon, outputTimeUnit,
               defaultMaximumSpeed);
       final MemoryOutputFormatter memoryOutputFormatter = testOutput.getFirst();
-      final TntpProject project = testOutput.getSecond();
+      final Tntp tntp = testOutput.getSecond();
 
       final Map<Long, Map<Long, double[]>> resultsMap = TNTPTestHelper.parseStandardResultsFile(standardResultsFileLocation);
-      final TimePeriod timePeriod = TimePeriod.getByExternalId(1);
+      final TimePeriod timePeriod = tntp.getTimePeriodByExternalId((long) 1);
       final int iterationIndex = memoryOutputFormatter.getLastIteration();
-      final Mode mode = project.physicalNetworks.getFirstNetwork().modes.findModeByExternalIdentifier(1);
+      final Mode mode = tntp.getModeByExternalId((long) 1);
       final int flowPosition = memoryOutputFormatter.getPositionOfOutputValueProperty(mode, timePeriod, iterationIndex, OutputType.LINK, OutputProperty.FLOW);
       final int costPosition = memoryOutputFormatter.getPositionOfOutputValueProperty(mode, timePeriod, iterationIndex, OutputType.LINK, OutputProperty.LINK_COST);
       final int linkTypePosition = memoryOutputFormatter.getPositionOfOutputValueProperty(mode, timePeriod, iterationIndex, OutputType.LINK, OutputProperty.LINK_TYPE);
@@ -93,7 +93,6 @@ public class TNTPTest {
       final Path path = FileSystems.getDefault().getPath(rootPath + "\\" + logfileLocation);
       Files.delete(path);
     } catch (final Exception e) {
-      e.printStackTrace();
       fail(e.getMessage());
     }
   }

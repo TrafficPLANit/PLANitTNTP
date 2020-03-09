@@ -53,4 +53,13 @@ public class TntpProject extends CustomPlanItProject {
     super(new Tntp(networkFileLocation, demandFileLocation, null, networkFileColumns, speedUnits, lengthUnits, capacityPeriod, defaultMaximumSpeed));
   }
 
+  /**
+   * Constructor
+   *
+   * @param tntp Tntp object already instantiated
+   */
+  public TntpProject(final Tntp tntp) {
+    super(tntp);
+  }
+
 }

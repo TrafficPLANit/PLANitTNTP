@@ -22,6 +22,7 @@ import org.planit.tntp.enums.CapacityPeriod;
 import org.planit.tntp.enums.LengthUnits;
 import org.planit.tntp.enums.NetworkFileColumns;
 import org.planit.tntp.enums.SpeedUnits;
+import org.planit.tntp.input.Tntp;
 import org.planit.tntp.project.TntpProject;
 import org.planit.trafficassignment.TraditionalStaticAssignment;
 import org.planit.trafficassignment.builder.TraditionalStaticAssignmentBuilder;
@@ -83,7 +84,7 @@ public class TNTPTestHelper {
    * @param defaultMaximumSpeed the default maximum speed along links
    * @throws PlanItException thrown if there is an error
    */
-  public static Pair<MemoryOutputFormatter, TntpProject> execute(final String networkFileLocation,
+  public static Pair<MemoryOutputFormatter, Tntp> execute(final String networkFileLocation,
       final String demandFileLocation,
       final int maxIterations,
       final double epsilon, final OutputTimeUnit outputTimeUnit, final double defaultMaximumSpeed) throws PlanItException {
@@ -106,19 +107,18 @@ public class TNTPTestHelper {
     networkFileColumns.put(NetworkFileColumns.LINK_TYPE, 9);
 
     final SpeedUnits speedUnits = SpeedUnits.MILES_H;
-    final LengthUnits lengthUnits = LengthUnits.MILES; // Both Chicago-Sketch and Philadelphia use
-                                                       // miles
-    final CapacityPeriod capacityPeriod = CapacityPeriod.HOUR; // Chicago-Sketch only - for
-                                                               // Philadelphia use days
+    final LengthUnits lengthUnits = LengthUnits.MILES; // Both Chicago-Sketch and Philadelphia use miles
+    final CapacityPeriod capacityPeriod = CapacityPeriod.HOUR; // Chicago-Sketch only - for Philadelphia use days
 
-    final TntpProject project = new TntpProject(networkFileLocation, demandFileLocation, null,
+    final Tntp tntp = new Tntp(networkFileLocation, demandFileLocation, null,
         networkFileColumns, speedUnits, lengthUnits, capacityPeriod, defaultMaximumSpeed);
+    final TntpProject project = new TntpProject(tntp);
 
     // RAW INPUT START --------------------------------
     final MacroscopicNetwork macroscopicNetwork =
         (MacroscopicNetwork) project.createAndRegisterPhysicalNetwork(MacroscopicNetwork.class.getCanonicalName());
     final Zoning zoning = project.createAndRegisterZoning(macroscopicNetwork);
-    final Demands demands = project.createAndRegisterDemands(zoning);
+    final Demands demands = project.createAndRegisterDemands(zoning, macroscopicNetwork);
 
     // RAW INPUT END -----------------------------------
 
@@ -139,8 +139,8 @@ public class TNTPTestHelper {
                                                             // iteration
 
     // OUTPUT FORMAT CONFIGURATION - LINKS
-    final LinkOutputTypeConfiguration linkOutputTypeConfiguration = (LinkOutputTypeConfiguration) taBuilder
-        .activateOutput(OutputType.LINK);
+    final LinkOutputTypeConfiguration linkOutputTypeConfiguration =
+        (LinkOutputTypeConfiguration) taBuilder.activateOutput(OutputType.LINK);
     linkOutputTypeConfiguration.addProperty(OutputProperty.LINK_TYPE);
     linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_ID);
     linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_EXTERNAL_ID);
@@ -176,6 +176,6 @@ public class TNTPTestHelper {
         throw exceptionMap.get(id);
       }
     }
-    return new Pair<MemoryOutputFormatter, TntpProject>(memoryOutputFormatter, project);
+    return new Pair<MemoryOutputFormatter, Tntp>(memoryOutputFormatter, tntp);
   }
 }

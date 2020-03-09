@@ -189,7 +189,7 @@ public class TntpMain {
     final MacroscopicNetwork macroscopicNetwork =
         (MacroscopicNetwork) project.createAndRegisterPhysicalNetwork(MacroscopicNetwork.class.getCanonicalName());
     final Zoning zoning = project.createAndRegisterZoning(macroscopicNetwork);
-    final Demands demands = project.createAndRegisterDemands(zoning);
+    final Demands demands = project.createAndRegisterDemands(zoning, macroscopicNetwork);
 
     // RAW INPUT END -----------------------------------
 
