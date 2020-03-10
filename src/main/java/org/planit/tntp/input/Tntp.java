@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 
@@ -54,6 +55,9 @@ public class Tntp extends InputBuilderListener {
 
   /** generated UID */
   private static final long serialVersionUID = 1L;
+  
+  /** the logger */
+  private static final Logger LOGGER = PlanItLogger.createLogger(Tntp.class);    
 
   /**
    *
@@ -384,7 +388,7 @@ public class Tntp extends InputBuilderListener {
    * @throws PlanItException thrown if there is an error reading the input file
    */
   protected void populatePhysicalNetwork(@Nonnull final PhysicalNetwork network) throws PlanItException {
-    PlanItLogger.info("Populating Physical Network");
+    LOGGER.info("Populating Physical Network");
 
     // TNTP only has one mode, define it here
     mode = network.modes.registerNewMode(1, "Base Mode", 1.0);
@@ -437,7 +441,7 @@ public class Tntp extends InputBuilderListener {
    * @throws PlanItException thrown if there is an error reading the input file
    */
   protected void populateDemands(@Nonnull final Demands demands, final Object parameter1) throws PlanItException {
-    PlanItLogger.info("Populating Demands");
+    LOGGER.info("Populating Demands");
     final Zoning zoning = (Zoning) parameter1;
     try (Scanner scanner = new Scanner(demandFile)) {
       boolean readingMetadata = true;
@@ -499,7 +503,7 @@ public class Tntp extends InputBuilderListener {
    * @throws PlanItException thrown if there is an error reading the input file
    */
   protected void populateZoning(final Zoning zoning, final Object parameter1) throws PlanItException {
-    PlanItLogger.info("Populating zoning");
+    LOGGER.info("Populating zoning");
     for (long zoneExternalId = 1; zoneExternalId <= noZones; zoneExternalId++) {
       final Zone zone = zoning.zones.createAndRegisterNewZone(zoneExternalId);
       addZoneToExternalIdMap(zone.getExternalId(), zone);
@@ -518,7 +522,7 @@ public class Tntp extends InputBuilderListener {
    * @throws PlanItException thrown if there is an error
    */
   protected void populatePhysicalCost(@Nonnull final PhysicalCost costComponent) throws PlanItException {
-    PlanItLogger.info("Populating BPR link costs");
+    LOGGER.info("Populating BPR link costs");
     if (bprParametersForLinkSegmentAndMode != null) {
       final BPRLinkTravelTimeCost bprLinkTravelTimeCost = (BPRLinkTravelTimeCost) costComponent;
       for (final LinkSegment linkSegment : linkSegments) {
@@ -658,8 +662,7 @@ public class Tntp extends InputBuilderListener {
         } else if (projectComponent instanceof PhysicalCost) {
           populatePhysicalCost((PhysicalCost) projectComponent);
         } else {
-          PlanItLogger.info("Event component is " + projectComponent.getClass().getCanonicalName()
-              + " which is not handled by PlanItInputBuilder.");
+          LOGGER.info("Event component is " + projectComponent.getClass().getCanonicalName() + " which is not handled by PlanItInputBuilder.");
         }
       } catch (final PlanItException e) {
         throw new RemoteException(e.toString());

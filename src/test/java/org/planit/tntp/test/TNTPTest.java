@@ -7,6 +7,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.junit.Test;
 import org.planit.logging.PlanItLogger;
@@ -17,6 +18,7 @@ import org.planit.output.formatter.MemoryOutputIterator;
 import org.planit.output.property.OutputProperty;
 import org.planit.time.TimePeriod;
 import org.planit.tntp.input.Tntp;
+import org.planit.tntp.output.formatter.CSVOutputFormatter;
 import org.planit.utils.misc.IdGenerator;
 import org.planit.utils.misc.Pair;
 import org.planit.utils.network.physical.Mode;
@@ -31,6 +33,9 @@ import org.planit.utils.network.physical.Mode;
  *
  */
 public class TNTPTest {
+  
+  /** the logger */
+  private static final Logger LOGGER = PlanItLogger.createLogger(TNTPTest.class);    
 
   /**
    * Compare the results for Chicago-Sketch TNTP network with previous results.
@@ -55,7 +60,7 @@ public class TNTPTest {
     IdGenerator.reset();
 
     try {
-      PlanItLogger.setLogging(logfileLocation, TNTPTest.class);
+      PlanItLogger.activateFileLogging(logfileLocation);
       final Pair<MemoryOutputFormatter, Tntp> testOutput =
           TNTPTestHelper.execute(networkFileLocation, demandFileLocation, maxIterations, epsilon, outputTimeUnit,
               defaultMaximumSpeed);

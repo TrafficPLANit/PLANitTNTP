@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.logging.Logger;
 
 import org.apache.commons.csv.CSVPrinter;
 import org.planit.exceptions.PlanItException;
@@ -32,6 +33,9 @@ import org.planit.utils.network.physical.Mode;
  * @author markr
  */
 public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTextFileOutputFormatter {
+  
+  /** the logger */
+  private static final Logger LOGGER = PlanItLogger.createLogger(CSVOutputFormatter.class);     
 
 	private static final String DEFAULT_NAME_EXTENSION = ".csv";
 	private static final String DEFAULT_NAME_ROOT = "CSVOutput";
@@ -152,7 +156,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	@Override
      protected void writeGeneralResultsForCurrentTimePeriod(
 	            OutputTypeConfiguration outputTypeConfiguration, OutputTypeEnum currentOutputType, OutputAdapter outputAdapter, Set<Mode> modes, TimePeriod timePeriod, int iterationIndex) throws PlanItException {
-		PlanItLogger.info("CSV Output for OutputType GENERAL has not been implemented yet.");
+	  LOGGER.info("CSV Output for OutputType GENERAL has not been implemented yet.");
 	}
 
 	/**
@@ -169,7 +173,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	@Override
 	protected void writeSimulationResultsForCurrentTimePeriod(
 	            OutputTypeConfiguration outputTypeConfiguration, OutputTypeEnum currentOutputType, OutputAdapter outputAdapter, Set<Mode> modes, TimePeriod timePeriod, int iterationIndex) throws PlanItException {
-		PlanItLogger.info("CSV Output for OutputType SIMULATION has not been implemented yet.");
+	  LOGGER.info("CSV Output for OutputType SIMULATION has not been implemented yet.");
 	}
 
 	/**
