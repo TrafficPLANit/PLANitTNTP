@@ -167,7 +167,10 @@ public class Tntp extends InputBuilderListener {
       node = new NodeImpl();
       node.setExternalId(nodeExternalId);
       network.nodes.registerNode(node);
-      addNodeToExternalIdMap(nodeExternalId, node);
+      final boolean duplicateNodeExternalId = addNodeToExternalIdMap(nodeExternalId, node);
+      if (duplicateNodeExternalId && isErrorIfDuplicateExternalId()) {
+        throw new PlanItException("Duplicate node external id " + nodeExternalId + " found in network file.");
+      }
     } else {
       node = getNodeByExternalId(nodeExternalId);
     }
@@ -248,19 +251,22 @@ public class Tntp extends InputBuilderListener {
     linkSegment.setExternalId(externalId);
     final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) network;
 
-    //final MacroscopicLinkSegmentType macroscopicLinkSegmentType =
-    //    macroscopicNetwork.registerNewLinkSegmentType("" + linkSegmentType, capacityPerLane, maxSpeed, externalId,
-    //        modePropertiesMap).getFirst();
     final Pair<MacroscopicLinkSegmentType, Boolean> linkSegmentTypePair = macroscopicNetwork.registerNewLinkSegmentType("" + linkSegmentType, capacityPerLane, maxSpeed, externalId, modePropertiesMap);
     final MacroscopicLinkSegmentType macroscopicLinkSegmentType = linkSegmentTypePair.getFirst();
     final boolean linkSegmentTypeAlreadyExists = linkSegmentTypePair.getSecond();
     if (!linkSegmentTypeAlreadyExists) {
-      addLinkSegmentTypeToExternalIdMap(macroscopicLinkSegmentType.getExternalId(), macroscopicLinkSegmentType);
+      final boolean duplicateLinkSegmentTypeExternalId = addLinkSegmentTypeToExternalIdMap(macroscopicLinkSegmentType.getExternalId(), macroscopicLinkSegmentType);
+      if (duplicateLinkSegmentTypeExternalId && isErrorIfDuplicateExternalId()) {
+        throw new PlanItException("Duplicate link segment type external id " + macroscopicLinkSegmentType.getExternalId() + " found in network file.");
+      }
     }
     linkSegment.setLinkSegmentType(macroscopicLinkSegmentType);
     network.linkSegments.registerLinkSegment(link, linkSegment, true);
     if (linkSegment.getExternalId() != null) {
-      addLinkSegmentToExternalIdMap(linkSegment.getExternalId(), linkSegment);
+      final boolean duplicateLinkSegmentExternalId = addLinkSegmentToExternalIdMap(linkSegment.getExternalId(), linkSegment) ;
+      if (duplicateLinkSegmentExternalId && isErrorIfDuplicateExternalId()) {
+        throw new PlanItException("Duplicate link segment external id " + linkSegment.getExternalId() + " found in network file.");
+      }
     }
     return linkSegment;
   }
