@@ -2,6 +2,7 @@ package org.planit.tntp;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.planit.cost.physical.BPRLinkTravelTimeCost;
 import org.planit.cost.virtual.FixedConnectoidTravelTimeCost;
@@ -37,6 +38,9 @@ import org.planit.utils.misc.IdGenerator;
  *
  */
 public class TntpMain {
+  
+  /** the logger */
+  private static final Logger LOGGER = PlanItLogger.createLogger(TntpMain.class);     
 
   public static final int DEFAULT_MAX_ITERATIONS = 1;
   public static final double DEFAULT_CONVERGENCE_EPSILON = 0.01;
@@ -109,9 +113,9 @@ public class TntpMain {
         }
       }
       if (logfileLocation == null) {
-        PlanItLogger.setLoggingToConsoleOnly(TntpMain.class);
+        PlanItLogger.activateLoggingToConsole();
       } else {
-        PlanItLogger.setLogging(logfileLocation, TntpMain.class);
+        PlanItLogger.activateFileLogging(logfileLocation);
       }
       if (outputTimeUnitValue != null) {
         final String outputSelection = outputTimeUnitValue.substring(0, 1).toUpperCase();
