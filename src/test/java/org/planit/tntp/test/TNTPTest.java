@@ -3,14 +3,14 @@ package org.planit.tntp.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.junit.After;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.planit.logging.PlanItLogger;
+import org.planit.logging.Logging;
 import org.planit.output.enums.OutputTimeUnit;
 import org.planit.output.enums.OutputType;
 import org.planit.output.formatter.MemoryOutputFormatter;
@@ -18,7 +18,6 @@ import org.planit.output.formatter.MemoryOutputIterator;
 import org.planit.output.property.OutputProperty;
 import org.planit.time.TimePeriod;
 import org.planit.tntp.input.Tntp;
-import org.planit.tntp.output.formatter.CSVOutputFormatter;
 import org.planit.utils.misc.IdGenerator;
 import org.planit.utils.misc.Pair;
 import org.planit.utils.network.physical.Mode;
@@ -33,10 +32,22 @@ import org.planit.utils.network.physical.Mode;
  *
  */
 public class TNTPTest {
-  
-  /** the logger */
-  private static final Logger LOGGER = PlanItLogger.createLogger(TNTPTest.class);    
 
+  /** the logger */
+  private static Logger LOGGER;
+
+
+  @BeforeClass
+  public static void setUp() throws Exception {
+    if (LOGGER == null) {
+      LOGGER = Logging.createLogger(TNTPTest.class);
+    }
+  }
+
+  @After
+  public void tearDown() {
+    Logging.closeLogger(LOGGER);
+  }
   /**
    * Compare the results for Chicago-Sketch TNTP network with previous results.
    *
@@ -53,14 +64,12 @@ public class TNTPTest {
     final String demandFileLocation = "src\\test\\resources\\ChicagoSketch\\ChicagoSketch_trips.tntp";
     final String standardResultsFileLocation = "src\\test\\resources\\ChicagoSketch\\ChicagoSketch_flow.tntp";
     final OutputTimeUnit outputTimeUnit = null;
-    final String logfileLocation = "logs\\ChicagoSketchTest.log";
     final int maxIterations = 100;
     final double epsilon = TNTPTestHelper.DEFAULT_CONVERGENCE_EPSILON;
     final double defaultMaximumSpeed = 25.0;
     IdGenerator.reset();
 
     try {
-      PlanItLogger.activateFileLogging(logfileLocation);
       final Pair<MemoryOutputFormatter, Tntp> testOutput =
           TNTPTestHelper.execute(networkFileLocation, demandFileLocation, maxIterations, epsilon, outputTimeUnit,
               defaultMaximumSpeed);
@@ -93,12 +102,9 @@ public class TNTPTest {
           }
       }
 
-      PlanItLogger.close();
-      final String rootPath = System.getProperty("user.dir");
-      final Path path = FileSystems.getDefault().getPath(rootPath + "\\" + logfileLocation);
-      Files.delete(path);
-    } catch (final Exception e) {
-      fail(e.getMessage());
+    } catch (final Exception ex) {
+      LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+      fail(ex.getMessage());
     }
   }
 }

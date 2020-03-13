@@ -2,13 +2,14 @@ package org.planit.tntp;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.planit.cost.physical.BPRLinkTravelTimeCost;
 import org.planit.cost.virtual.FixedConnectoidTravelTimeCost;
 import org.planit.demands.Demands;
 import org.planit.exceptions.PlanItException;
-import org.planit.logging.PlanItLogger;
+import org.planit.logging.Logging;
 import org.planit.network.physical.macroscopic.MacroscopicNetwork;
 import org.planit.network.virtual.Zoning;
 import org.planit.output.configuration.LinkOutputTypeConfiguration;
@@ -38,9 +39,9 @@ import org.planit.utils.misc.IdGenerator;
  *
  */
 public class TntpMain {
-  
+
   /** the logger */
-  private static final Logger LOGGER = PlanItLogger.createLogger(TntpMain.class);     
+  private static Logger LOGGER;
 
   public static final int DEFAULT_MAX_ITERATIONS = 1;
   public static final double DEFAULT_CONVERGENCE_EPSILON = 0.01;
@@ -57,7 +58,7 @@ public class TntpMain {
     String demandFileLocation = null;
     String nodeCoordinateFileLocation = null;
     String linkOutputFilename = null;
-    String logfileLocation = null;
+    String loggingPropertiesFileLocation = null;
     String outputTimeUnitValue = null;
     OutputTimeUnit outputTimeUnit = null;
     String odOutputFilename = null;
@@ -96,7 +97,7 @@ public class TntpMain {
             epsilon = Double.parseDouble(argValue);
             break;
           case "LOGFILE":
-            logfileLocation = argValue;
+            loggingPropertiesFileLocation = argValue;
             break;
           case "OUTPUTTIMEUNIT":
             outputTimeUnitValue = argValue;
@@ -112,11 +113,14 @@ public class TntpMain {
             break;
         }
       }
-      if (logfileLocation == null) {
-        PlanItLogger.activateLoggingToConsole();
+
+      //If the user has specified a logging properties file use that, otherwise use the default
+      if (loggingPropertiesFileLocation != null) {
+        LOGGER = Logging.createLogger(TntpMain.class, loggingPropertiesFileLocation);
       } else {
-        PlanItLogger.activateFileLogging(logfileLocation);
+        LOGGER = Logging.createLogger(TntpMain.class);
       }
+
       if (outputTimeUnitValue != null) {
         final String outputSelection = outputTimeUnitValue.substring(0, 1).toUpperCase();
         switch (outputSelection) {
@@ -136,9 +140,10 @@ public class TntpMain {
       tntpMain.execute(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation,
           linkOutputFilename, odOutputFilename,
           odPathOutputFilename, maxIterations, epsilon, outputTimeUnit, defaultMaximumSpeed);
-      PlanItLogger.close();
-    } catch (final Exception e) {
-      e.printStackTrace();
+    } catch (final Exception ex) {
+      LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+    } finally {
+      Logging.closeLogger(LOGGER);
     }
   }
 
@@ -204,7 +209,7 @@ public class TntpMain {
 
     // SUPPLY-DEMAND INTERACTIONS
     taBuilder.createAndRegisterPhysicalCost(BPRLinkTravelTimeCost.class.getCanonicalName());
-    taBuilder.createAndRegisterVirtualTravelTimeCostFunction(FixedConnectoidTravelTimeCost.class.getCanonicalName());
+    taBuilder.createAndRegisterVirtualCost(FixedConnectoidTravelTimeCost.class.getCanonicalName());
     taBuilder.createAndRegisterSmoothing(MSASmoothing.class.getCanonicalName());
 
     // DATA OUTPUT CONFIGURATION

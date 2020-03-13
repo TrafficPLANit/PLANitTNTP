@@ -19,7 +19,6 @@ import org.planit.demands.Demands;
 import org.planit.exceptions.PlanItException;
 import org.planit.geo.PlanitGeoUtils;
 import org.planit.input.InputBuilderListener;
-import org.planit.logging.PlanItLogger;
 import org.planit.network.physical.NodeImpl;
 import org.planit.network.physical.PhysicalNetwork;
 import org.planit.network.physical.macroscopic.MacroscopicModePropertiesImpl;
@@ -55,9 +54,9 @@ public class Tntp extends InputBuilderListener {
 
   /** generated UID */
   private static final long serialVersionUID = 1L;
-  
+
   /** the logger */
-  private static final Logger LOGGER = PlanItLogger.createLogger(Tntp.class);    
+  private static final Logger LOGGER = Logger.getLogger(Tntp.class.getCanonicalName());
 
   /**
    *
