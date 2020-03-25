@@ -5,7 +5,7 @@
 	<groupId>PLANitTNTP</groupId>
 	<artifactId>PLANitTNTP</artifactId>
 	<version>0.0.4-SNAPSHOT</version>
-	<name>PLANItTNTP </name>
+	<name>PLANItTNTP</name>
 	<url>http://maven.apache.org</url>
 	<description>PLANIt Interface For TNTP Format</description>
 
@@ -133,7 +133,7 @@
 							<Class-Path>.</Class-Path>
 						</manifestEntries>
 					</archive>
-					<finalName>BasicCsv</finalName>
+					<finalName>PLANItTNTP</finalName>
 				</configuration>
 			</plugin>
 
