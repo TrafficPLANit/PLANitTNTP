@@ -490,7 +490,7 @@ public class Tntp extends InputBuilderListener {
       }
       scanner.close();
       updateOdDemandMatrix(demandToDestination, zoning, originZone, odDemandMatrix);
-
+      demands.timePeriods.registerTimePeriod(timePeriod);     
       demands.registerODDemand(timePeriod, mode, odDemandMatrix);
     } catch (final Exception ex) {
       throw new PlanItException(ex);

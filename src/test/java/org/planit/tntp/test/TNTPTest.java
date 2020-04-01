@@ -34,7 +34,7 @@ import org.planit.utils.network.physical.Mode;
 public class TNTPTest {
 
   /** the logger */
-  private static Logger LOGGER;
+  private static Logger LOGGER = Logger.getLogger(TNTPTest.class.getCanonicalName()); 
 
 
   @BeforeClass
