@@ -70,10 +70,14 @@ public class TntpMain {
       final TntpMain tntpMain = new TntpMain();
       final Map<String, String> argsMap = ArgumentParser.convertArgsToMap(args);
       if (!argsMap.keySet().contains("NETWORK")) {
-        throw new PlanItException("No Network input file defined");
+        final String errorMessage = "No Network input file defined";
+        LOGGER.severe(errorMessage);
+        throw new PlanItException(errorMessage);
       }
       if (!argsMap.keySet().contains("DEMANDS")) {
-        throw new PlanItException("No Demands input file defined");
+        final String errorMessage = "No Demands input file defined";
+        LOGGER.severe(errorMessage);
+        throw new PlanItException(errorMessage);
       }
       for (final String inputFileType : argsMap.keySet()) {
         final String argValue = argsMap.get(inputFileType);
@@ -134,7 +138,9 @@ public class TntpMain {
             outputTimeUnit = OutputTimeUnit.SECONDS;
             break;
           default:
-            throw new PlanItException("Argument OutputTimeUnit included but does not start with h, m or s.");
+            final String errorMessage = "Argument OutputTimeUnit included but does not start with h, m or s.";
+            LOGGER.severe(errorMessage);
+            throw new PlanItException(errorMessage);
         }
       }
       tntpMain.execute(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation,

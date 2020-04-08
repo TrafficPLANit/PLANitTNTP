@@ -162,8 +162,10 @@ public class Tntp extends InputBuilderListener {
       throws PlanItException {
     final long nodeExternalId = Long.parseLong(cols[networkFileColumns.get(networkFileColumn)]);
     if (nodeExternalId > noPhysicalNodes) {
-      throw new PlanItException("Number of nodes is specified as " + noPhysicalNodes
-          + " but found a reference to node " + nodeExternalId);
+      final String errorMessage = "Number of nodes is specified as " + noPhysicalNodes
+          + " but found a reference to node " + nodeExternalId;
+      LOGGER.severe(errorMessage);
+      throw new PlanItException(errorMessage);
     }
     Node node = null;
     if (getNodeByExternalId(nodeExternalId) == null) {
@@ -172,7 +174,9 @@ public class Tntp extends InputBuilderListener {
       network.nodes.registerNode(node);
       final boolean duplicateNodeExternalId = addNodeToExternalIdMap(nodeExternalId, node);
       if (duplicateNodeExternalId && isErrorIfDuplicateExternalId()) {
-        throw new PlanItException("Duplicate node external id " + nodeExternalId + " found in network file.");
+        final String errorMessage = "Duplicate node external id " + nodeExternalId + " found in network file.";
+        LOGGER.severe(errorMessage);
+        throw new PlanItException(errorMessage);
       }
     } else {
       node = getNodeByExternalId(nodeExternalId);
@@ -260,7 +264,9 @@ public class Tntp extends InputBuilderListener {
     if (!linkSegmentTypeAlreadyExists) {
       final boolean duplicateLinkSegmentTypeExternalId = addLinkSegmentTypeToExternalIdMap(macroscopicLinkSegmentType.getExternalId(), macroscopicLinkSegmentType);
       if (duplicateLinkSegmentTypeExternalId && isErrorIfDuplicateExternalId()) {
-        throw new PlanItException("Duplicate link segment type external id " + macroscopicLinkSegmentType.getExternalId() + " found in network file.");
+        final String errorMessage = "Duplicate link segment type external id " + macroscopicLinkSegmentType.getExternalId() + " found in network file.";
+        LOGGER.severe(errorMessage);
+        throw new PlanItException(errorMessage);
       }
     }
     linkSegment.setLinkSegmentType(macroscopicLinkSegmentType);
@@ -268,7 +274,9 @@ public class Tntp extends InputBuilderListener {
     if (linkSegment.getExternalId() != null) {
       final boolean duplicateLinkSegmentExternalId = addLinkSegmentToExternalIdMap(linkSegment.getExternalId(), linkSegment) ;
       if (duplicateLinkSegmentExternalId && isErrorIfDuplicateExternalId()) {
-        throw new PlanItException("Duplicate link segment external id " + linkSegment.getExternalId() + " found in network file.");
+        final String errorMessage = "Duplicate link segment external id " + linkSegment.getExternalId() + " found in network file.";
+        LOGGER.severe(errorMessage);
+        throw new PlanItException(errorMessage);
       }
     }
     return linkSegment;
@@ -423,8 +431,10 @@ public class Tntp extends InputBuilderListener {
       }
 
       if (linkSegmentExternalId != noLinks) {
-        throw new PlanItException("Header says " + noLinks + " links but " + linkSegmentExternalId
-            + " were actually defined.");
+        final String errorMessage = "Header says " + noLinks + " links but " + linkSegmentExternalId
+            + " were actually defined.";
+        LOGGER.severe(errorMessage);
+        throw new PlanItException(errorMessage);
       }
     } catch (final PlanItException pex) {
       throw pex;
@@ -464,8 +474,10 @@ public class Tntp extends InputBuilderListener {
           if (line.startsWith(NUMBER_OF_ZONES_INDICATOR)) {
             final String subLine = line.substring(NUMBER_OF_ZONES_INDICATOR.length()).trim();
             if (noZones != Integer.parseInt(subLine)) {
-              throw new PlanItException("Network file indicates there are " + noZones
-                  + " but demand file indicates there are " + Integer.parseInt(subLine) + " zones.");
+              final String errorMessage = "Network file indicates there are " + noZones
+                  + " but demand file indicates there are " + Integer.parseInt(subLine) + " zones.";
+              LOGGER.severe(errorMessage);
+              throw new PlanItException(errorMessage);
             }
           }
         } else if (!atEndOfMetadata) {
@@ -490,7 +502,7 @@ public class Tntp extends InputBuilderListener {
       }
       scanner.close();
       updateOdDemandMatrix(demandToDestination, zoning, originZone, odDemandMatrix);
-      demands.timePeriods.registerTimePeriod(timePeriod);     
+      demands.timePeriods.registerTimePeriod(timePeriod);
       demands.registerODDemand(timePeriod, mode, odDemandMatrix);
     } catch (final Exception ex) {
       throw new PlanItException(ex);
