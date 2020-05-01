@@ -21,9 +21,9 @@ import org.planit.output.formatter.CsvTextFileOutputFormatter;
 import org.planit.output.property.BaseOutputProperty;
 import org.planit.output.property.OutputProperty;
 import org.planit.time.TimePeriod;
-import org.planit.utils.OutputUtils;
 import org.planit.utils.network.physical.LinkSegment;
 import org.planit.utils.network.physical.Mode;
+import org.planit.utils.output.OutputUtils;
 
 /**
  * Output formatter for CSV output, i.e. this class is capable of persisting

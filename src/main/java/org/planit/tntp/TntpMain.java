@@ -29,7 +29,7 @@ import org.planit.tntp.output.formatter.CSVOutputFormatter;
 import org.planit.tntp.project.TntpProject;
 import org.planit.trafficassignment.TraditionalStaticAssignment;
 import org.planit.trafficassignment.builder.TraditionalStaticAssignmentBuilder;
-import org.planit.utils.ArgumentParser;
+import org.planit.utils.args.ArgumentParser;
 import org.planit.utils.misc.IdGenerator;
 
 /**
