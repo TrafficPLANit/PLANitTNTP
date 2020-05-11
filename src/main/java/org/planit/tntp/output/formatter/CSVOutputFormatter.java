@@ -19,7 +19,6 @@ import org.planit.output.enums.OutputTypeEnum;
 import org.planit.output.formatter.CsvFileOutputFormatter;
 import org.planit.output.formatter.CsvTextFileOutputFormatter;
 import org.planit.output.property.BaseOutputProperty;
-import org.planit.output.property.OutputProperty;
 import org.planit.time.TimePeriod;
 import org.planit.utils.network.physical.LinkSegment;
 import org.planit.utils.network.physical.Mode;
@@ -79,18 +78,11 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 		final SortedSet<BaseOutputProperty> outputProperties = outputTypeConfiguration.getOutputProperties();
 		try {
 			for (final Mode mode : modes) {
-				double totalCost = 0.0;
 				for (final LinkSegment linkSegment : linkOutputTypeAdapter.getLinkSegments()) {
 					if (outputTypeConfiguration.isRecordLinksWithZeroFlow() || linkOutputTypeAdapter.isFlowPositive(linkSegment, mode)) {
-						totalCost += ((Double) linkOutputTypeAdapter.getLinkOutputPropertyValue(OutputProperty.FLOW, linkSegment, mode, timePeriod, outputTimeUnit.getMultiplier())) *
-					                         ((Double) linkOutputTypeAdapter.getLinkOutputPropertyValue(OutputProperty.LINK_COST, linkSegment, mode, timePeriod, outputTimeUnit.getMultiplier()));
 						final List<Object> rowValues = new ArrayList<Object>();
 						for (final BaseOutputProperty outputProperty : outputProperties) {
-							if (outputProperty.getOutputProperty().equals(OutputProperty.TOTAL_COST_TO_END_NODE)) {
-								rowValues.add(OutputUtils.formatObject(totalCost));
-							} else {
-								rowValues.add(OutputUtils.formatObject(linkOutputTypeAdapter.getLinkOutputPropertyValue(outputProperty.getOutputProperty(), linkSegment, mode, timePeriod, outputTimeUnit.getMultiplier())));
-							}
+              rowValues.add(OutputUtils.formatObject(linkOutputTypeAdapter.getLinkOutputPropertyValue(outputProperty.getOutputProperty(), linkSegment, mode, timePeriod, outputTimeUnit.getMultiplier())));
  						}
 						printer.get(outputTypeConfiguration.getOutputType()).printRecord(rowValues);
 					}
