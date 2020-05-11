@@ -86,11 +86,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 					                         ((Double) linkOutputTypeAdapter.getLinkOutputPropertyValue(OutputProperty.LINK_COST, linkSegment, mode, timePeriod, outputTimeUnit.getMultiplier()));
 						final List<Object> rowValues = new ArrayList<Object>();
 						for (final BaseOutputProperty outputProperty : outputProperties) {
-							if (outputProperty.getOutputProperty().equals(OutputProperty.TOTAL_COST_TO_END_NODE)) {
-								rowValues.add(OutputUtils.formatObject(totalCost));
-							} else {
-								rowValues.add(OutputUtils.formatObject(linkOutputTypeAdapter.getLinkOutputPropertyValue(outputProperty.getOutputProperty(), linkSegment, mode, timePeriod, outputTimeUnit.getMultiplier())));
-							}
+							rowValues.add(OutputUtils.formatObject(linkOutputTypeAdapter.getLinkOutputPropertyValue(outputProperty.getOutputProperty(), linkSegment, mode, timePeriod, outputTimeUnit.getMultiplier())));
  						}
 						printer.get(outputTypeConfiguration.getOutputType()).printRecord(rowValues);
 					}
