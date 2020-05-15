@@ -34,7 +34,7 @@ import org.planit.utils.network.physical.Mode;
 public class TNTPTest {
 
   /** the logger */
-  private static Logger LOGGER = Logger.getLogger(TNTPTest.class.getCanonicalName()); 
+  private static Logger LOGGER = Logger.getLogger(TNTPTest.class.getCanonicalName());
 
 
   @BeforeClass
@@ -87,6 +87,7 @@ public class TNTPTest {
       final int upstreamNodeExternalIdPosition = memoryOutputFormatter.getPositionOfOutputKeyProperty(mode, timePeriod, iterationIndex, OutputType.LINK, OutputProperty.UPSTREAM_NODE_EXTERNAL_ID);
       final MemoryOutputIterator memoryOutputIterator = memoryOutputFormatter.getIterator(mode, timePeriod, iterationIndex, OutputType.LINK);
       while (memoryOutputIterator.hasNext()) {
+          memoryOutputIterator.next();
           final Object[] results = memoryOutputIterator.getValues();
           final String runLinkType = (String) results[linkTypePosition];
           if (runLinkType.equals("3")) {
