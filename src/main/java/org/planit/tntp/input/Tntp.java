@@ -232,10 +232,10 @@ public class Tntp extends InputBuilderListener {
    * @throws PlanItException thrown if there is an error
    */
   private MacroscopicLinkSegment createAndRegisterLinkSegment(@Nonnull final PhysicalNetwork network,
-      @Nonnull final Link link, final double maxSpeed, final double capacityPerLane, final int linkSegmentType,
+      @Nonnull final Link link, final double maxSpeed, final double capacityPerLane, final int linkSegmentTypeExternalId,
       final long externalId, final double length, final double freeFlowTravelTime)  throws PlanItException {
     MacroscopicModeProperties macroscopicModeProperties = null;
-    switch (linkSegmentType) {
+    switch (linkSegmentTypeExternalId) {
       case 1:
         macroscopicModeProperties = new MacroscopicModePropertiesImpl((length / freeFlowTravelTime) * speedUnits
             .getMultiplier(), (length / freeFlowTravelTime) * speedUnits.getMultiplier());
@@ -258,7 +258,7 @@ public class Tntp extends InputBuilderListener {
     linkSegment.setExternalId(externalId);
     final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) network;
 
-    final Pair<MacroscopicLinkSegmentType, Boolean> linkSegmentTypePair = macroscopicNetwork.registerNewLinkSegmentType("" + linkSegmentType, capacityPerLane, maxSpeed, externalId, modePropertiesMap);
+    final Pair<MacroscopicLinkSegmentType, Boolean> linkSegmentTypePair = macroscopicNetwork.registerNewMacroscopicLinkSegmentType("" + linkSegmentTypeExternalId, capacityPerLane, maxSpeed, linkSegmentTypeExternalId, modePropertiesMap, this);
     final MacroscopicLinkSegmentType macroscopicLinkSegmentType = linkSegmentTypePair.getFirst();
     final boolean linkSegmentTypeAlreadyExists = linkSegmentTypePair.getSecond();
     if (!linkSegmentTypeAlreadyExists) {
@@ -358,9 +358,9 @@ public class Tntp extends InputBuilderListener {
     }
     final double capacityPerLane =
         Integer.parseInt(cols[networkFileColumns.get(NetworkFileColumns.CAPACITY_PER_LANE)]) * capacityPeriod.getMultiplier();
-    final int linkSegmentType = Integer.parseInt(cols[networkFileColumns.get(NetworkFileColumns.LINK_TYPE)]);
+    final int linkSegmentTypeExternalId = Integer.parseInt(cols[networkFileColumns.get(NetworkFileColumns.LINK_TYPE)]);
     final MacroscopicLinkSegment linkSegment =
-        createAndRegisterLinkSegment(network, link, maxSpeed, capacityPerLane, linkSegmentType, linkSegmentExternalId, length, freeFlowTravelTime);
+        createAndRegisterLinkSegment(network, link, maxSpeed, capacityPerLane, linkSegmentTypeExternalId, linkSegmentExternalId, length, freeFlowTravelTime);
 
     double alpha = BPRLinkTravelTimeCost.DEFAULT_ALPHA;
     double beta = BPRLinkTravelTimeCost.DEFAULT_BETA;
