@@ -257,18 +257,22 @@ public class Tntp extends InputBuilderListener {
     linkSegment.setMaximumSpeed(mode, maxSpeed);
     linkSegment.setExternalId(externalId);
     final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) network;
-
-    final Pair<MacroscopicLinkSegmentType, Boolean> linkSegmentTypePair = macroscopicNetwork.registerNewMacroscopicLinkSegmentType("" + linkSegmentTypeExternalId, capacityPerLane, maxSpeed, linkSegmentTypeExternalId, modePropertiesMap, this);
-    final MacroscopicLinkSegmentType macroscopicLinkSegmentType = linkSegmentTypePair.getFirst();
-    final boolean linkSegmentTypeAlreadyExists = linkSegmentTypePair.getSecond();
-    if (!linkSegmentTypeAlreadyExists) {
+    final MacroscopicLinkSegmentType macroscopicLinkSegmentType = macroscopicNetwork
+        .createNewMacroscopicLinkSegmentType("" + linkSegmentTypeExternalId, capacityPerLane, maxSpeed, linkSegmentTypeExternalId, modePropertiesMap);
+    final MacroscopicLinkSegmentType existingLinkSegmentType = getLinkSegmentTypeByExternalId(macroscopicLinkSegmentType.getExternalId());
+    if (existingLinkSegmentType == null) {
+      macroscopicNetwork.registerLinkSegmentType(macroscopicLinkSegmentType);
       final boolean duplicateLinkSegmentTypeExternalId = addLinkSegmentTypeToExternalIdMap(macroscopicLinkSegmentType.getExternalId(), macroscopicLinkSegmentType);
       if (duplicateLinkSegmentTypeExternalId && isErrorIfDuplicateExternalId()) {
         final String errorMessage = "Duplicate link segment type external id " + macroscopicLinkSegmentType.getExternalId() + " found in network file.";
         LOGGER.severe(errorMessage);
         throw new PlanItException(errorMessage);
       }
+      linkSegment.setLinkSegmentType(macroscopicLinkSegmentType);
+    } else {
+      linkSegment.setLinkSegmentType(existingLinkSegmentType);
     }
+
     linkSegment.setLinkSegmentType(macroscopicLinkSegmentType);
     network.linkSegments.registerLinkSegment(link, linkSegment, true);
     if (linkSegment.getExternalId() != null) {
