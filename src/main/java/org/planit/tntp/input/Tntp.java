@@ -222,7 +222,7 @@ public class Tntp extends InputBuilderListener {
    * Link type
    * 3 is the only one for which our results match the published results.
    *
-   * @param network the current physical network
+   * @param network the current macroscopic network
    * @param link the current link
    * @param maxSpeed the maximum speed for this link
    * @param capacityPerLane the capacity per lane for this link
@@ -231,9 +231,10 @@ public class Tntp extends InputBuilderListener {
    * @return the macroscopic link segment which has been created
    * @throws PlanItException thrown if there is an error
    */
-  private MacroscopicLinkSegment createAndRegisterLinkSegment(@Nonnull final PhysicalNetwork network,
-      @Nonnull final Link link, final double maxSpeed, final double capacityPerLane, final int linkSegmentTypeExternalId,
-      final long externalId, final double length, final double freeFlowTravelTime)  throws PlanItException {
+  private MacroscopicLinkSegment createAndRegisterLinkSegment(@Nonnull final MacroscopicNetwork network,
+      @Nonnull final Link link, final double maxSpeed, final double capacityPerLane,
+      final int linkSegmentTypeExternalId,
+      final long externalId, final double length, final double freeFlowTravelTime) throws PlanItException {
     MacroscopicModeProperties macroscopicModeProperties = null;
     switch (linkSegmentTypeExternalId) {
       case 1:
@@ -256,29 +257,26 @@ public class Tntp extends InputBuilderListener {
         (MacroscopicLinkSegment) network.linkSegments.createDirectionalLinkSegment(link, true);
     linkSegment.setMaximumSpeed(mode, maxSpeed);
     linkSegment.setExternalId(externalId);
-    final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) network;
-    final MacroscopicLinkSegmentType macroscopicLinkSegmentType = macroscopicNetwork
-        .createNewMacroscopicLinkSegmentType("" + linkSegmentTypeExternalId, capacityPerLane, maxSpeed, linkSegmentTypeExternalId, modePropertiesMap);
-    final MacroscopicLinkSegmentType existingLinkSegmentType = getLinkSegmentTypeByExternalId(macroscopicLinkSegmentType.getExternalId());
+    final MacroscopicNetwork macroscopicNetwork = network;
+
+    final MacroscopicLinkSegmentType existingLinkSegmentType = getLinkSegmentTypeByExternalId(
+        linkSegmentTypeExternalId);
     if (existingLinkSegmentType == null) {
-      macroscopicNetwork.registerLinkSegmentType(macroscopicLinkSegmentType);
-      final boolean duplicateLinkSegmentTypeExternalId = addLinkSegmentTypeToExternalIdMap(macroscopicLinkSegmentType.getExternalId(), macroscopicLinkSegmentType);
-      if (duplicateLinkSegmentTypeExternalId && isErrorIfDuplicateExternalId()) {
-        final String errorMessage = "Duplicate link segment type external id " + macroscopicLinkSegmentType.getExternalId() + " found in network file.";
-        LOGGER.severe(errorMessage);
-        throw new PlanItException(errorMessage);
-      }
+      final MacroscopicLinkSegmentType macroscopicLinkSegmentType = macroscopicNetwork
+          .createAndRegisterNewMacroscopicLinkSegmentType("" + linkSegmentTypeExternalId, capacityPerLane, maxSpeed,
+              linkSegmentTypeExternalId, modePropertiesMap);
+      addLinkSegmentTypeToExternalIdMap(macroscopicLinkSegmentType.getExternalId(), macroscopicLinkSegmentType);
       linkSegment.setLinkSegmentType(macroscopicLinkSegmentType);
     } else {
       linkSegment.setLinkSegmentType(existingLinkSegmentType);
     }
-
-    linkSegment.setLinkSegmentType(macroscopicLinkSegmentType);
     network.linkSegments.registerLinkSegment(link, linkSegment, true);
     if (linkSegment.getExternalId() != null) {
-      final boolean duplicateLinkSegmentExternalId = addLinkSegmentToExternalIdMap(linkSegment.getExternalId(), linkSegment) ;
+      final boolean duplicateLinkSegmentExternalId = addLinkSegmentToExternalIdMap(linkSegment.getExternalId(),
+          linkSegment);
       if (duplicateLinkSegmentExternalId && isErrorIfDuplicateExternalId()) {
-        final String errorMessage = "Duplicate link segment external id " + linkSegment.getExternalId() + " found in network file.";
+        final String errorMessage = "Duplicate link segment external id " + linkSegment.getExternalId()
+            + " found in network file.";
         LOGGER.severe(errorMessage);
         throw new PlanItException(errorMessage);
       }
@@ -335,12 +333,12 @@ public class Tntp extends InputBuilderListener {
    * Create and register the nodes, links and link segments from the current line in the network
    * input file
    *
-   * @param physicalNetwork the physical network object to be populated from the input data
+   * @param network the macroscopic network object to be populated from the input data
    * @param line the current line in the network input file
    * @param linkSegmentExternalId the external Id for the current line segment
    * @throws PlanItException thrown if there is an error
    */
-  private void readLinkData(final PhysicalNetwork network, final String line, final long linkSegmentExternalId)
+  private void readLinkData(final MacroscopicNetwork network, final String line, final long linkSegmentExternalId)
       throws PlanItException {
     final String[] cols = line.split("\\s+");
 
@@ -361,10 +359,12 @@ public class Tntp extends InputBuilderListener {
       maxSpeed = Double.POSITIVE_INFINITY;
     }
     final double capacityPerLane =
-        Integer.parseInt(cols[networkFileColumns.get(NetworkFileColumns.CAPACITY_PER_LANE)]) * capacityPeriod.getMultiplier();
+        Integer.parseInt(cols[networkFileColumns.get(NetworkFileColumns.CAPACITY_PER_LANE)]) * capacityPeriod
+            .getMultiplier();
     final int linkSegmentTypeExternalId = Integer.parseInt(cols[networkFileColumns.get(NetworkFileColumns.LINK_TYPE)]);
     final MacroscopicLinkSegment linkSegment =
-        createAndRegisterLinkSegment(network, link, maxSpeed, capacityPerLane, linkSegmentTypeExternalId, linkSegmentExternalId, length, freeFlowTravelTime);
+        createAndRegisterLinkSegment(network, link, maxSpeed, capacityPerLane, linkSegmentTypeExternalId,
+            linkSegmentExternalId, length, freeFlowTravelTime);
 
     double alpha = BPRLinkTravelTimeCost.DEFAULT_ALPHA;
     double beta = BPRLinkTravelTimeCost.DEFAULT_BETA;
@@ -387,10 +387,11 @@ public class Tntp extends InputBuilderListener {
    * Add BPR parameters for a specified link segmen
    *
    * @param linkSegment the specified link segment
-    * @param alpha the BPR alpha parameter
+   * @param alpha the BPR alpha parameter
    * @param beta the BPR beta parameter
    */
-  private void addBprParametersForLinkSegmentAndMode(final LinkSegment linkSegment, final double alpha,  final double beta) {
+  private void addBprParametersForLinkSegmentAndMode(final LinkSegment linkSegment, final double alpha,
+      final double beta) {
     if (bprParametersForLinkSegmentAndMode == null) {
       bprParametersForLinkSegmentAndMode = new HashMap<LinkSegment, Pair<Double, Double>>();
     }
@@ -404,9 +405,10 @@ public class Tntp extends InputBuilderListener {
    * @param physicalNetwork the physical network object to be populated from the input data
    * @throws PlanItException thrown if there is an error reading the input file
    */
-  protected void populatePhysicalNetwork(@Nonnull final PhysicalNetwork network) throws PlanItException {
+  protected void populatePhysicalNetwork(@Nonnull final PhysicalNetwork physicalNetwork) throws PlanItException {
     LOGGER.info("Populating Physical Network");
 
+    final MacroscopicNetwork network = (MacroscopicNetwork) physicalNetwork;
     // TNTP only has one mode, define it here
     mode = network.modes.registerNewMode(1, "Base Mode", 1.0);
     addModeToExternalIdMap(mode.getExternalId(), mode);
@@ -683,7 +685,8 @@ public class Tntp extends InputBuilderListener {
         } else if (projectComponent instanceof PhysicalCost) {
           populatePhysicalCost((PhysicalCost) projectComponent);
         } else {
-          LOGGER.info("Event component is " + projectComponent.getClass().getCanonicalName() + " which is not handled by PlanItInputBuilder.");
+          LOGGER.info("Event component is " + projectComponent.getClass().getCanonicalName()
+              + " which is not handled by PlanItInputBuilder.");
         }
       } catch (final PlanItException e) {
         throw new RemoteException(e.toString());
