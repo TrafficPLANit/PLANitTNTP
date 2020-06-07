@@ -153,7 +153,6 @@ public class TNTPTestHelper {
     linkOutputTypeConfiguration.removeProperty(OutputProperty.TIME_PERIOD_EXTERNAL_ID);
     linkOutputTypeConfiguration.removeProperty(OutputProperty.TIME_PERIOD_ID);
     linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_ID);
-    linkOutputTypeConfiguration.removeProperty(OutputProperty.DENSITY);
     linkOutputTypeConfiguration.removeProperty(OutputProperty.MAXIMUM_SPEED);
 
     // MemoryOutputFormatter - Links
