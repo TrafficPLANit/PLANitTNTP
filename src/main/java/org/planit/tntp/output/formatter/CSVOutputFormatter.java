@@ -78,7 +78,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 		final SortedSet<BaseOutputProperty> outputProperties = outputTypeConfiguration.getOutputProperties();
 		try {
 			for (final Mode mode : modes) {
-				for (final LinkSegment linkSegment : linkOutputTypeAdapter.getLinkSegments()) {
+				for (final LinkSegment linkSegment : linkOutputTypeAdapter.getPhysicalLinkSegments()) {
 					if (outputTypeConfiguration.isRecordLinksWithZeroFlow() || linkOutputTypeAdapter.isFlowPositive(linkSegment, mode)) {
 						final List<Object> rowValues = new ArrayList<Object>();
 						for (final BaseOutputProperty outputProperty : outputProperties) {
