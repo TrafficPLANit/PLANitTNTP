@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
-import javax.annotation.Nonnull;
-
 import org.djutils.event.EventInterface;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.Position;
@@ -231,8 +229,8 @@ public class Tntp extends InputBuilderListener {
    * @return the macroscopic link segment which has been created
    * @throws PlanItException thrown if there is an error
    */
-  private MacroscopicLinkSegment createAndRegisterLinkSegment(@Nonnull final MacroscopicNetwork network,
-      @Nonnull final Link link, final double maxSpeed, final double capacityPerLane,
+  private MacroscopicLinkSegment createAndRegisterLinkSegment( final MacroscopicNetwork network,
+       final Link link, final double maxSpeed, final double capacityPerLane,
       final int linkSegmentTypeExternalId,
       final long externalId, final double length, final double freeFlowTravelTime) throws PlanItException {
     MacroscopicModeProperties macroscopicModeProperties = null;
@@ -405,7 +403,7 @@ public class Tntp extends InputBuilderListener {
    * @param physicalNetwork the physical network object to be populated from the input data
    * @throws PlanItException thrown if there is an error reading the input file
    */
-  protected void populatePhysicalNetwork(@Nonnull final PhysicalNetwork physicalNetwork) throws PlanItException {
+  protected void populatePhysicalNetwork( final PhysicalNetwork physicalNetwork) throws PlanItException {
     LOGGER.info("Populating Physical Network");
 
     final MacroscopicNetwork network = (MacroscopicNetwork) physicalNetwork;
@@ -463,7 +461,7 @@ public class Tntp extends InputBuilderListener {
    * @param parameter1 Zoning object previously defined
    * @throws PlanItException thrown if there is an error reading the input file
    */
-  protected void populateDemands(@Nonnull final Demands demands, final Object parameter1) throws PlanItException {
+  protected void populateDemands( final Demands demands, final Object parameter1) throws PlanItException {
     LOGGER.info("Populating Demands");
     final Zoning zoning = (Zoning) parameter1;
     try (Scanner scanner = new Scanner(demandFile)) {
@@ -546,7 +544,7 @@ public class Tntp extends InputBuilderListener {
    * @param costComponent the BPRLinkTravelTimeCost to be populated
    * @throws PlanItException thrown if there is an error
    */
-  protected void populatePhysicalCost(@Nonnull final PhysicalCost costComponent) throws PlanItException {
+  protected void populatePhysicalCost( final PhysicalCost costComponent) throws PlanItException {
     LOGGER.info("Populating BPR link costs");
     if (bprParametersForLinkSegmentAndMode != null) {
       final BPRLinkTravelTimeCost bprLinkTravelTimeCost = (BPRLinkTravelTimeCost) costComponent;

@@ -4,13 +4,18 @@ PLANit Interface for TNTP format files
 
 The input files for this format can be found at https://github.com/bstabler/TransportationNetworks
 
-February 2020: So far we have got the standard files for Philadelphia and Chicago-Sketch to run.  The test case for Philadelphia runs using this code but we have not validated the outputs.
-The contents and format of the input data files is different for some data sets which we have not yet used.  
+February 2020: So far we have got the standard files for Philadelphia and Chicago-Sketch to run.  The test case for Philadelphia runs using this code but we have not validated the outputs. The contents and format of the input data files is different for some data sets which we have not yet used.  
 For example, the GoldCoast network file (https://github.com/bstabler/TransportationNetworks/blob/master/GoldCoast/Goldcoast_network_2016_01.tntp) has a different format from that described below.  We have not yet written code which could run the Gold Coast data set.
+
+# Maven parent
+
+Projects need to be built from Maven before they can be run. The common maven configuration can be found in the PLANitAll project which acts as the parent for this project's pom.xml.
+
+> Make sure you install the PLANitAll pom.xml before conducting a maven build (in Eclipse) on this project, otherwise it cannot find the references dependencies, plugins, and other resources.
 
 # Data Files 
 
-Comment lines in files begin with the tilda symbol '~' and are ignored.
+Comment lines in files begin with the tilde symbol '~' and are ignored.
 
 Data files use columns which are separated by one or more spaces.  The number of spaces used to separate columns varies from row to row, so the columns in a file do not always line up in a manner which is neat to humans.  
 
