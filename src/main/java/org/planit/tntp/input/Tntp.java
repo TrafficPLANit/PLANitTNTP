@@ -114,21 +114,21 @@ public class Tntp extends InputBuilderListener {
   private int noZones;
 
   /**
-   * The populated network
-   */
-  private MacroscopicNetwork network;
-  
-  /**
    * The number of nodes in the network according to TNTP
    */
   private int noPhysicalNodes;
 
   /**
-   * The number of links in the network accroding to TNTP
+   * The number of links in the network according to TNTP
    */
   private int noLinks;
 
   /**
+   * List of link segments in the network
+   */
+  private PhysicalNetwork.LinkSegments linkSegments;
+
+ /**
    * Map containing the BPR parameters for each link segment, if these are specified in the
    * network file (null if default values are being used)
    */
@@ -452,6 +452,8 @@ public class Tntp extends InputBuilderListener {
       updateNodeCoordinatesFromFile(network);
     }
 
+    linkSegments = network.linkSegments;
+
   }
 
   /**
@@ -548,7 +550,7 @@ public class Tntp extends InputBuilderListener {
     LOGGER.info("Populating BPR link costs");
     if (bprParametersForLinkSegmentAndMode != null) {
       final BPRLinkTravelTimeCost bprLinkTravelTimeCost = (BPRLinkTravelTimeCost) costComponent;
-      for (final LinkSegment linkSegment : network.linkSegments) {
+      for (final LinkSegment linkSegment : linkSegments) {
         if (bprParametersForLinkSegmentAndMode.containsKey(linkSegment)) {
           final Pair<Double, Double> alphaBeta = bprParametersForLinkSegmentAndMode.get(linkSegment);
           final MacroscopicLinkSegment macroscopicLinkSegment = (MacroscopicLinkSegment) linkSegment;
