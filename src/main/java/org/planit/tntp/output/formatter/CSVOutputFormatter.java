@@ -89,8 +89,9 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 				}
 			}
 		} catch (final Exception e) {
-			throw new PlanItException(e);
-		}
+      LOGGER.severe(e.getMessage());
+      throw new PlanItException("Error when writing link results for current time period in TNTP",e);
+    }
 	}
 
 	/**
@@ -192,8 +193,9 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 		    for(final Map.Entry<OutputType, OutputTypeConfiguration> entry : outputTypeConfigurations.entrySet()) {
 	            printer.get(entry.getKey()).close();
 		    }
-		} catch (final IOException ioe) {
-			throw new PlanItException(ioe);
+		} catch (final IOException e) {
+      LOGGER.severe(e.getMessage());
+      throw new PlanItException("Error when finalising after simulation in TNTP",e);
 		}
 	}
 
@@ -223,8 +225,9 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	            printer.put(outputType, csvPrinter);
 		    }
 		} catch (final Exception e) {
-			throw new PlanItException(e);
-		}
+      LOGGER.severe(e.getMessage());
+      throw new PlanItException("Error when initialising before simulation in TNTP",e);
+    }
 	}
 
 	/**

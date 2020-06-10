@@ -2,7 +2,6 @@ package org.planit.tntp;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.planit.cost.physical.BPRLinkTravelTimeCost;
@@ -146,8 +145,8 @@ public class TntpMain {
       tntpMain.execute(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation,
           linkOutputFilename, odOutputFilename,
           odPathOutputFilename, maxIterations, epsilon, outputTimeUnit, defaultMaximumSpeed);
-    } catch (final Exception ex) {
-      LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+    } catch (final Exception e) {
+      LOGGER.severe(e.getMessage());
     } finally {
       Logging.closeLogger(LOGGER);
     }

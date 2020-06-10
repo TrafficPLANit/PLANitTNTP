@@ -103,9 +103,9 @@ public class TNTPTest {
           }
       }
 
-    } catch (final Exception ex) {
-      LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-      fail(ex.getMessage());
+    } catch (final Exception e) {
+      LOGGER.severe(e.getMessage());
+      fail(e.getMessage());
     }
   }
 }

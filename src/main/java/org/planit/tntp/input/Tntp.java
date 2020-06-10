@@ -306,8 +306,9 @@ public class Tntp extends InputBuilderListener {
           node.setCentrePointGeometry(nodeGeometry);
         }
       }
-    } catch (final Exception ex) {
-      throw new PlanItException(ex);
+    } catch (final Exception e) {
+      LOGGER.severe(e.getMessage());
+      throw new PlanItException("Error when updating node coordinates from file in TNTP",e);
     }
   }
 
@@ -440,10 +441,11 @@ public class Tntp extends InputBuilderListener {
         LOGGER.severe(errorMessage);
         throw new PlanItException(errorMessage);
       }
-    } catch (final PlanItException pex) {
-      throw pex;
-    } catch (final Exception ex) {
-      throw new PlanItException(ex);
+    } catch (final PlanItException e) {
+      throw e;
+    } catch (final Exception e) {
+      LOGGER.severe(e.getMessage());
+      throw new PlanItException("Error when populating physical network in TNTP",e);
     }
 
     if (nodeCoordinateFile != null) {
@@ -510,8 +512,9 @@ public class Tntp extends InputBuilderListener {
       updateOdDemandMatrix(demandToDestination, zoning, originZone, odDemandMatrix);
       demands.timePeriods.registerTimePeriod(timePeriod);
       demands.registerODDemand(timePeriod, mode, odDemandMatrix);
-    } catch (final Exception ex) {
-      throw new PlanItException(ex);
+    } catch (final Exception e) {
+      LOGGER.severe(e.getMessage());
+      throw new PlanItException("Error when populating demands in TNTP",e);
     }
   }
 
@@ -655,8 +658,9 @@ public class Tntp extends InputBuilderListener {
       this.capacityPeriod = (capacityPeriod == null) ? CapacityPeriod.HOUR : capacityPeriod;
       this.defaultMaximumSpeed = defaultMaximumSpeed;
       planitGeoUtils = new PlanitGeoUtils();
-    } catch (final Exception ex) {
-      throw new PlanItException(ex);
+    } catch (final Exception e) {
+      LOGGER.severe(e.getMessage());
+      throw new PlanItException("Error in constructof TNTP",e);
     }
   }
 
@@ -689,7 +693,8 @@ public class Tntp extends InputBuilderListener {
               + " which is not handled by PlanItInputBuilder.");
         }
       } catch (final PlanItException e) {
-        throw new RemoteException(e.toString());
+        LOGGER.severe(e.getMessage());
+        throw new RemoteException("Error rethrown as RemoteException in notify of TNTP",e);
       }
     }
   }

@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 import org.planit.cost.physical.BPRLinkTravelTimeCost;
 import org.planit.cost.virtual.FixedConnectoidTravelTimeCost;
@@ -18,10 +19,7 @@ import org.planit.output.enums.OutputType;
 import org.planit.output.formatter.MemoryOutputFormatter;
 import org.planit.output.property.OutputProperty;
 import org.planit.sdinteraction.smoothing.MSASmoothing;
-import org.planit.tntp.enums.CapacityPeriod;
-import org.planit.tntp.enums.LengthUnits;
-import org.planit.tntp.enums.NetworkFileColumns;
-import org.planit.tntp.enums.SpeedUnits;
+import org.planit.tntp.enums.*;
 import org.planit.tntp.input.Tntp;
 import org.planit.tntp.project.TntpProject;
 import org.planit.trafficassignment.TraditionalStaticAssignment;
@@ -36,6 +34,10 @@ import org.planit.utils.misc.Pair;
  *
  */
 public class TNTPTestHelper {
+  
+  /** the logger */
+  private static final Logger LOGGER = Logger.getLogger(TNTPTestHelper.class.getCanonicalName());
+
 
   public static final int DEFAULT_MAX_ITERATIONS = 1;
   public static final double DEFAULT_CONVERGENCE_EPSILON = 0.01;
@@ -67,8 +69,9 @@ public class TNTPTestHelper {
           resultsMap.get(upstreamNodeExternalId).put(downstreamNodeExternalId, flowCost);
         }
       }
-    } catch (final Exception ex) {
-      throw new PlanItException(ex);
+    } catch (final Exception e) {
+      LOGGER.severe(e.getMessage());
+      throw new PlanItException("Error when parsing standard results file",e);
     }
     return resultsMap;
   }
