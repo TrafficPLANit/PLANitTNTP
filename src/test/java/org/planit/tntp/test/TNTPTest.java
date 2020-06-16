@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.After;
@@ -80,11 +79,11 @@ public class TNTPTest {
       final TimePeriod timePeriod = tntp.getTimePeriodByExternalId((long) 1);
       final int iterationIndex = memoryOutputFormatter.getLastIteration();
       final Mode mode = tntp.getModeByExternalId((long) 1);
-      final int flowPosition = memoryOutputFormatter.getPositionOfOutputValueProperty(mode, timePeriod, iterationIndex, OutputType.LINK, OutputProperty.FLOW);
-      final int costPosition = memoryOutputFormatter.getPositionOfOutputValueProperty(mode, timePeriod, iterationIndex, OutputType.LINK, OutputProperty.LINK_COST);
-      final int linkTypePosition = memoryOutputFormatter.getPositionOfOutputValueProperty(mode, timePeriod, iterationIndex, OutputType.LINK, OutputProperty.LINK_TYPE);
-      final int downstreamNodeExternalIdPosition = memoryOutputFormatter.getPositionOfOutputKeyProperty(mode, timePeriod, iterationIndex, OutputType.LINK, OutputProperty.DOWNSTREAM_NODE_EXTERNAL_ID);
-      final int upstreamNodeExternalIdPosition = memoryOutputFormatter.getPositionOfOutputKeyProperty(mode, timePeriod, iterationIndex, OutputType.LINK, OutputProperty.UPSTREAM_NODE_EXTERNAL_ID);
+      final int flowPosition = memoryOutputFormatter.getPositionOfOutputValueProperty(OutputType.LINK, OutputProperty.FLOW);
+      final int costPosition = memoryOutputFormatter.getPositionOfOutputValueProperty(OutputType.LINK, OutputProperty.LINK_COST);
+      final int linkTypePosition = memoryOutputFormatter.getPositionOfOutputValueProperty(OutputType.LINK, OutputProperty.LINK_TYPE);
+      final int downstreamNodeExternalIdPosition = memoryOutputFormatter.getPositionOfOutputKeyProperty(OutputType.LINK, OutputProperty.DOWNSTREAM_NODE_EXTERNAL_ID);
+      final int upstreamNodeExternalIdPosition = memoryOutputFormatter.getPositionOfOutputKeyProperty(OutputType.LINK, OutputProperty.UPSTREAM_NODE_EXTERNAL_ID);
       final MemoryOutputIterator memoryOutputIterator = memoryOutputFormatter.getIterator(mode, timePeriod, iterationIndex, OutputType.LINK);
       while (memoryOutputIterator.hasNext()) {
           memoryOutputIterator.next();
