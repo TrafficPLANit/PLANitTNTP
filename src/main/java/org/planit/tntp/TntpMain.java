@@ -65,6 +65,7 @@ public class TntpMain {
     int maxIterations = DEFAULT_MAX_ITERATIONS;
     double epsilon = DEFAULT_CONVERGENCE_EPSILON;
     double defaultMaximumSpeed = DEFAULT_MAXIMUM_SPEED;
+    boolean persistZeroFlow = false;
     try {
       final TntpMain tntpMain = new TntpMain();
       final Map<String, String> argsMap = ArgumentParser.convertArgsToMap(args);
@@ -114,6 +115,8 @@ public class TntpMain {
           case "DEFAULTMAXIMUMSPEED":
             defaultMaximumSpeed = Double.parseDouble(argValue);
             break;
+          case "PERSISTZEROFLOW":
+            persistZeroFlow = Boolean.parseBoolean(argValue);
         }
       }
 
@@ -144,7 +147,7 @@ public class TntpMain {
       }
       tntpMain.execute(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation,
           linkOutputFilename, odOutputFilename,
-          odPathOutputFilename, maxIterations, epsilon, outputTimeUnit, defaultMaximumSpeed);
+          odPathOutputFilename, persistZeroFlow, maxIterations, epsilon, outputTimeUnit, defaultMaximumSpeed);
     } catch (final Exception e) {
       LOGGER.severe(e.getMessage());
     } finally {
@@ -161,6 +164,7 @@ public class TntpMain {
    * @param linkOutputFilename the link output CSV file
    * @param odOutputFilename the OD output CSV file
    * @param odPathOutputFilename the OD path output CSV file
+   * @param persistZeroFlow if true record
    * @param maxIterations the maximum number of iterations
    * @param epsilon the epsilon used for convergence
    * @param outputTimeUnit the output time units
@@ -169,7 +173,8 @@ public class TntpMain {
    */
   public void execute(final String networkFileLocation, final String demandFileLocation,
       final String nodeCoordinateFileLocation, final String linkOutputFilename,
-      final String odOutputFilename, final String odPathOutputFilename, final int maxIterations, final double epsilon,
+      final String odOutputFilename, final String odPathOutputFilename,
+      final boolean persistZeroFlow, final int maxIterations, final double epsilon,
       final OutputTimeUnit outputTimeUnit, final double defaultMaximumSpeed) throws PlanItException {
 
     final boolean isLinkOutputActive = (linkOutputFilename != null);
@@ -220,8 +225,8 @@ public class TntpMain {
     // DATA OUTPUT CONFIGURATION
     taBuilder.activateOutput(OutputType.LINK);
     final OutputConfiguration outputConfiguration = taBuilder.getOutputConfiguration();
-    outputConfiguration.setPersistOnlyFinalIteration(true); // option to only persist the final
-                                                            // iteration
+    outputConfiguration.setPersistOnlyFinalIteration(true); // option to only persist the final iteration
+    outputConfiguration.setPersistZeroFlow(persistZeroFlow);
 
     // OUTPUT FORMAT CONFIGURATION - LINKS
     if (isLinkOutputActive) {

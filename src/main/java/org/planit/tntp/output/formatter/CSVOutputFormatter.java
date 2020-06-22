@@ -13,6 +13,7 @@ import org.apache.commons.csv.CSVPrinter;
 import org.planit.exceptions.PlanItException;
 import org.planit.output.adapter.LinkOutputTypeAdapter;
 import org.planit.output.adapter.OutputAdapter;
+import org.planit.output.configuration.OutputConfiguration;
 import org.planit.output.configuration.OutputTypeConfiguration;
 import org.planit.output.enums.OutputType;
 import org.planit.output.enums.OutputTypeEnum;
@@ -62,6 +63,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	/**
 	 * Write link results for the current time period to the CSV file
 	 *
+	 * @param outputConfiguration output configuration
 	 * @param outputTypeConfiguration OutputTypeConfiguration for current  persistence
 	 * @param currentOutputType active OutputTypeEnum of the configuration we are persisting for (can be a SubOutputTypeEnum or an OutputType)
 	 * @param outputTypeAdapter OutputTypeAdapter for current persistence
@@ -71,7 +73,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	 * @throws PlanItException thrown if there is an error
 	 */
 	@Override
-	protected void writeLinkResultsForCurrentTimePeriod(
+	protected void writeLinkResultsForCurrentTimePeriod(final OutputConfiguration outputConfiguration,
 	            final OutputTypeConfiguration outputTypeConfiguration, final OutputTypeEnum currentOutputType, final OutputAdapter outputAdapter, final Set<Mode> modes, final TimePeriod timePeriod, final int iterationIndex) throws PlanItException {
 
 		final LinkOutputTypeAdapter linkOutputTypeAdapter = (LinkOutputTypeAdapter) outputAdapter.getOutputTypeAdapter(outputTypeConfiguration.getOutputType());
@@ -79,7 +81,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 		try {
 			for (final Mode mode : modes) {
 				for (final LinkSegment linkSegment : linkOutputTypeAdapter.getPhysicalLinkSegments()) {
-					if (outputTypeConfiguration.isRecordZeroFlow() || linkOutputTypeAdapter.isFlowPositive(linkSegment, mode)) {
+					if (outputConfiguration.isPersistZeroFlow() || linkOutputTypeAdapter.isFlowPositive(linkSegment, mode)) {
 						final List<Object> rowValues = new ArrayList<Object>();
 						for (final BaseOutputProperty outputProperty : outputProperties) {
               rowValues.add(OutputUtils.formatObject(linkOutputTypeAdapter.getLinkOutputPropertyValue(outputProperty.getOutputProperty(), linkSegment, mode, timePeriod, outputTimeUnit.getMultiplier())));
@@ -97,6 +99,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	/**
 	 * Write Origin-Destination results for the time period to the CSV file
 	 *
+   * @param outputConfiguration output configuration
 	 * @param outputTypeConfiguration OutputTypeConfiguration for current  persistence
 	 * @param currentOutputType active OutputTypeEnum of the configuration we are persisting for (can be a SubOutputTypeEnum or an OutputType)
 	 * @param outputTypeAdapter OutputTypeAdapter for current persistence
@@ -106,9 +109,9 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	 * @throws PlanItException thrown if there is an error
 	 */
 	@Override
-	protected void writeOdResultsForCurrentTimePeriod(
+	protected void writeOdResultsForCurrentTimePeriod(final OutputConfiguration outputConfiguration,
             final OutputTypeConfiguration outputTypeConfiguration, final OutputTypeEnum currentOutputType, final OutputAdapter outputAdapter, final Set<Mode> modes, final TimePeriod timePeriod, final int iterationIndex) throws PlanItException {
-		final PlanItException pe = writeOdResultsForCurrentTimePeriodToCsvPrinter(outputTypeConfiguration, currentOutputType, outputAdapter, modes, timePeriod, printer.get(outputTypeConfiguration.getOutputType()));
+		final PlanItException pe = writeOdResultsForCurrentTimePeriodToCsvPrinter(outputConfiguration, outputTypeConfiguration, currentOutputType, outputAdapter, modes, timePeriod, printer.get(outputTypeConfiguration.getOutputType()));
 		if (pe != null) {
 			throw pe;
 		}
@@ -117,6 +120,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	/**
 	 * Write Path results for the time period to the CSV file
 	 *
+   * @param outputConfiguration output configuration
 	 * @param outputTypeConfiguration OutputTypeConfiguration for current  persistence
 	 * @param currentOutputType active OutputTypeEnum of the configuration we are persisting for (can be a SubOutputTypeEnum or an OutputType)
 	 * @param outputTypeAdapter OutputTypeAdapter for current persistence
@@ -126,9 +130,9 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	 * @throws PlanItException thrown if there is an error
 	 */
 	@Override
-	protected void writePathResultsForCurrentTimePeriod(
+	protected void writePathResultsForCurrentTimePeriod(final OutputConfiguration outputConfiguration,
 	            final OutputTypeConfiguration outputTypeConfiguration, final OutputTypeEnum currentOutputType, final OutputAdapter outputAdapter, final Set<Mode> modes, final TimePeriod timePeriod, final int iterationIndex) throws PlanItException {
-		final PlanItException pe = writePathResultsForCurrentTimePeriodToCsvPrinter(outputTypeConfiguration, currentOutputType, outputAdapter, modes, timePeriod, printer.get(outputTypeConfiguration.getOutputType()));
+		final PlanItException pe = writePathResultsForCurrentTimePeriodToCsvPrinter(outputConfiguration, outputTypeConfiguration, currentOutputType, outputAdapter, modes, timePeriod, printer.get(outputTypeConfiguration.getOutputType()));
 		if (pe != null) {
 			throw pe;
 		}
@@ -137,6 +141,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	/**
 	 * Write General results for the current time period to the CSV file
 	 *
+   * @param outputConfiguration output configuration
 	 * @param outputTypeConfiguration OutputTypeConfiguration for current  persistence
 	 * @param currentOutputType active OutputTypeEnum of the configuration we are persisting for (can be a SubOutputTypeEnum or an OutputType)
 	 * @param outputTypeAdapter OutputTypeAdapter for current persistence
@@ -146,7 +151,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	 * @throws PlanItException thrown if there is an error
 	 */
 	@Override
-     protected void writeGeneralResultsForCurrentTimePeriod(
+     protected void writeGeneralResultsForCurrentTimePeriod(final OutputConfiguration outputConfiguration,
 	            final OutputTypeConfiguration outputTypeConfiguration, final OutputTypeEnum currentOutputType, final OutputAdapter outputAdapter, final Set<Mode> modes, final TimePeriod timePeriod, final int iterationIndex) throws PlanItException {
 	  LOGGER.info("CSV Output for OutputType GENERAL has not been implemented yet.");
 	}
@@ -154,6 +159,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	/**
 	 * Write Simulation results for the current time period to the CSV file
 	 *
+   * @param outputConfiguration output configuration
 	 * @param outputTypeConfiguration OutputTypeConfiguration for current  persistence
 	 * @param currentOutputType active OutputTypeEnum of the configuration we are persisting for (can be a SubOutputTypeEnum or an OutputType)
 	 * @param outputTypeAdapter OutputTypeAdapter for current persistence
@@ -163,7 +169,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	 * @throws PlanItException thrown if there is an error
 	 */
 	@Override
-	protected void writeSimulationResultsForCurrentTimePeriod(
+	protected void writeSimulationResultsForCurrentTimePeriod(final OutputConfiguration outputConfiguration,
 	            final OutputTypeConfiguration outputTypeConfiguration, final OutputTypeEnum currentOutputType, final OutputAdapter outputAdapter, final Set<Mode> modes, final TimePeriod timePeriod, final int iterationIndex) throws PlanItException {
 	  LOGGER.info("CSV Output for OutputType SIMULATION has not been implemented yet.");
 	}
