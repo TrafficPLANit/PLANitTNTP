@@ -81,7 +81,8 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 		try {
 			for (final Mode mode : modes) {
 				for (final LinkSegment linkSegment : linkOutputTypeAdapter.getPhysicalLinkSegments()) {
-					if (outputTypeConfiguration.isPersistZeroFlow() || linkOutputTypeAdapter.isFlowPositive(linkSegment, mode)) {						final List<Object> rowValues = new ArrayList<Object>();
+					if (outputConfiguration.isPersistZeroFlow() || linkOutputTypeAdapter.isFlowPositive(linkSegment, mode)) {
+					  final List<Object> rowValues = new ArrayList<Object>();
 						for (final BaseOutputProperty outputProperty : outputProperties) {
               rowValues.add(OutputUtils.formatObject(linkOutputTypeAdapter.getLinkOutputPropertyValue(outputProperty.getOutputProperty(), linkSegment, mode, timePeriod, outputTimeUnit.getMultiplier())));
  						}
