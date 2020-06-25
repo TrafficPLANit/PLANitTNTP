@@ -66,7 +66,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	 * @param outputConfiguration output configuration
 	 * @param outputTypeConfiguration OutputTypeConfiguration for current  persistence
 	 * @param currentOutputType active OutputTypeEnum of the configuration we are persisting for (can be a SubOutputTypeEnum or an OutputType)
-	 * @param outputTypeAdapter OutputTypeAdapter for current persistence
+	 * @param outputAdapter OutputAdapter for current persistence
 	 * @param modes                   Set of modes of travel
 	 * @param timePeriod              current time period
 	 * @param iterationIndex current iteration index
@@ -101,7 +101,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
    * @param outputConfiguration output configuration
 	 * @param outputTypeConfiguration OutputTypeConfiguration for current  persistence
 	 * @param currentOutputType active OutputTypeEnum of the configuration we are persisting for (can be a SubOutputTypeEnum or an OutputType)
-	 * @param outputTypeAdapter OutputTypeAdapter for current persistence
+	 * @param outputAdapter OutputAdapter for current persistence
 	 * @param modes                   Set of modes of travel
 	 * @param timePeriod              current time period
 	 * @param iterationIndex current iteration index
@@ -122,7 +122,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
    * @param outputConfiguration output configuration
 	 * @param outputTypeConfiguration OutputTypeConfiguration for current  persistence
 	 * @param currentOutputType active OutputTypeEnum of the configuration we are persisting for (can be a SubOutputTypeEnum or an OutputType)
-	 * @param outputTypeAdapter OutputTypeAdapter for current persistence
+	 * @param outputAdapter OutputAdapter for current persistence
 	 * @param modes                   Set of modes of travel
 	 * @param timePeriod              current time period
 	 * @param iterationIndex current iteration index
@@ -143,7 +143,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
    * @param outputConfiguration output configuration
 	 * @param outputTypeConfiguration OutputTypeConfiguration for current  persistence
 	 * @param currentOutputType active OutputTypeEnum of the configuration we are persisting for (can be a SubOutputTypeEnum or an OutputType)
-	 * @param outputTypeAdapter OutputTypeAdapter for current persistence
+	 * @param outputAdapter OutputAdapter for current persistence
 	 * @param modes                   Set of modes of travel
 	 * @param timePeriod              current time period
 	 * @param iterationIndex current iteration index
@@ -161,7 +161,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
    * @param outputConfiguration output configuration
 	 * @param outputTypeConfiguration OutputTypeConfiguration for current  persistence
 	 * @param currentOutputType active OutputTypeEnum of the configuration we are persisting for (can be a SubOutputTypeEnum or an OutputType)
-	 * @param outputTypeAdapter OutputTypeAdapter for current persistence
+	 * @param outputAdapter OutputAdapter for current persistence
 	 * @param modes                   Set of modes of travel
 	 * @param timePeriod              current time period
 	 * @param iterationIndex current iteration index
@@ -210,8 +210,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	 * This method also creates the output file directory if it does not already
 	 * exist.
 	 *
-	 * @param outputTypeConfiguration OutputTypeConfiguration for the assignment to
-	 *                                be saved
+	 * @param outputTypeConfigurations Map of OutputTypeConfiguration for the assignment to be saved
 	 * @throws PlanItException thrown if output file or directory cannot be opened
 	 */
 	@Override
@@ -238,7 +237,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	/**
 	 * Sets the name of the CSAV output file directory
 	 *
-	 * @param outputDirectory the name of the output file directory
+	 * @param csvOutputDirectory the name of the output file directory
 	 */
 	@Override
   public void setCsvDirectory(final String csvOutputDirectory) {
@@ -248,7 +247,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	/**
 	 * Sets the extension of the CSV output file
 	 *
-	 * @param nameExtension the extension of the CSV output file
+	 * @param csvNameExtension the extension of the CSV output file
 	 */
 	@Override
   public void setCsvNameExtension(final String csvNameExtension) {
@@ -258,7 +257,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	/**
 	 * Sets the root name of the CSV output file
 	 *
-	 * @param nameRoot root name of CSV output file
+	 * @param csvNameRoot root name of CSV output file
 	 */
 	@Override
   public void setCsvNameRoot(final String csvNameRoot) {

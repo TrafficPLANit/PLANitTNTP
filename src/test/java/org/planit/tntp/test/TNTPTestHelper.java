@@ -19,7 +19,10 @@ import org.planit.output.enums.OutputType;
 import org.planit.output.formatter.MemoryOutputFormatter;
 import org.planit.output.property.OutputProperty;
 import org.planit.sdinteraction.smoothing.MSASmoothing;
-import org.planit.tntp.enums.*;
+import org.planit.tntp.enums.CapacityPeriod;
+import org.planit.tntp.enums.LengthUnits;
+import org.planit.tntp.enums.NetworkFileColumns;
+import org.planit.tntp.enums.SpeedUnits;
 import org.planit.tntp.input.Tntp;
 import org.planit.tntp.project.TntpProject;
 import org.planit.trafficassignment.TraditionalStaticAssignment;
@@ -34,7 +37,7 @@ import org.planit.utils.misc.Pair;
  *
  */
 public class TNTPTestHelper {
-  
+
   /** the logger */
   private static final Logger LOGGER = Logger.getLogger(TNTPTestHelper.class.getCanonicalName());
 
@@ -85,6 +88,7 @@ public class TNTPTestHelper {
    * @param epsilon the epsilon used for convergence
    * @param outputTimeUnit the output time units
    * @param defaultMaximumSpeed the default maximum speed along links
+   * @return a Pair containing the MemoryOutputFormatter and the Tntp object
    * @throws PlanItException thrown if there is an error
    */
   public static Pair<MemoryOutputFormatter, Tntp> execute(final String networkFileLocation,

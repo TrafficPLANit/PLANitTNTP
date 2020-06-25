@@ -1,0 +1,6 @@
+org.planit.tntp
+org.planit.tntp.enums
+org.planit.tntp.input
+org.planit.tntp.output.formatter
+org.planit.tntp.project
+org.planit.tntp.test

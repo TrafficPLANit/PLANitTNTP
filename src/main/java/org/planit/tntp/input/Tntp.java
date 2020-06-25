@@ -152,8 +152,8 @@ public class Tntp extends InputBuilderListener {
    * @param network the current physical network
    * @param cols the columns in the network input file
    * @param networkFileColumn the column in the network file which contains the node external Id
-   * @param nodeExternalId the external Id of the node to be created
    * @return the node corresponding to this external ID
+   * @throws PlanItException thrown if there is an error registering the node
    */
   private Node createAndRegisterNode(final PhysicalNetwork network, final String[] cols,
       final NetworkFileColumns networkFileColumn)
@@ -224,8 +224,10 @@ public class Tntp extends InputBuilderListener {
    * @param link the current link
    * @param maxSpeed the maximum speed for this link
    * @param capacityPerLane the capacity per lane for this link
-   * @param linkSegmentType the type of this link segment
+   * @param linkSegmentTypeExternalId the external Id of the type of this link segment
    * @param externalId external Id of this link segment
+   * @param length the length of this link segment
+   * @param freeFlowTravelTime the free flow travel time for this link segment
    * @return the macroscopic link segment which has been created
    * @throws PlanItException thrown if there is an error
    */
@@ -285,7 +287,7 @@ public class Tntp extends InputBuilderListener {
   /**
    * Update the node coordinates from the node coordinate file
    *
-   * @param physicalNetwork the physical network object to be populated from the input data
+   * @param network the physical network object to be populated from the input data
    * @throws PlanItException thrown if there is an error reading the input file
    */
   private void updateNodeCoordinatesFromFile(final PhysicalNetwork network) throws PlanItException {
@@ -572,7 +574,7 @@ public class Tntp extends InputBuilderListener {
    * @param lengthUnits length units being used
    * @param capacityPeriod time period for link capacity
    * @param defaultMaximumSpeed default maximum speed along a link
-   * @throws PlanItException
+   * @throws PlanItException thrown if there is an error during running
    */
   public Tntp(final String networkFileLocation, final String demandFileLocation,
       final Map<NetworkFileColumns, Integer> networkFileColumns, final SpeedUnits speedUnits,
@@ -592,7 +594,7 @@ public class Tntp extends InputBuilderListener {
    * @param speedUnits speed units being used
    * @param lengthUnits length units being used
    * @param defaultMaximumSpeed default maximum speed along a link
-   * @throws PlanItException
+   * @throws PlanItException thrown if there is an error during running
    */
   public Tntp(final String networkFileLocation, final String demandFileLocation,
       final Map<NetworkFileColumns, Integer> networkFileColumns, final SpeedUnits speedUnits,
@@ -609,11 +611,12 @@ public class Tntp extends InputBuilderListener {
    * @param networkFileLocation network file location
    * @param demandFileLocation demand file location
    * @param nodeCoordinateFileLocation node coordinate file location
+   * @param standardResultsFileLocation the location of the standard results file
    * @param networkFileColumns Map specifying which columns in the network file contain which values
    * @param speedUnits speed units being used
    * @param lengthUnits length units being used
    * @param defaultMaximumSpeed default maximum speed along a link
-   * @throws PlanItException
+   * @throws PlanItException thrown if there is an error during running
    */
   public Tntp(final String networkFileLocation, final String demandFileLocation,
       final String nodeCoordinateFileLocation, final String standardResultsFileLocation,
@@ -635,7 +638,7 @@ public class Tntp extends InputBuilderListener {
    * @param lengthUnits length units being used
    * @param capacityPeriod time period for link capacity
    * @param defaultMaximumSpeed default maximum speed along links
-   * @throws PlanItException
+   * @throws PlanItException thrown if there is an error during running
    */
   public Tntp(final String networkFileLocation, final String demandFileLocation,
       final String nodeCoordinateFileLocation, final Map<NetworkFileColumns, Integer> networkFileColumns,

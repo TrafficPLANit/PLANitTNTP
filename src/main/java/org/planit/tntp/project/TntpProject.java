@@ -28,6 +28,7 @@ public class TntpProject extends CustomPlanItProject {
   * @param speedUnits units of speed
   * @param lengthUnits units of link length
   * @param capacityPeriod time period for link capacity
+  * @param defaultMaximumSpeed the default maximum speed along link segments
   * @throws PlanItException thrown if there is an error
   */
   public TntpProject(final String networkFileLocation, final String demandFileLocation, final String nodeCoordinateFileLocation,
@@ -45,6 +46,7 @@ public class TntpProject extends CustomPlanItProject {
    * @param speedUnits units of speed
    * @param lengthUnits units of link length
    * @param capacityPeriod time period for link capacity
+   * @param defaultMaximumSpeed the default maximum speed along link segments
    * @throws PlanItException thrown if there is an error
    */
   public TntpProject(final String networkFileLocation, final String demandFileLocation,
