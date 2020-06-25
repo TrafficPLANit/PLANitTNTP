@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.planit.all</groupId>
     <artifactId>PLANitAll</artifactId>
-    <version>0.0.4</version>
+    <version>0.0.5a1</version>
   </parent> 
 
 	<modelVersion>4.0.0</modelVersion>
