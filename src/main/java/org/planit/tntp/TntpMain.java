@@ -286,11 +286,6 @@ public class TntpMain {
     taBuilder.getGapFunction().getStopCriterion().setMaxIterations(maxIterations);
     taBuilder.getGapFunction().getStopCriterion().setEpsilon(epsilon);
 
-    final Map<Long, PlanItException> exceptionMap = project.executeAllTrafficAssignments();
-    if (!exceptionMap.keySet().isEmpty()) {
-      for (final long id : exceptionMap.keySet()) {
-        throw exceptionMap.get(id);
-      }
-    }
+    project.executeAllTrafficAssignments();
   }
 }
