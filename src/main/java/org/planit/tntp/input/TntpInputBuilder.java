@@ -48,13 +48,13 @@ import com.vividsolutions.jts.geom.Coordinate;
  * @author gman6028
  *
  */
-public class Tntp extends InputBuilderListener {
+public class TntpInputBuilder extends InputBuilderListener {
 
   /** generated UID */
   private static final long serialVersionUID = 1L;
 
   /** the logger */
-  private static final Logger LOGGER = Logger.getLogger(Tntp.class.getCanonicalName());
+  private static final Logger LOGGER = Logger.getLogger(TntpInputBuilder.class.getCanonicalName());
 
   /**
    *
@@ -576,7 +576,7 @@ public class Tntp extends InputBuilderListener {
    * @param defaultMaximumSpeed default maximum speed along a link
    * @throws PlanItException thrown if there is an error during running
    */
-  public Tntp(final String networkFileLocation, final String demandFileLocation,
+  public TntpInputBuilder(final String networkFileLocation, final String demandFileLocation,
       final Map<NetworkFileColumns, Integer> networkFileColumns, final SpeedUnits speedUnits,
       final LengthUnits lengthUnits,
       final CapacityPeriod capacityPeriod, final double defaultMaximumSpeed)
@@ -596,7 +596,7 @@ public class Tntp extends InputBuilderListener {
    * @param defaultMaximumSpeed default maximum speed along a link
    * @throws PlanItException thrown if there is an error during running
    */
-  public Tntp(final String networkFileLocation, final String demandFileLocation,
+  public TntpInputBuilder(final String networkFileLocation, final String demandFileLocation,
       final Map<NetworkFileColumns, Integer> networkFileColumns, final SpeedUnits speedUnits,
       final LengthUnits lengthUnits,
       final double defaultMaximumSpeed)
@@ -618,7 +618,7 @@ public class Tntp extends InputBuilderListener {
    * @param defaultMaximumSpeed default maximum speed along a link
    * @throws PlanItException thrown if there is an error during running
    */
-  public Tntp(final String networkFileLocation, final String demandFileLocation,
+  public TntpInputBuilder(final String networkFileLocation, final String demandFileLocation,
       final String nodeCoordinateFileLocation, final String standardResultsFileLocation,
       final Map<NetworkFileColumns, Integer> networkFileColumns,
       final SpeedUnits speedUnits,
@@ -640,7 +640,7 @@ public class Tntp extends InputBuilderListener {
    * @param defaultMaximumSpeed default maximum speed along links
    * @throws PlanItException thrown if there is an error during running
    */
-  public Tntp(final String networkFileLocation, final String demandFileLocation,
+  public TntpInputBuilder(final String networkFileLocation, final String demandFileLocation,
       final String nodeCoordinateFileLocation, final Map<NetworkFileColumns, Integer> networkFileColumns,
       final SpeedUnits speedUnits, final LengthUnits lengthUnits, final CapacityPeriod capacityPeriod,
       final double defaultMaximumSpeed) throws PlanItException {

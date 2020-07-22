@@ -16,7 +16,7 @@ import org.planit.output.formatter.MemoryOutputFormatter;
 import org.planit.output.formatter.MemoryOutputIterator;
 import org.planit.output.property.OutputProperty;
 import org.planit.time.TimePeriod;
-import org.planit.tntp.input.Tntp;
+import org.planit.tntp.input.TntpInputBuilder;
 import org.planit.utils.misc.IdGenerator;
 import org.planit.utils.misc.Pair;
 import org.planit.utils.network.physical.Mode;
@@ -69,11 +69,11 @@ public class TNTPTest {
     IdGenerator.reset();
 
     try {
-      final Pair<MemoryOutputFormatter, Tntp> testOutput =
+      final Pair<MemoryOutputFormatter, TntpInputBuilder> testOutput =
           TNTPTestHelper.execute(networkFileLocation, demandFileLocation, maxIterations, epsilon, outputTimeUnit,
               defaultMaximumSpeed);
       final MemoryOutputFormatter memoryOutputFormatter = testOutput.getFirst();
-      final Tntp tntp = testOutput.getSecond();
+      final TntpInputBuilder tntp = testOutput.getSecond();
 
       final Map<Long, Map<Long, double[]>> resultsMap = TNTPTestHelper.parseStandardResultsFile(standardResultsFileLocation);
       final TimePeriod timePeriod = tntp.getTimePeriodByExternalId((long) 1);

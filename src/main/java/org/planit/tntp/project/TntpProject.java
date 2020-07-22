@@ -8,7 +8,7 @@ import org.planit.tntp.enums.CapacityPeriod;
 import org.planit.tntp.enums.LengthUnits;
 import org.planit.tntp.enums.NetworkFileColumns;
 import org.planit.tntp.enums.SpeedUnits;
-import org.planit.tntp.input.Tntp;
+import org.planit.tntp.input.TntpInputBuilder;
 
 /**
  * TNTP implementation of CustomPlanItProject
@@ -34,7 +34,7 @@ public class TntpProject extends CustomPlanItProject {
   public TntpProject(final String networkFileLocation, final String demandFileLocation, final String nodeCoordinateFileLocation,
       final Map<NetworkFileColumns, Integer> networkFileColumns, final SpeedUnits speedUnits, final LengthUnits lengthUnits,
       final CapacityPeriod capacityPeriod, final double defaultMaximumSpeed) throws PlanItException {
-    super(new Tntp(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, networkFileColumns, speedUnits, lengthUnits,capacityPeriod, defaultMaximumSpeed));
+    super(new TntpInputBuilder(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, networkFileColumns, speedUnits, lengthUnits,capacityPeriod, defaultMaximumSpeed));
   }
 
   /**
@@ -52,7 +52,7 @@ public class TntpProject extends CustomPlanItProject {
   public TntpProject(final String networkFileLocation, final String demandFileLocation,
       final Map<NetworkFileColumns, Integer> networkFileColumns, final SpeedUnits speedUnits, final LengthUnits lengthUnits,
       final CapacityPeriod capacityPeriod, final double defaultMaximumSpeed) throws PlanItException {
-    super(new Tntp(networkFileLocation, demandFileLocation, null, networkFileColumns, speedUnits, lengthUnits, capacityPeriod, defaultMaximumSpeed));
+    super(new TntpInputBuilder(networkFileLocation, demandFileLocation, null, networkFileColumns, speedUnits, lengthUnits, capacityPeriod, defaultMaximumSpeed));
   }
 
   /**
@@ -60,7 +60,7 @@ public class TntpProject extends CustomPlanItProject {
    *
    * @param tntp Tntp object already instantiated
    */
-  public TntpProject(final Tntp tntp) {
+  public TntpProject(final TntpInputBuilder tntp) {
     super(tntp);
   }
 

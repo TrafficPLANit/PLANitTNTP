@@ -9,12 +9,12 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	
-	<groupId>PLANitTNTP</groupId>
+	<groupId>org.planit.tntp</groupId>
 	<artifactId>PLANitTNTP</artifactId>
   <description>PLANIt Interface For TNTP Format</description>	
 	
 	<name>PLANItTNTP</name>
-	<url>https://github.sydney.edu.au/planit/planittntp</url>
+	<url>https://github.com/TrafficPLANit/PLANitTNTP</url>
 
 	<dependencies>
   

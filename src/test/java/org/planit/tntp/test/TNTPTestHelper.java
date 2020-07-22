@@ -24,7 +24,7 @@ import org.planit.tntp.enums.CapacityPeriod;
 import org.planit.tntp.enums.LengthUnits;
 import org.planit.tntp.enums.NetworkFileColumns;
 import org.planit.tntp.enums.SpeedUnits;
-import org.planit.tntp.input.Tntp;
+import org.planit.tntp.input.TntpInputBuilder;
 import org.planit.tntp.project.TntpProject;
 import org.planit.trafficassignment.TraditionalStaticAssignment;
 import org.planit.trafficassignment.builder.TraditionalStaticAssignmentBuilder;
@@ -92,7 +92,7 @@ public class TNTPTestHelper {
    * @return a Pair containing the MemoryOutputFormatter and the Tntp object
    * @throws PlanItException thrown if there is an error
    */
-  public static Pair<MemoryOutputFormatter, Tntp> execute(final String networkFileLocation,
+  public static Pair<MemoryOutputFormatter, TntpInputBuilder> execute(final String networkFileLocation,
       final String demandFileLocation,
       final int maxIterations,
       final double epsilon, final OutputTimeUnit outputTimeUnit, final double defaultMaximumSpeed) throws PlanItException {
@@ -118,7 +118,7 @@ public class TNTPTestHelper {
     final LengthUnits lengthUnits = LengthUnits.MILES; // Both Chicago-Sketch and Philadelphia use miles
     final CapacityPeriod capacityPeriod = CapacityPeriod.HOUR; // Chicago-Sketch only - for Philadelphia use days
 
-    final Tntp tntp = new Tntp(networkFileLocation, demandFileLocation, null,
+    final TntpInputBuilder tntp = new TntpInputBuilder(networkFileLocation, demandFileLocation, null,
         networkFileColumns, speedUnits, lengthUnits, capacityPeriod, defaultMaximumSpeed);
     final TntpProject project = new TntpProject(tntp);
 
@@ -178,6 +178,6 @@ public class TNTPTestHelper {
     taBuilder.getGapFunction().getStopCriterion().setEpsilon(epsilon);
 
     project.executeAllTrafficAssignments();
-    return new Pair<MemoryOutputFormatter, Tntp>(memoryOutputFormatter, tntp);
+    return new Pair<MemoryOutputFormatter, TntpInputBuilder>(memoryOutputFormatter, tntp);
   }
 }
