@@ -663,7 +663,7 @@ public class TntpInputBuilder extends InputBuilderListener {
       planitGeoUtils = new PlanitGeoUtils();
     } catch (final Exception e) {
       LOGGER.severe(e.getMessage());
-      throw new PlanItException("Error in constructof TNTP",e);
+      throw new PlanItException("Error in construction of TNTP",e);
     }
   }
 
