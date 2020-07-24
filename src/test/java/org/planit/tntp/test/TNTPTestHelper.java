@@ -28,7 +28,7 @@ import org.planit.tntp.input.TntpInputBuilder;
 import org.planit.tntp.project.TntpProject;
 import org.planit.trafficassignment.TraditionalStaticAssignment;
 import org.planit.trafficassignment.builder.TraditionalStaticAssignmentBuilder;
-import org.planit.utils.misc.IdGenerator;
+import org.planit.utils.misc.LocalIdGenerator;
 import org.planit.utils.misc.Pair;
 
 /**
@@ -98,7 +98,7 @@ public class TNTPTestHelper {
       final double epsilon, final OutputTimeUnit outputTimeUnit, final double defaultMaximumSpeed) throws PlanItException {
 
     // SET UP INPUT SCANNER AND PROJECT
-    IdGenerator.reset();
+    LocalIdGenerator.reset();
 
     // TODO - The following arrangement of columns is correct for Chicago Sketch and Philadelphia.
     // For some other cities the arrangement is different.

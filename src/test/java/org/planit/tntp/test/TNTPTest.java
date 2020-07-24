@@ -17,7 +17,7 @@ import org.planit.output.formatter.MemoryOutputIterator;
 import org.planit.output.property.OutputProperty;
 import org.planit.time.TimePeriod;
 import org.planit.tntp.input.TntpInputBuilder;
-import org.planit.utils.misc.IdGenerator;
+import org.planit.utils.misc.LocalIdGenerator;
 import org.planit.utils.misc.Pair;
 import org.planit.utils.network.physical.Mode;
 
@@ -66,7 +66,7 @@ public class TNTPTest {
     final int maxIterations = 100;
     final double epsilon = TNTPTestHelper.DEFAULT_CONVERGENCE_EPSILON;
     final double defaultMaximumSpeed = 25.0;
-    IdGenerator.reset();
+    LocalIdGenerator.reset();
 
     try {
       final Pair<MemoryOutputFormatter, TntpInputBuilder> testOutput =
