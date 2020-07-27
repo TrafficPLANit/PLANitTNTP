@@ -29,7 +29,7 @@ import org.planit.tntp.project.TntpProject;
 import org.planit.trafficassignment.TraditionalStaticAssignment;
 import org.planit.trafficassignment.builder.TraditionalStaticAssignmentBuilder;
 import org.planit.utils.args.ArgumentParser;
-import org.planit.utils.misc.LocalIdGenerator;
+import org.planit.utils.id.IdGenerator;
 
 /**
  * Main class for running TNTP models
@@ -182,7 +182,7 @@ public class TntpMain {
     final boolean isOdPathOutputActive = (odPathOutputFilename != null);
 
     // SET UP INPUT SCANNER AND PROJECT
-    LocalIdGenerator.reset();
+    IdGenerator.reset();
 
     //TODO - The following arrangement of columns is correct for Chicago Sketch and Philadelphia.  For some other cities the arrangement is different.
     final Map<NetworkFileColumns, Integer> networkFileColumns = new HashMap<NetworkFileColumns, Integer>();

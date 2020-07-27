@@ -21,6 +21,7 @@ import org.planit.output.formatter.CsvFileOutputFormatter;
 import org.planit.output.formatter.CsvTextFileOutputFormatter;
 import org.planit.output.property.BaseOutputProperty;
 import org.planit.time.TimePeriod;
+import org.planit.utils.id.IdGroupingToken;
 import org.planit.utils.network.physical.LinkSegment;
 import org.planit.utils.network.physical.Mode;
 import org.planit.utils.output.OutputUtils;
@@ -176,10 +177,11 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	/**
 	 * Base constructor
 	 *
+   * @param groupId contiguous id generation within this group for instances of this class
 	 * @throws PlanItException thrown if there is an error
 	 */
-	public CSVOutputFormatter() throws PlanItException {
-		super();
+	public CSVOutputFormatter(IdGroupingToken groupId) throws PlanItException {
+		super(groupId);
 		csvOutputDirectory = DEFAULT_OUTPUT_DIRECTORY;
 		csvNameRoot = DEFAULT_NAME_ROOT;
 		csvNameExtension = DEFAULT_NAME_EXTENSION;

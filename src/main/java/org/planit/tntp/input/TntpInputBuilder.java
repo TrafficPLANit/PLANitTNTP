@@ -17,7 +17,6 @@ import org.planit.demands.Demands;
 import org.planit.exceptions.PlanItException;
 import org.planit.geo.PlanitGeoUtils;
 import org.planit.input.InputBuilderListener;
-import org.planit.network.physical.NodeImpl;
 import org.planit.network.physical.PhysicalNetwork;
 import org.planit.network.physical.macroscopic.MacroscopicModePropertiesImpl;
 import org.planit.network.physical.macroscopic.MacroscopicNetwork;
@@ -104,7 +103,7 @@ public class TntpInputBuilder extends InputBuilderListener {
   /**
    * TNTP only has one time period
    */
-  private final TimePeriod timePeriod;
+  private TimePeriod timePeriod;
 
   /**
    * The number of zones in the network
@@ -155,21 +154,19 @@ public class TntpInputBuilder extends InputBuilderListener {
    * @return the node corresponding to this external ID
    * @throws PlanItException thrown if there is an error registering the node
    */
-  private Node createAndRegisterNode(final PhysicalNetwork network, final String[] cols,
-      final NetworkFileColumns networkFileColumn)
+  private Node createAndRegisterNode(final PhysicalNetwork network, final String[] cols, final NetworkFileColumns networkFileColumn)
       throws PlanItException {
+    
     final long nodeExternalId = Long.parseLong(cols[networkFileColumns.get(networkFileColumn)]);
     if (nodeExternalId > noPhysicalNodes) {
-      final String errorMessage = "Number of nodes is specified as " + noPhysicalNodes
-          + " but found a reference to node " + nodeExternalId;
+      final String errorMessage = "Number of nodes is specified as " + noPhysicalNodes + " but found a reference to node " + nodeExternalId;
       LOGGER.severe(errorMessage);
       throw new PlanItException(errorMessage);
     }
     Node node = null;
-    if (getNodeByExternalId(nodeExternalId) == null) {
-      node = new NodeImpl();
+    if (getNodeByExternalId(nodeExternalId) == null) {      
+      node = network.nodes.registerNewNode();
       node.setExternalId(nodeExternalId);
-      network.nodes.registerNode(node);
       final boolean duplicateNodeExternalId = addNodeToExternalIdMap(nodeExternalId, node);
       if (duplicateNodeExternalId && isErrorIfDuplicateExternalId()) {
         final String errorMessage = "Duplicate node external id " + nodeExternalId + " found in network file.";
@@ -468,6 +465,13 @@ public class TntpInputBuilder extends InputBuilderListener {
   protected void populateDemands( final Demands demands, final Object parameter1) throws PlanItException {
     LOGGER.info("Populating Demands");
     final Zoning zoning = (Zoning) parameter1;
+    
+    // TNTP only has one time period, define it here
+    int wholeDaydurationSeconds = 24*3600;
+    int startAtMidNightSeconds = 0;
+    timePeriod = demands.timePeriods.createAndRegisterNewTimePeriod((long) 1, "All Day", startAtMidNightSeconds, wholeDaydurationSeconds);
+    addTimePeriodToExternalIdMap(timePeriod.getExternalId(), timePeriod);    
+    
     try (Scanner scanner = new Scanner(demandFile)) {
       boolean readingMetadata = true;
       Zone originZone = null;
@@ -512,7 +516,6 @@ public class TntpInputBuilder extends InputBuilderListener {
       }
       scanner.close();
       updateOdDemandMatrix(demandToDestination, zoning, originZone, odDemandMatrix);
-      demands.timePeriods.registerTimePeriod(timePeriod);
       demands.registerODDemand(timePeriod, mode, odDemandMatrix);
     } catch (final Exception e) {
       LOGGER.severe(e.getMessage());
@@ -646,9 +649,6 @@ public class TntpInputBuilder extends InputBuilderListener {
       final double defaultMaximumSpeed) throws PlanItException {
 
     super();
-    // TNTP only has one time period, define it here
-    timePeriod = new TimePeriod((long) 1, "All Day", "0000", 24.0);
-    addTimePeriodToExternalIdMap(timePeriod.getExternalId(), timePeriod);
 
     try {
       networkFile = new File(networkFileLocation).getCanonicalFile();
