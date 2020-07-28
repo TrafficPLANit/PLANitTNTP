@@ -192,10 +192,11 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	 * Close output CSV file for a specified output type configuration
 	 *
 	 * @param outputTypeConfigurations OutputTypeConfigurations for the assignment that have been activated
+	 * @param outputAdapter the outputAdapter
 	 * @throws PlanItException thrown if the the output file cannot be closed
 	 */
 	@Override
-	public void finaliseAfterSimulation(final Map<OutputType, OutputTypeConfiguration> outputTypeConfigurations) throws PlanItException {
+	public void finaliseAfterSimulation(final Map<OutputType, OutputTypeConfiguration> outputTypeConfigurations, OutputAdapter outputAdapter) throws PlanItException {
 		try {
 		    for(final Map.Entry<OutputType, OutputTypeConfiguration> entry : outputTypeConfigurations.entrySet()) {
 	            printer.get(entry.getKey()).close();

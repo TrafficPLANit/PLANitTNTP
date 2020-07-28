@@ -692,7 +692,7 @@ public class TntpInputBuilder extends InputBuilderListener {
         } else if (projectComponent instanceof PhysicalCost) {
           populatePhysicalCost((PhysicalCost) projectComponent);
         } else {
-          LOGGER.info("Event component is " + projectComponent.getClass().getCanonicalName()
+          LOGGER.fine("Event component is " + projectComponent.getClass().getCanonicalName()
               + " which is not handled by PlanItInputBuilder.");
         }
       } catch (final PlanItException e) {
