@@ -10,7 +10,6 @@ import java.util.SortedSet;
 import java.util.logging.Logger;
 
 import org.apache.commons.csv.CSVPrinter;
-import org.planit.exceptions.PlanItException;
 import org.planit.output.adapter.LinkOutputTypeAdapter;
 import org.planit.output.adapter.OutputAdapter;
 import org.planit.output.configuration.OutputConfiguration;
@@ -21,6 +20,7 @@ import org.planit.output.formatter.CsvFileOutputFormatter;
 import org.planit.output.formatter.CsvTextFileOutputFormatter;
 import org.planit.output.property.BaseOutputProperty;
 import org.planit.time.TimePeriod;
+import org.planit.utils.exceptions.PlanItException;
 import org.planit.utils.id.IdGroupingToken;
 import org.planit.utils.network.physical.LinkSegment;
 import org.planit.utils.network.physical.Mode;

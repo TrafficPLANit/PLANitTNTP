@@ -2,13 +2,13 @@ package org.planit.tntp.project;
 
 import java.util.Map;
 
-import org.planit.exceptions.PlanItException;
 import org.planit.project.CustomPlanItProject;
 import org.planit.tntp.enums.CapacityPeriod;
 import org.planit.tntp.enums.LengthUnits;
 import org.planit.tntp.enums.NetworkFileColumns;
 import org.planit.tntp.enums.SpeedUnits;
 import org.planit.tntp.input.TntpInputBuilder;
+import org.planit.utils.exceptions.PlanItException;
 
 /**
  * TNTP implementation of CustomPlanItProject
