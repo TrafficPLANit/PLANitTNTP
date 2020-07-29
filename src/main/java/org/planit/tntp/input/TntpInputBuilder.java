@@ -28,6 +28,7 @@ import org.planit.tntp.enums.LengthUnits;
 import org.planit.tntp.enums.NetworkFileColumns;
 import org.planit.tntp.enums.SpeedUnits;
 import org.planit.trafficassignment.TrafficAssignmentComponentFactory;
+import org.planit.utils.misc.LoggingUtils;
 import org.planit.utils.misc.Pair;
 import org.planit.utils.network.physical.Link;
 import org.planit.utils.network.physical.LinkSegment;
@@ -56,7 +57,7 @@ public class TntpInputBuilder extends InputBuilderListener {
   private static final Logger LOGGER = Logger.getLogger(TntpInputBuilder.class.getCanonicalName());
 
   /**
-   *
+   * geoUtils
    */
   private PlanitGeoUtils planitGeoUtils;
 
@@ -404,7 +405,7 @@ public class TntpInputBuilder extends InputBuilderListener {
    * @throws PlanItException thrown if there is an error reading the input file
    */
   protected void populatePhysicalNetwork( final PhysicalNetwork physicalNetwork) throws PlanItException {
-    LOGGER.info("Populating Physical Network");
+    LOGGER.fine(LoggingUtils.getClassNameWithBrackets(this)+"populating Physical Network");
 
     final MacroscopicNetwork network = (MacroscopicNetwork) physicalNetwork;
     // TNTP only has one mode, define it here
@@ -435,8 +436,7 @@ public class TntpInputBuilder extends InputBuilderListener {
       }
 
       if (linkSegmentExternalId != noLinks) {
-        final String errorMessage = "Header says " + noLinks + " links but " + linkSegmentExternalId
-            + " were actually defined.";
+        final String errorMessage = "Header says " + noLinks + " links but " + linkSegmentExternalId+ " were actually defined.";
         LOGGER.severe(errorMessage);
         throw new PlanItException(errorMessage);
       }
@@ -463,7 +463,7 @@ public class TntpInputBuilder extends InputBuilderListener {
    * @throws PlanItException thrown if there is an error reading the input file
    */
   protected void populateDemands( final Demands demands, final Object parameter1) throws PlanItException {
-    LOGGER.info("Populating Demands");
+    LOGGER.fine(LoggingUtils.getClassNameWithBrackets(this)+"populating Demands");
     final Zoning zoning = (Zoning) parameter1;
     
     // TNTP only has one time period, define it here
@@ -488,8 +488,7 @@ public class TntpInputBuilder extends InputBuilderListener {
           if (line.startsWith(NUMBER_OF_ZONES_INDICATOR)) {
             final String subLine = line.substring(NUMBER_OF_ZONES_INDICATOR.length()).trim();
             if (noZones != Integer.parseInt(subLine)) {
-              final String errorMessage = "Network file indicates there are " + noZones
-                  + " but demand file indicates there are " + Integer.parseInt(subLine) + " zones.";
+              final String errorMessage = "Network file indicates there are " + noZones + " but demand file indicates there are " + Integer.parseInt(subLine) + " zones.";
               LOGGER.severe(errorMessage);
               throw new PlanItException(errorMessage);
             }
@@ -534,7 +533,7 @@ public class TntpInputBuilder extends InputBuilderListener {
    * @throws PlanItException thrown if there is an error reading the input file
    */
   protected void populateZoning(final Zoning zoning, final Object parameter1) throws PlanItException {
-    LOGGER.info("Populating zoning");
+    LOGGER.fine(LoggingUtils.getClassNameWithBrackets(this)+"populating zoning");
     for (long zoneExternalId = 1; zoneExternalId <= noZones; zoneExternalId++) {
       final Zone zone = zoning.zones.createAndRegisterNewZone(zoneExternalId);
       addZoneToExternalIdMap(zone.getExternalId(), zone);
@@ -553,7 +552,7 @@ public class TntpInputBuilder extends InputBuilderListener {
    * @throws PlanItException thrown if there is an error
    */
   protected void populatePhysicalCost( final PhysicalCost costComponent) throws PlanItException {
-    LOGGER.info("Populating BPR link costs");
+    LOGGER.info(LoggingUtils.getClassNameWithBrackets(this)+"populating BPR link costs");
     if (bprParametersForLinkSegmentAndMode != null) {
       final BPRLinkTravelTimeCost bprLinkTravelTimeCost = (BPRLinkTravelTimeCost) costComponent;
       for (final LinkSegment linkSegment : linkSegments) {
@@ -692,12 +691,11 @@ public class TntpInputBuilder extends InputBuilderListener {
         } else if (projectComponent instanceof PhysicalCost) {
           populatePhysicalCost((PhysicalCost) projectComponent);
         } else {
-          LOGGER.fine("Event component is " + projectComponent.getClass().getCanonicalName()
-              + " which is not handled by PlanItInputBuilder.");
+          LOGGER.fine(LoggingUtils.getClassNameWithBrackets(this)+"event component is " + projectComponent.getClass().getCanonicalName()+ " which is not handled by PlanItInputBuilder.");
         }
       } catch (final PlanItException e) {
         LOGGER.severe(e.getMessage());
-        throw new RemoteException("Error rethrown as RemoteException in notify of TNTP",e);
+        throw new RemoteException("error rethrown as RemoteException in notify of TNTP",e);
       }
     }
   }
