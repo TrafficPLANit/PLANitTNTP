@@ -26,6 +26,18 @@
 			<comments>A slightly modified version of a modified BSD license</comments>
 		</license>
 	</licenses>
+	
+	<build>
+	    <resources>
+	        <resource>
+	            <directory>src/main/resources</directory>
+	            <excludes>
+	            	<!-- only used for internal formatting of logging statements -->
+	                <exclude>*.properties</exclude>
+	            </excludes>
+	        </resource>
+	    </resources>	
+	</build>
 
 	<!-- versions inherited from parent -->
 	<dependencies>
