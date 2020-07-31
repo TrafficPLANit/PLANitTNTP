@@ -27,12 +27,21 @@
 		</license>
 	</licenses>
 
+	<!-- versions inherited from parent -->
 	<dependencies>
-		<!-- version inherited from parent -->
+
 		<dependency>
 			<groupId>org.planit</groupId>
 			<artifactId>PLANit</artifactId>
 		</dependency>
+		
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<!-- only used locally for testing so not an actual dependency for using the API -->
+			<optional>true</optional>
+		</dependency>	
+				
 	</dependencies>
 
 </project>
