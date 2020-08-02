@@ -7,6 +7,8 @@ The input files for this format can be found at https://github.com/bstabler/Tran
 February 2020: So far we have got the standard files for Philadelphia and Chicago-Sketch to run.  The test case for Philadelphia runs using this code but we have not validated the outputs. The contents and format of the input data files is different for some data sets which we have not yet used.  
 For example, the GoldCoast network file (https://github.com/bstabler/TransportationNetworks/blob/master/GoldCoast/Goldcoast_network_2016_01.tntp) has a different format from that described below.  We have not yet written code which could run the Gold Coast data set.
 
+For more information on PLANit such as the user the manual, licensing, installation, getting started, reference documentation, and more, please visit [https://trafficplanit.github.io/PLANitManual/](https://trafficplanit.github.io/PLANitManual/)
+
 # Maven parent
 
 Projects need to be built from Maven before they can be run. The common maven configuration can be found in the PLANitAll project which acts as the parent for this project's pom.xml.
