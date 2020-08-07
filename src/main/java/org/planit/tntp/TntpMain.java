@@ -16,7 +16,7 @@ import org.planit.output.configuration.OutputConfiguration;
 import org.planit.output.configuration.PathOutputTypeConfiguration;
 import org.planit.output.enums.OutputTimeUnit;
 import org.planit.output.enums.OutputType;
-import org.planit.output.enums.RouteIdType;
+import org.planit.output.enums.PathOutputIdentificationType;
 import org.planit.output.property.OutputProperty;
 import org.planit.sdinteraction.smoothing.MSASmoothing;
 import org.planit.tntp.enums.CapacityPeriod;
@@ -262,7 +262,7 @@ public class TntpMain {
       pathOutputTypeConfiguration.removeProperty(OutputProperty.RUN_ID);
       pathOutputTypeConfiguration.addProperty(OutputProperty.ORIGIN_ZONE_ID);
       pathOutputTypeConfiguration.addProperty(OutputProperty.DESTINATION_ZONE_ID);
-      pathOutputTypeConfiguration.setPathIdType(RouteIdType.LINK_SEGMENT_EXTERNAL_ID);
+      pathOutputTypeConfiguration.setPathIdentificationType(PathOutputIdentificationType.LINK_SEGMENT_EXTERNAL_ID);
     }
 
     // CSVOutputFormatter - Links
