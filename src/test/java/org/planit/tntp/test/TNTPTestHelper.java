@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
+import org.planit.assignment.traditionalstatic.TraditionalStaticAssignment;
 import org.planit.cost.physical.BPRLinkTravelTimeCost;
 import org.planit.cost.virtual.FixedConnectoidTravelTimeCost;
 import org.planit.demands.Demands;
@@ -25,7 +26,6 @@ import org.planit.tntp.enums.NetworkFileColumns;
 import org.planit.tntp.enums.SpeedUnits;
 import org.planit.tntp.input.TntpInputBuilder;
 import org.planit.tntp.project.TntpProject;
-import org.planit.trafficassignment.TraditionalStaticAssignment;
 import org.planit.trafficassignment.builder.TraditionalStaticAssignmentBuilder;
 import org.planit.utils.exceptions.PlanItException;
 import org.planit.utils.id.IdGenerator;
