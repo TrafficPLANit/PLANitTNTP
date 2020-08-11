@@ -28,6 +28,7 @@ import org.planit.tntp.enums.LengthUnits;
 import org.planit.tntp.enums.NetworkFileColumns;
 import org.planit.tntp.enums.SpeedUnits;
 import org.planit.utils.exceptions.PlanItException;
+import org.planit.utils.graph.EdgeSegment;
 import org.planit.utils.misc.LoggingUtils;
 import org.planit.utils.misc.Pair;
 import org.planit.utils.network.physical.Link;
@@ -252,7 +253,7 @@ public class TntpInputBuilder extends InputBuilderListener {
     modePropertiesMap.put(mode, macroscopicModeProperties);
 
     final MacroscopicLinkSegment linkSegment =
-        (MacroscopicLinkSegment) network.linkSegments.createDirectionalLinkSegment(link, true);
+        (MacroscopicLinkSegment) network.linkSegments.createLinkSegment(link, true);
     linkSegment.setMaximumSpeed(mode, maxSpeed);
     linkSegment.setExternalId(externalId);
     final MacroscopicNetwork macroscopicNetwork = network;
@@ -348,7 +349,7 @@ public class TntpInputBuilder extends InputBuilderListener {
         Double.parseDouble(cols[networkFileColumns.get(NetworkFileColumns.LENGTH)]) * lengthUnits.getMultiplier();
     final double freeFlowTravelTime =
         Double.parseDouble(cols[networkFileColumns.get(NetworkFileColumns.FREE_FLOW_TRAVEL_TIME)]);
-    final Link link = network.links.registerNewLink(upstreamNode, downstreamNode, length, "" + linkSegmentExternalId);
+    final Link link = network.links.registerNewLink(upstreamNode, downstreamNode, length);
     double maxSpeed = 0.0;
     final double speed = Double.parseDouble(cols[networkFileColumns.get(NetworkFileColumns.MAXIMUM_SPEED)]);
     if (speed == 0.0) {
@@ -555,10 +556,10 @@ public class TntpInputBuilder extends InputBuilderListener {
     LOGGER.info(LoggingUtils.getClassNameWithBrackets(this)+"populating BPR link costs");
     if (bprParametersForLinkSegmentAndMode != null) {
       final BPRLinkTravelTimeCost bprLinkTravelTimeCost = (BPRLinkTravelTimeCost) costComponent;
-      for (final LinkSegment linkSegment : linkSegments) {
-        if (bprParametersForLinkSegmentAndMode.containsKey(linkSegment)) {
-          final Pair<Double, Double> alphaBeta = bprParametersForLinkSegmentAndMode.get(linkSegment);
-          final MacroscopicLinkSegment macroscopicLinkSegment = (MacroscopicLinkSegment) linkSegment;
+      for (final EdgeSegment edgeSegment : linkSegments) {
+        if (bprParametersForLinkSegmentAndMode.containsKey(edgeSegment)) {
+          final Pair<Double, Double> alphaBeta = bprParametersForLinkSegmentAndMode.get(edgeSegment);
+          final MacroscopicLinkSegment macroscopicLinkSegment = (MacroscopicLinkSegment) edgeSegment;
           bprLinkTravelTimeCost.setParameters(macroscopicLinkSegment, mode, alphaBeta.getFirst(), alphaBeta
               .getSecond());
         }
