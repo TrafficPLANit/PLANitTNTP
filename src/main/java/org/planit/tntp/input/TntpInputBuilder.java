@@ -125,7 +125,7 @@ public class TntpInputBuilder extends InputBuilderListener {
   /**
    * List of link segments in the network
    */
-  private PhysicalNetwork.LinkSegments linkSegments;
+  private PhysicalNetwork.LinkSegments<? super LinkSegment> linkSegments;
 
  /**
    * Map containing the BPR parameters for each link segment, if these are specified in the
@@ -556,12 +556,11 @@ public class TntpInputBuilder extends InputBuilderListener {
     LOGGER.info(LoggingUtils.getClassNameWithBrackets(this)+"populating BPR link costs");
     if (bprParametersForLinkSegmentAndMode != null) {
       final BPRLinkTravelTimeCost bprLinkTravelTimeCost = (BPRLinkTravelTimeCost) costComponent;
-      for (final EdgeSegment edgeSegment : linkSegments) {
-        if (bprParametersForLinkSegmentAndMode.containsKey(edgeSegment)) {
-          final Pair<Double, Double> alphaBeta = bprParametersForLinkSegmentAndMode.get(edgeSegment);
-          final MacroscopicLinkSegment macroscopicLinkSegment = (MacroscopicLinkSegment) edgeSegment;
-          bprLinkTravelTimeCost.setParameters(macroscopicLinkSegment, mode, alphaBeta.getFirst(), alphaBeta
-              .getSecond());
+      for (final LinkSegment linkSegment : linkSegments) {
+        if (bprParametersForLinkSegmentAndMode.containsKey(linkSegment)) {
+          final Pair<Double, Double> alphaBeta = bprParametersForLinkSegmentAndMode.get(linkSegment);
+          final MacroscopicLinkSegment macroscopicLinkSegment = (MacroscopicLinkSegment) linkSegment;
+          bprLinkTravelTimeCost.setParameters(macroscopicLinkSegment, mode, alphaBeta.getFirst(), alphaBeta.getSecond());
         }
       }
     }

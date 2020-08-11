@@ -82,14 +82,14 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 		final SortedSet<BaseOutputProperty> outputProperties = outputTypeConfiguration.getOutputProperties();
 		try {
 			for (final Mode mode : modes) {
-				for (final EdgeSegment linkSegment : linkOutputTypeAdapter.getPhysicalLinkSegments()) {
-					if (outputConfiguration.isPersistZeroFlow() || linkOutputTypeAdapter.isFlowPositive((LinkSegment)linkSegment, mode)) {
+				for (final LinkSegment linkSegment : linkOutputTypeAdapter.getPhysicalLinkSegments()) {
+					if (outputConfiguration.isPersistZeroFlow() || linkOutputTypeAdapter.isFlowPositive(linkSegment, mode)) {
 					  final List<Object> rowValues = new ArrayList<Object>();						
 					  for (final BaseOutputProperty outputProperty : outputProperties) {
               rowValues.add(
                   OutputUtils.formatObject(
                       linkOutputTypeAdapter.getLinkOutputPropertyValue(
-                          outputProperty.getOutputProperty(), (LinkSegment)linkSegment, mode, timePeriod, outputTimeUnit.getMultiplier())));
+                          outputProperty.getOutputProperty(), linkSegment, mode, timePeriod, outputTimeUnit.getMultiplier())));
  						}
 						printer.get(outputTypeConfiguration.getOutputType()).printRecord(rowValues);
 					}
