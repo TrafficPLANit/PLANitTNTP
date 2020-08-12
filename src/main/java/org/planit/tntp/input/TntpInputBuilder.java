@@ -28,7 +28,6 @@ import org.planit.tntp.enums.LengthUnits;
 import org.planit.tntp.enums.NetworkFileColumns;
 import org.planit.tntp.enums.SpeedUnits;
 import org.planit.utils.exceptions.PlanItException;
-import org.planit.utils.graph.EdgeSegment;
 import org.planit.utils.misc.LoggingUtils;
 import org.planit.utils.misc.Pair;
 import org.planit.utils.network.physical.Link;
@@ -125,7 +124,7 @@ public class TntpInputBuilder extends InputBuilderListener {
   /**
    * List of link segments in the network
    */
-  private PhysicalNetwork.LinkSegments<? super LinkSegment> linkSegments;
+  private PhysicalNetwork<?,?,? extends LinkSegment>.LinkSegments linkSegments;
 
  /**
    * Map containing the BPR parameters for each link segment, if these are specified in the
@@ -156,7 +155,7 @@ public class TntpInputBuilder extends InputBuilderListener {
    * @return the node corresponding to this external ID
    * @throws PlanItException thrown if there is an error registering the node
    */
-  private Node createAndRegisterNode(final PhysicalNetwork network, final String[] cols, final NetworkFileColumns networkFileColumn)
+  private Node createAndRegisterNode(final PhysicalNetwork<?,?,?> network, final String[] cols, final NetworkFileColumns networkFileColumn)
       throws PlanItException {
     
     final long nodeExternalId = Long.parseLong(cols[networkFileColumns.get(networkFileColumn)]);
@@ -289,7 +288,7 @@ public class TntpInputBuilder extends InputBuilderListener {
    * @param network the physical network object to be populated from the input data
    * @throws PlanItException thrown if there is an error reading the input file
    */
-  private void updateNodeCoordinatesFromFile(final PhysicalNetwork network) throws PlanItException {
+  private void updateNodeCoordinatesFromFile(final PhysicalNetwork<?,?,?> network) throws PlanItException {
     try (Scanner scanner = new Scanner(nodeCoordinateFile)) {
       while (scanner.hasNextLine()) {
         final String line = scanner.nextLine().trim();
@@ -405,7 +404,7 @@ public class TntpInputBuilder extends InputBuilderListener {
    * @param physicalNetwork the physical network object to be populated from the input data
    * @throws PlanItException thrown if there is an error reading the input file
    */
-  protected void populatePhysicalNetwork( final PhysicalNetwork physicalNetwork) throws PlanItException {
+  protected void populatePhysicalNetwork( final PhysicalNetwork<?,?,?> physicalNetwork) throws PlanItException {
     LOGGER.fine(LoggingUtils.getClassNameWithBrackets(this)+"populating Physical Network");
 
     final MacroscopicNetwork network = (MacroscopicNetwork) physicalNetwork;
@@ -682,8 +681,8 @@ public class TntpInputBuilder extends InputBuilderListener {
       // parameters (second parameter)
       final Object[] parameters = (Object[]) content[1];
       try {
-        if (projectComponent instanceof PhysicalNetwork) {
-          populatePhysicalNetwork((PhysicalNetwork) projectComponent);
+        if (projectComponent instanceof PhysicalNetwork<?,?,?>) {
+          populatePhysicalNetwork((PhysicalNetwork<?,?,?>) projectComponent);
         } else if (projectComponent instanceof Zoning) {
           populateZoning((Zoning) projectComponent, parameters[0]);
         } else if (projectComponent instanceof Demands) {
