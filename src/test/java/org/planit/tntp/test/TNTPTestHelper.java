@@ -6,7 +6,8 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
-import org.planit.assignment.traditionalstatic.TraditionalStaticAssignment;
+import org.planit.assignment.TrafficAssignment;
+import org.planit.assignment.traditionalstatic.TraditionalStaticAssignmentConfigurator;
 import org.planit.cost.physical.BPRLinkTravelTimeCost;
 import org.planit.cost.virtual.FixedConnectoidTravelTimeCost;
 import org.planit.demands.Demands;
@@ -26,7 +27,6 @@ import org.planit.tntp.enums.NetworkFileColumns;
 import org.planit.tntp.enums.SpeedUnits;
 import org.planit.tntp.input.TntpInputBuilder;
 import org.planit.tntp.project.TntpProject;
-import org.planit.trafficassignment.builder.TraditionalStaticAssignmentBuilder;
 import org.planit.utils.exceptions.PlanItException;
 import org.planit.utils.id.IdGenerator;
 import org.planit.utils.misc.Pair;
@@ -131,24 +131,23 @@ public class TNTPTestHelper {
     // RAW INPUT END -----------------------------------
 
     // TRAFFIC ASSIGNMENT START------------------------
-    final TraditionalStaticAssignmentBuilder taBuilder =
-        (TraditionalStaticAssignmentBuilder) project.createAndRegisterTrafficAssignment(
-            TraditionalStaticAssignment.class.getCanonicalName(), demands, zoning, macroscopicNetwork);
+    final TraditionalStaticAssignmentConfigurator ta =
+        (TraditionalStaticAssignmentConfigurator) project.createAndRegisterTrafficAssignment(TrafficAssignment.TRADITIONAL_STATIC_ASSIGNMENT, demands, zoning, macroscopicNetwork);
 
     // SUPPLY-DEMAND INTERACTIONS
-    taBuilder.createAndRegisterPhysicalCost(BPRLinkTravelTimeCost.class.getCanonicalName());
-    taBuilder.createAndRegisterVirtualCost(FixedConnectoidTravelTimeCost.class.getCanonicalName());
-    taBuilder.createAndRegisterSmoothing(MSASmoothing.class.getCanonicalName());
+    ta.createAndRegisterPhysicalCost(BPRLinkTravelTimeCost.class.getCanonicalName());
+    ta.createAndRegisterVirtualCost(FixedConnectoidTravelTimeCost.class.getCanonicalName());
+    ta.createAndRegisterSmoothing(MSASmoothing.class.getCanonicalName());
 
     // DATA OUTPUT CONFIGURATION
-    taBuilder.activateOutput(OutputType.LINK);
-    final OutputConfiguration outputConfiguration = taBuilder.getOutputConfiguration();
+    ta.activateOutput(OutputType.LINK);
+    final OutputConfiguration outputConfiguration = ta.getOutputConfiguration();
     outputConfiguration.setPersistOnlyFinalIteration(true); // option to only persist the final
                                                             // iteration
 
     // OUTPUT FORMAT CONFIGURATION - LINKS
     final LinkOutputTypeConfiguration linkOutputTypeConfiguration =
-        (LinkOutputTypeConfiguration) taBuilder.activateOutput(OutputType.LINK);
+        (LinkOutputTypeConfiguration) ta.getOutputTypeConfiguration(OutputType.LINK);
     linkOutputTypeConfiguration.addProperty(OutputProperty.LINK_TYPE);
     linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_ID);
     linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_EXTERNAL_ID);
@@ -171,11 +170,11 @@ public class TNTPTestHelper {
     }
 
     // taBuilder.registerOutputFormatter(csvOutputFormatter);
-    taBuilder.registerOutputFormatter(memoryOutputFormatter);
+    ta.registerOutputFormatter(memoryOutputFormatter);
 
     // "USER" configuration
-    taBuilder.getGapFunction().getStopCriterion().setMaxIterations(maxIterations);
-    taBuilder.getGapFunction().getStopCriterion().setEpsilon(epsilon);
+    ta.getGapFunction().getStopCriterion().setMaxIterations(maxIterations);
+    ta.getGapFunction().getStopCriterion().setEpsilon(epsilon);
 
     project.executeAllTrafficAssignments();
     return new Pair<MemoryOutputFormatter, TntpInputBuilder>(memoryOutputFormatter, tntp);
