@@ -97,9 +97,6 @@ public class TNTPTestHelper {
       final int maxIterations,
       final double epsilon, final OutputTimeUnit outputTimeUnit, final double defaultMaximumSpeed) throws PlanItException {
 
-    // SET UP INPUT SCANNER AND PROJECT
-    IdGenerator.reset();
-
     // TODO - The following arrangement of columns is correct for Chicago Sketch and Philadelphia.
     // For some other cities the arrangement is different.
     final Map<NetworkFileColumns, Integer> networkFileColumns = new HashMap<NetworkFileColumns, Integer>();
@@ -132,7 +129,8 @@ public class TNTPTestHelper {
 
     // TRAFFIC ASSIGNMENT START------------------------
     final TraditionalStaticAssignmentConfigurator ta =
-        (TraditionalStaticAssignmentConfigurator) project.createAndRegisterTrafficAssignment(TrafficAssignment.TRADITIONAL_STATIC_ASSIGNMENT, demands, zoning, macroscopicNetwork);
+        (TraditionalStaticAssignmentConfigurator) project.createAndRegisterTrafficAssignment(
+            TrafficAssignment.TRADITIONAL_STATIC_ASSIGNMENT, demands, zoning, macroscopicNetwork);
 
     // SUPPLY-DEMAND INTERACTIONS
     ta.createAndRegisterPhysicalCost(BPRLinkTravelTimeCost.class.getCanonicalName());

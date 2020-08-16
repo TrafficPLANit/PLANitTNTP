@@ -103,6 +103,7 @@ public class TNTPTest {
       }
 
     } catch (final Exception e) {
+      e.printStackTrace();
       LOGGER.severe(e.getMessage());
       fail(e.getMessage());
     }
