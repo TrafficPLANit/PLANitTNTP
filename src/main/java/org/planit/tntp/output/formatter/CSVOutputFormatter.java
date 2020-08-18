@@ -21,7 +21,6 @@ import org.planit.output.formatter.CsvTextFileOutputFormatter;
 import org.planit.output.property.BaseOutputProperty;
 import org.planit.time.TimePeriod;
 import org.planit.utils.exceptions.PlanItException;
-import org.planit.utils.graph.EdgeSegment;
 import org.planit.utils.id.IdGroupingToken;
 import org.planit.utils.network.physical.LinkSegment;
 import org.planit.utils.network.physical.Mode;

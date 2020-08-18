@@ -28,7 +28,6 @@ import org.planit.tntp.enums.SpeedUnits;
 import org.planit.tntp.input.TntpInputBuilder;
 import org.planit.tntp.project.TntpProject;
 import org.planit.utils.exceptions.PlanItException;
-import org.planit.utils.id.IdGenerator;
 import org.planit.utils.misc.Pair;
 
 /**

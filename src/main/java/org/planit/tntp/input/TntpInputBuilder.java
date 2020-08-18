@@ -28,6 +28,7 @@ import org.planit.tntp.enums.LengthUnits;
 import org.planit.tntp.enums.NetworkFileColumns;
 import org.planit.tntp.enums.SpeedUnits;
 import org.planit.utils.exceptions.PlanItException;
+import org.planit.utils.math.Precision;
 import org.planit.utils.misc.LoggingUtils;
 import org.planit.utils.misc.Pair;
 import org.planit.utils.network.physical.Link;
@@ -233,41 +234,46 @@ public class TntpInputBuilder extends InputBuilderListener {
        final Link link, final double maxSpeed, final double capacityPerLane,
       final int linkSegmentTypeExternalId,
       final long externalId, final double length, final double freeFlowTravelTime) throws PlanItException {
+    
     MacroscopicModeProperties macroscopicModeProperties = null;
+    double freeflowSpeed = defaultMaximumSpeed * speedUnits.getMultiplier();
     switch (linkSegmentTypeExternalId) {
       case 1:
-        macroscopicModeProperties = new MacroscopicModePropertiesImpl((length / freeFlowTravelTime) * speedUnits
-            .getMultiplier(), (length / freeFlowTravelTime) * speedUnits.getMultiplier());
+        freeflowSpeed = (length / freeFlowTravelTime) * speedUnits.getMultiplier();
         break;
       case 2:
-        macroscopicModeProperties = new MacroscopicModePropertiesImpl((length / freeFlowTravelTime) * speedUnits
-            .getMultiplier(), (length / freeFlowTravelTime) * speedUnits.getMultiplier());
+        freeflowSpeed = (length / freeFlowTravelTime) * speedUnits.getMultiplier();
         break;
       case 3:
-        macroscopicModeProperties = new MacroscopicModePropertiesImpl(defaultMaximumSpeed * speedUnits.getMultiplier(),
-            defaultMaximumSpeed * speedUnits.getMultiplier());
+        // already correct fall through
         break;
+      default:
+        throw new PlanItException("incorrect external id type encountered");
     }
-    final Map<Mode, MacroscopicModeProperties> modePropertiesMap = new HashMap<Mode, MacroscopicModeProperties>();
+    final Map<Mode, MacroscopicModeProperties> modePropertiesMap = new HashMap<Mode, MacroscopicModeProperties>();    
+    macroscopicModeProperties = new MacroscopicModePropertiesImpl(freeflowSpeed, freeflowSpeed);
     modePropertiesMap.put(mode, macroscopicModeProperties);
 
-    final MacroscopicLinkSegment linkSegment =
-        (MacroscopicLinkSegment) network.linkSegments.createLinkSegment(link, true);
-    linkSegment.setMaximumSpeed(mode, maxSpeed);
+    final MacroscopicLinkSegment linkSegment = (MacroscopicLinkSegment) network.linkSegments.createLinkSegment(link, true);
     linkSegment.setExternalId(externalId);
     final MacroscopicNetwork macroscopicNetwork = network;
 
-    final MacroscopicLinkSegmentType existingLinkSegmentType = getLinkSegmentTypeByExternalId(
-        linkSegmentTypeExternalId);
+    final MacroscopicLinkSegmentType existingLinkSegmentType = getLinkSegmentTypeByExternalId(linkSegmentTypeExternalId);
     if (existingLinkSegmentType == null) {
       final MacroscopicLinkSegmentType macroscopicLinkSegmentType = macroscopicNetwork
-          .createAndRegisterNewMacroscopicLinkSegmentType("" + linkSegmentTypeExternalId, capacityPerLane, maxSpeed,
-              linkSegmentTypeExternalId, modePropertiesMap);
+          .createAndRegisterNewMacroscopicLinkSegmentType(
+              String.valueOf(linkSegmentTypeExternalId), 
+              capacityPerLane,
+              MacroscopicLinkSegmentType.DEFAULT_MAX_DENSITY_LANE,
+              linkSegmentTypeExternalId, 
+              modePropertiesMap);
       addLinkSegmentTypeToExternalIdMap(macroscopicLinkSegmentType.getExternalId(), macroscopicLinkSegmentType);
       linkSegment.setLinkSegmentType(macroscopicLinkSegmentType);
     } else {
       linkSegment.setLinkSegmentType(existingLinkSegmentType);
     }
+    linkSegment.getLinkSegmentType().getModeProperties(mode).setMaximumSpeed(maxSpeed);
+    
     network.linkSegments.registerLinkSegment(link, linkSegment, true);
     if (linkSegment.getExternalId() != null) {
       final boolean duplicateLinkSegmentExternalId = addLinkSegmentToExternalIdMap(linkSegment.getExternalId(),
@@ -349,21 +355,20 @@ public class TntpInputBuilder extends InputBuilderListener {
     final double freeFlowTravelTime =
         Double.parseDouble(cols[networkFileColumns.get(NetworkFileColumns.FREE_FLOW_TRAVEL_TIME)]);
     final Link link = network.links.registerNewLink(upstreamNode, downstreamNode, length);
-    double maxSpeed = 0.0;
+    
+    double maxSpeed = defaultMaximumSpeed;
     final double speed = Double.parseDouble(cols[networkFileColumns.get(NetworkFileColumns.MAXIMUM_SPEED)]);
-    if (speed == 0.0) {
+    if (speed > Precision.EPSILON_6 && speed < Double.POSITIVE_INFINITY) {
       maxSpeed = speed * speedUnits.getMultiplier();
     }
-    if (maxSpeed == 0.0) {
-      maxSpeed = Double.POSITIVE_INFINITY;
-    }
+    
     final double capacityPerLane =
-        Integer.parseInt(cols[networkFileColumns.get(NetworkFileColumns.CAPACITY_PER_LANE)]) * capacityPeriod
-            .getMultiplier();
+        Integer.parseInt(cols[networkFileColumns.get(NetworkFileColumns.CAPACITY_PER_LANE)]) * capacityPeriod.getMultiplier();
+    
     final int linkSegmentTypeExternalId = Integer.parseInt(cols[networkFileColumns.get(NetworkFileColumns.LINK_TYPE)]);
     final MacroscopicLinkSegment linkSegment =
-        createAndRegisterLinkSegment(network, link, maxSpeed, capacityPerLane, linkSegmentTypeExternalId,
-            linkSegmentExternalId, length, freeFlowTravelTime);
+        createAndRegisterLinkSegment(
+            network, link, maxSpeed, capacityPerLane, linkSegmentTypeExternalId, linkSegmentExternalId, length, freeFlowTravelTime);
 
     double alpha = BPRLinkTravelTimeCost.DEFAULT_ALPHA;
     double beta = BPRLinkTravelTimeCost.DEFAULT_BETA;
