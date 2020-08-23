@@ -254,7 +254,7 @@ public class TntpInputBuilder extends InputBuilderListener {
     macroscopicModeProperties = new MacroscopicModePropertiesImpl(freeflowSpeed, freeflowSpeed);
     modePropertiesMap.put(mode, macroscopicModeProperties);
 
-    final MacroscopicLinkSegment linkSegment = (MacroscopicLinkSegment) network.linkSegments.createLinkSegment(link, true);
+    final MacroscopicLinkSegment linkSegment = (MacroscopicLinkSegment) network.linkSegments.createAndRegisterLinkSegment(link, true, true);
     linkSegment.setExternalId(externalId);
     final MacroscopicNetwork macroscopicNetwork = network;
 
@@ -274,7 +274,6 @@ public class TntpInputBuilder extends InputBuilderListener {
     }
     linkSegment.getLinkSegmentType().getModeProperties(mode).setMaximumSpeed(maxSpeed);
     
-    network.linkSegments.registerLinkSegment(link, linkSegment, true);
     if (linkSegment.getExternalId() != null) {
       final boolean duplicateLinkSegmentExternalId = addLinkSegmentToExternalIdMap(linkSegment.getExternalId(),
           linkSegment);
