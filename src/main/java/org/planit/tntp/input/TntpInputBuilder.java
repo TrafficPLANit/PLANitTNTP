@@ -13,7 +13,7 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.Position;
 import org.planit.assignment.TrafficAssignmentComponentFactory;
 import org.planit.cost.physical.BPRLinkTravelTimeCost;
-import org.planit.cost.physical.PhysicalCost;
+import org.planit.cost.physical.AbstractPhysicalCost;
 import org.planit.demands.Demands;
 import org.planit.geo.PlanitGeoUtils;
 import org.planit.input.InputBuilderListener;
@@ -555,7 +555,7 @@ public class TntpInputBuilder extends InputBuilderListener {
    * @param costComponent the BPRLinkTravelTimeCost to be populated
    * @throws PlanItException thrown if there is an error
    */
-  protected void populatePhysicalCost( final PhysicalCost costComponent) throws PlanItException {
+  protected void populatePhysicalCost( final AbstractPhysicalCost costComponent) throws PlanItException {
     LOGGER.info(LoggingUtils.getClassNameWithBrackets(this)+"populating BPR link costs");
     if (bprParametersForLinkSegmentAndMode != null) {
       final BPRLinkTravelTimeCost bprLinkTravelTimeCost = (BPRLinkTravelTimeCost) costComponent;
@@ -691,8 +691,8 @@ public class TntpInputBuilder extends InputBuilderListener {
           populateZoning((Zoning) projectComponent, parameters[0]);
         } else if (projectComponent instanceof Demands) {
           populateDemands((Demands) projectComponent, parameters[0]);
-        } else if (projectComponent instanceof PhysicalCost) {
-          populatePhysicalCost((PhysicalCost) projectComponent);
+        } else if (projectComponent instanceof AbstractPhysicalCost) {
+          populatePhysicalCost((AbstractPhysicalCost) projectComponent);
         } else {
           LOGGER.fine(LoggingUtils.getClassNameWithBrackets(this)+"event component is " + projectComponent.getClass().getCanonicalName()+ " which is not handled by PlanItInputBuilder.");
         }

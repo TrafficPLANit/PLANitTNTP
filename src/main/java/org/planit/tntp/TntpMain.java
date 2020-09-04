@@ -13,7 +13,7 @@ import org.planit.logging.Logging;
 import org.planit.network.physical.macroscopic.MacroscopicNetwork;
 import org.planit.network.virtual.Zoning;
 import org.planit.output.configuration.LinkOutputTypeConfiguration;
-import org.planit.output.configuration.OriginDestinationOutputTypeConfiguration;
+import org.planit.output.configuration.ODOutputTypeConfiguration;
 import org.planit.output.configuration.OutputConfiguration;
 import org.planit.output.configuration.PathOutputTypeConfiguration;
 import org.planit.output.enums.OutputTimeUnit;
@@ -267,8 +267,8 @@ public class TntpMain {
     }
     // OUTPUT FORMAT CONFIGURATION - ORIGIN-DESTINATION
     if (isOdOutputActive) {
-      final OriginDestinationOutputTypeConfiguration originDestinationOutputTypeConfiguration =
-          (OriginDestinationOutputTypeConfiguration) ta.getOutputTypeConfiguration(OutputType.OD);
+      final ODOutputTypeConfiguration originDestinationOutputTypeConfiguration =
+          (ODOutputTypeConfiguration) ta.getOutputTypeConfiguration(OutputType.OD);
       originDestinationOutputTypeConfiguration.removeProperty(OutputProperty.RUN_ID);
       originDestinationOutputTypeConfiguration.addProperty(OutputProperty.ORIGIN_ZONE_ID);
       originDestinationOutputTypeConfiguration.addProperty(OutputProperty.DESTINATION_ZONE_ID);
