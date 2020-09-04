@@ -167,7 +167,7 @@ public class TntpInputBuilder extends InputBuilderListener {
     }
     Node node = null;
     if (getNodeByExternalId(nodeExternalId) == null) {      
-      node = network.nodes.registerNewNode();
+      node = network.nodes.registerNew();
       node.setExternalId(nodeExternalId);
       final boolean duplicateNodeExternalId = addNodeToExternalIdMap(nodeExternalId, node);
       if (duplicateNodeExternalId && isErrorIfDuplicateExternalId()) {
@@ -254,7 +254,7 @@ public class TntpInputBuilder extends InputBuilderListener {
     macroscopicModeProperties = new MacroscopicModePropertiesImpl(freeflowSpeed, freeflowSpeed);
     modePropertiesMap.put(mode, macroscopicModeProperties);
 
-    final MacroscopicLinkSegment linkSegment = (MacroscopicLinkSegment) network.linkSegments.createAndRegisterLinkSegment(link, true, true);
+    final MacroscopicLinkSegment linkSegment = (MacroscopicLinkSegment) network.linkSegments.createAndRegisterNew(link, true, true);
     linkSegment.setExternalId(externalId);
     final MacroscopicNetwork macroscopicNetwork = network;
 
@@ -413,7 +413,7 @@ public class TntpInputBuilder extends InputBuilderListener {
 
     final MacroscopicNetwork network = (MacroscopicNetwork) physicalNetwork;
     // TNTP only has one mode, define it here
-    mode = network.modes.registerNewMode(1, "Base Mode", 1.0);
+    mode = network.modes.registerNew(1, "Base Mode", 1.0);
     addModeToExternalIdMap(mode.getExternalId(), mode);
 
     try (Scanner scanner = new Scanner(networkFile)) {
