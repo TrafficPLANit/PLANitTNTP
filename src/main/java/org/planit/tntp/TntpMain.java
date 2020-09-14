@@ -249,7 +249,7 @@ public class TntpMain {
 
     // OUTPUT FORMAT CONFIGURATION - LINKS
     if (isLinkOutputActive) {
-      final LinkOutputTypeConfiguration linkOutputTypeConfiguration = (LinkOutputTypeConfiguration) ta.getOutputTypeConfiguration(OutputType.LINK);
+      final LinkOutputTypeConfiguration linkOutputTypeConfiguration = (LinkOutputTypeConfiguration) outputConfiguration.getOutputTypeConfiguration(OutputType.LINK);
       linkOutputTypeConfiguration.addProperty(OutputProperty.LINK_TYPE);
       linkOutputTypeConfiguration.addProperty(OutputProperty.VC_RATIO);
       linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_ID);
@@ -268,7 +268,7 @@ public class TntpMain {
     // OUTPUT FORMAT CONFIGURATION - ORIGIN-DESTINATION
     if (isOdOutputActive) {
       final ODOutputTypeConfiguration originDestinationOutputTypeConfiguration =
-          (ODOutputTypeConfiguration) ta.getOutputTypeConfiguration(OutputType.OD);
+          (ODOutputTypeConfiguration) outputConfiguration.getOutputTypeConfiguration(OutputType.OD);
       originDestinationOutputTypeConfiguration.removeProperty(OutputProperty.RUN_ID);
       originDestinationOutputTypeConfiguration.addProperty(OutputProperty.ORIGIN_ZONE_ID);
       originDestinationOutputTypeConfiguration.addProperty(OutputProperty.DESTINATION_ZONE_ID);
@@ -276,7 +276,7 @@ public class TntpMain {
     // OUTPUT FORMAT CONFIGURATION - PATH
     if (isOdPathOutputActive) {
       final PathOutputTypeConfiguration pathOutputTypeConfiguration =
-          (PathOutputTypeConfiguration) ta.getOutputTypeConfiguration(OutputType.PATH);
+          (PathOutputTypeConfiguration) outputConfiguration.getOutputTypeConfiguration(OutputType.PATH);
       pathOutputTypeConfiguration.removeProperty(OutputProperty.RUN_ID);
       pathOutputTypeConfiguration.addProperty(OutputProperty.ORIGIN_ZONE_ID);
       pathOutputTypeConfiguration.addProperty(OutputProperty.DESTINATION_ZONE_ID);

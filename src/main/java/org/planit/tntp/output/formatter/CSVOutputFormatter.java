@@ -195,15 +195,15 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	/**
 	 * Close output CSV file for a specified output type configuration
 	 *
-	 * @param outputTypeConfigurations OutputTypeConfigurations for the assignment that have been activated
+	 * @param outputConfiguration OutputConfiguration of the assignment
 	 * @param outputAdapter the outputAdapter
 	 * @throws PlanItException thrown if the the output file cannot be closed
 	 */
 	@Override
-	public void finaliseAfterSimulation(final Map<OutputType, OutputTypeConfiguration> outputTypeConfigurations, OutputAdapter outputAdapter) throws PlanItException {
+	public void finaliseAfterSimulation(final OutputConfiguration outputConfiguration, OutputAdapter outputAdapter) throws PlanItException {
 		try {
-		    for(final Map.Entry<OutputType, OutputTypeConfiguration> entry : outputTypeConfigurations.entrySet()) {
-	            printer.get(entry.getKey()).close();
+		    for(final OutputType outputType : outputConfiguration.getActivatedOutputTypes()) {
+	            printer.get(outputType).close();
 		    }
 		} catch (final IOException e) {
       LOGGER.severe(e.getMessage());
@@ -217,14 +217,13 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	 * This method also creates the output file directory if it does not already
 	 * exist.
 	 *
-	 * @param outputTypeConfigurations Map of OutputTypeConfiguration for the assignment to be saved
+	 * @param outputConfiguration OutputConfiguration of the assignment
 	 * @throws PlanItException thrown if output file or directory cannot be opened
 	 */
 	@Override
-	public void initialiseBeforeSimulation(final Map<OutputType, OutputTypeConfiguration> outputTypeConfigurations, final long runId) throws PlanItException {
+	public void initialiseBeforeSimulation(final OutputConfiguration outputConfiguration, final long runId) throws PlanItException {
 		try {
-		    for(final Map.Entry<OutputType, OutputTypeConfiguration> entry : outputTypeConfigurations.entrySet()) {
-	            final OutputType outputType = entry.getKey();
+		    for(final OutputType outputType : outputConfiguration.getActivatedOutputTypes()) {
 	            if (!csvFileNameMap.containsKey(outputType)) {
 	                final String csvFileName = generateOutputFileName(csvOutputDirectory, csvNameRoot, csvNameExtension, null, outputType, runId);
 	                addCsvFileNamePerOutputType(outputType, csvFileName);
@@ -232,7 +231,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 
 	            //In CSVOutputFormatter we can only have one CSV file per output type
 	            final String csvFileName = csvFileNameMap.get(outputType).get(0);
-	            final CSVPrinter csvPrinter = openCsvFileAndWriteHeaders(entry.getValue(), csvFileName);
+	            final CSVPrinter csvPrinter = openCsvFileAndWriteHeaders(outputConfiguration.getOutputTypeConfiguration(outputType), csvFileName);
 	            printer.put(outputType, csvPrinter);
 		    }
 		} catch (final Exception e) {
