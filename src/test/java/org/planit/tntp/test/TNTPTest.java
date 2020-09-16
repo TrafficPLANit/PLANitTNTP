@@ -19,7 +19,7 @@ import org.planit.time.TimePeriod;
 import org.planit.tntp.input.TntpInputBuilder;
 import org.planit.utils.id.IdGenerator;
 import org.planit.utils.misc.Pair;
-import org.planit.utils.network.physical.Mode;
+import org.planit.utils.mode.Mode;
 
 /**
  * Unit test for TNTP model.
