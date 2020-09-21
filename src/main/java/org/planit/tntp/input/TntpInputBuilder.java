@@ -32,6 +32,7 @@ import org.planit.utils.math.Precision;
 import org.planit.utils.misc.LoggingUtils;
 import org.planit.utils.misc.Pair;
 import org.planit.utils.mode.Mode;
+import org.planit.utils.mode.PredefinedModeType;
 import org.planit.utils.network.physical.Link;
 import org.planit.utils.network.physical.LinkSegment;
 import org.planit.utils.network.physical.Node;
@@ -413,7 +414,7 @@ public class TntpInputBuilder extends InputBuilderListener {
 
     final MacroscopicNetwork network = (MacroscopicNetwork) physicalNetwork;
     // TNTP only has one mode, define it here
-    mode = network.modes.registerNew(1, "Base Mode", 1.0);
+    mode = network.modes.registerNew(PredefinedModeType.CAR);
     addModeToExternalIdMap(mode.getExternalId(), mode);
 
     try (Scanner scanner = new Scanner(networkFile)) {
