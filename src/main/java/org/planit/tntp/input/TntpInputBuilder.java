@@ -18,7 +18,7 @@ import org.planit.demands.Demands;
 import org.planit.geo.PlanitGeoUtils;
 import org.planit.input.InputBuilderListener;
 import org.planit.network.physical.PhysicalNetwork;
-import org.planit.network.physical.macroscopic.MacroscopicModePropertiesImpl;
+import org.planit.network.physical.macroscopic.MacroscopicModePropertiesFactory;
 import org.planit.network.physical.macroscopic.MacroscopicNetwork;
 import org.planit.network.virtual.Zoning;
 import org.planit.od.odmatrix.demand.ODDemandMatrix;
@@ -252,7 +252,7 @@ public class TntpInputBuilder extends InputBuilderListener {
         throw new PlanItException("incorrect external id type encountered");
     }
     final Map<Mode, MacroscopicModeProperties> modePropertiesMap = new HashMap<Mode, MacroscopicModeProperties>();    
-    macroscopicModeProperties = new MacroscopicModePropertiesImpl(freeflowSpeed, freeflowSpeed);
+    macroscopicModeProperties = MacroscopicModePropertiesFactory.create(freeflowSpeed, freeflowSpeed);
     modePropertiesMap.put(mode, macroscopicModeProperties);
 
     final MacroscopicLinkSegment linkSegment = (MacroscopicLinkSegment) network.linkSegments.createAndRegisterNew(link, true, true);
