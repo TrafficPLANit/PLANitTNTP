@@ -255,7 +255,7 @@ public class TntpInputBuilder extends InputBuilderListener {
     macroscopicModeProperties = MacroscopicModePropertiesFactory.create(freeflowSpeed, freeflowSpeed);
     modePropertiesMap.put(mode, macroscopicModeProperties);
 
-    final MacroscopicLinkSegment linkSegment = (MacroscopicLinkSegment) network.linkSegments.createAndRegisterNew(link, true, true);
+    final MacroscopicLinkSegment linkSegment = (MacroscopicLinkSegment) network.linkSegments.registerNew(link, true, true);
     linkSegment.setExternalId(externalId);
     final MacroscopicNetwork macroscopicNetwork = network;
 
@@ -354,7 +354,7 @@ public class TntpInputBuilder extends InputBuilderListener {
         Double.parseDouble(cols[networkFileColumns.get(NetworkFileColumns.LENGTH)]) * lengthUnits.getMultiplier();
     final double freeFlowTravelTime =
         Double.parseDouble(cols[networkFileColumns.get(NetworkFileColumns.FREE_FLOW_TRAVEL_TIME)]);
-    final Link link = network.links.registerNewLink(upstreamNode, downstreamNode, length);
+    final Link link = network.links.registerNew(upstreamNode, downstreamNode, length);
     
     double maxSpeed = defaultMaximumSpeed;
     final double speed = Double.parseDouble(cols[networkFileColumns.get(NetworkFileColumns.MAXIMUM_SPEED)]);
