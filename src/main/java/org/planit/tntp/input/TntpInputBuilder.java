@@ -15,7 +15,7 @@ import org.planit.assignment.TrafficAssignmentComponentFactory;
 import org.planit.cost.physical.BPRLinkTravelTimeCost;
 import org.planit.cost.physical.AbstractPhysicalCost;
 import org.planit.demands.Demands;
-import org.planit.geo.PlanitGeoUtils;
+import org.planit.geo.PlanitOpenGisUtils;
 import org.planit.input.InputBuilderListener;
 import org.planit.network.physical.PhysicalNetwork;
 import org.planit.network.physical.macroscopic.MacroscopicModePropertiesFactory;
@@ -61,7 +61,7 @@ public class TntpInputBuilder extends InputBuilderListener {
   /**
    * geoUtils
    */
-  private PlanitGeoUtils planitGeoUtils;
+  private PlanitOpenGisUtils planitGeoUtils;
 
   /**
    * network data file
@@ -309,7 +309,7 @@ public class TntpInputBuilder extends InputBuilderListener {
           final List<Position> positions = planitGeoUtils.convertToDirectPositions(coordinates);
           final DirectPosition nodeGeometry = (DirectPosition) positions.get(0);
           final Node node = getNodeByExternalId(nodeExternalId);
-          node.setCentrePointGeometry(nodeGeometry);
+          node.setPosition(nodeGeometry);
         }
       }
     } catch (final Exception e) {
@@ -663,7 +663,7 @@ public class TntpInputBuilder extends InputBuilderListener {
       this.lengthUnits = lengthUnits;
       this.capacityPeriod = (capacityPeriod == null) ? CapacityPeriod.HOUR : capacityPeriod;
       this.defaultMaximumSpeed = defaultMaximumSpeed;
-      planitGeoUtils = new PlanitGeoUtils();
+      planitGeoUtils = new PlanitOpenGisUtils();
     } catch (final Exception e) {
       LOGGER.severe(e.getMessage());
       throw new PlanItException("Error in construction of TNTP",e);
