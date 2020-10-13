@@ -3,19 +3,16 @@ package org.planit.tntp.input;
 import java.io.File;
 import java.rmi.RemoteException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
 import org.djutils.event.EventInterface;
-import org.opengis.geometry.DirectPosition;
-import org.opengis.geometry.coordinate.Position;
 import org.planit.assignment.TrafficAssignmentComponentFactory;
 import org.planit.cost.physical.BPRLinkTravelTimeCost;
 import org.planit.cost.physical.AbstractPhysicalCost;
 import org.planit.demands.Demands;
-import org.planit.geo.PlanitOpenGisUtils;
+import org.planit.geo.PlanitJtsUtils;
 import org.planit.input.InputBuilderListener;
 import org.planit.network.physical.PhysicalNetwork;
 import org.planit.network.physical.macroscopic.MacroscopicModePropertiesFactory;
@@ -42,7 +39,7 @@ import org.planit.utils.network.physical.macroscopic.MacroscopicModeProperties;
 import org.planit.utils.network.virtual.Centroid;
 import org.planit.utils.network.virtual.Zone;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * Class which reads input from TNTP files
@@ -61,7 +58,7 @@ public class TntpInputBuilder extends InputBuilderListener {
   /**
    * geoUtils
    */
-  private PlanitOpenGisUtils planitGeoUtils;
+  private PlanitJtsUtils planitGeoUtils;
 
   /**
    * network data file
@@ -304,12 +301,9 @@ public class TntpInputBuilder extends InputBuilderListener {
           final String[] cols = line.split("\\s+");
           final long nodeExternalId = Long.parseLong(cols[0]);
 
-          final Coordinate coordinate = new Coordinate(Double.parseDouble(cols[1]), Double.parseDouble(cols[2]));
-          final Coordinate[] coordinates = {coordinate};
-          final List<Position> positions = planitGeoUtils.convertToDirectPositions(coordinates);
-          final DirectPosition nodeGeometry = (DirectPosition) positions.get(0);
           final Node node = getNodeByExternalId(nodeExternalId);
-          node.setPosition(nodeGeometry);
+          Point nodePosition = planitGeoUtils.createPoint(Double.parseDouble(cols[1]), Double.parseDouble(cols[2]));          
+          node.setPosition(nodePosition);
         }
       }
     } catch (final Exception e) {
@@ -663,7 +657,7 @@ public class TntpInputBuilder extends InputBuilderListener {
       this.lengthUnits = lengthUnits;
       this.capacityPeriod = (capacityPeriod == null) ? CapacityPeriod.HOUR : capacityPeriod;
       this.defaultMaximumSpeed = defaultMaximumSpeed;
-      planitGeoUtils = new PlanitOpenGisUtils();
+      planitGeoUtils = new PlanitJtsUtils();
     } catch (final Exception e) {
       LOGGER.severe(e.getMessage());
       throw new PlanItException("Error in construction of TNTP",e);
