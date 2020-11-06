@@ -174,6 +174,6 @@ public class TNTPTestHelper {
     ta.getGapFunction().getStopCriterion().setEpsilon(epsilon);
 
     project.executeAllTrafficAssignments();
-    return new Pair<MemoryOutputFormatter, TntpInputBuilder>(memoryOutputFormatter, tntp);
+    return Pair.create(memoryOutputFormatter, tntp);
   }
 }
