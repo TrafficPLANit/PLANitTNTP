@@ -72,8 +72,8 @@ public class TNTPTest {
       final Pair<MemoryOutputFormatter, TntpInputBuilder> testOutput =
           TNTPTestHelper.execute(networkFileLocation, demandFileLocation, maxIterations, epsilon, outputTimeUnit,
               defaultMaximumSpeed);
-      final MemoryOutputFormatter memoryOutputFormatter = testOutput.getFirst();
-      final TntpInputBuilder tntp = testOutput.getSecond();
+      final MemoryOutputFormatter memoryOutputFormatter = testOutput.first();
+      final TntpInputBuilder tntp = testOutput.second();
 
       final Map<Long, Map<Long, double[]>> resultsMap = TNTPTestHelper.parseStandardResultsFile(standardResultsFileLocation);
       final TimePeriod timePeriod = tntp.getTimePeriodByExternalId((long) 1);

@@ -558,7 +558,7 @@ public class TntpInputBuilder extends InputBuilderListener {
         if (bprParametersForLinkSegmentAndMode.containsKey(linkSegment)) {
           final Pair<Double, Double> alphaBeta = bprParametersForLinkSegmentAndMode.get(linkSegment);
           final MacroscopicLinkSegment macroscopicLinkSegment = (MacroscopicLinkSegment) linkSegment;
-          bprLinkTravelTimeCost.setParameters(macroscopicLinkSegment, mode, alphaBeta.getFirst(), alphaBeta.getSecond());
+          bprLinkTravelTimeCost.setParameters(macroscopicLinkSegment, mode, alphaBeta.first(), alphaBeta.second());
         }
       }
     }
