@@ -39,7 +39,7 @@ import org.planit.utils.network.physical.macroscopic.MacroscopicModeProperties;
 import org.planit.utils.network.virtual.Centroid;
 import org.planit.utils.network.virtual.Zone;
 
-import com.vividsolutions.jts.geom.Point;
+import org.locationtech.jts.geom.Point;
 
 /**
  * Class which reads input from TNTP files
