@@ -32,6 +32,7 @@ import org.planit.utils.mode.Mode;
 import org.planit.utils.mode.PredefinedModeType;
 import org.planit.utils.network.physical.Link;
 import org.planit.utils.network.physical.LinkSegment;
+import org.planit.utils.network.physical.LinkSegments;
 import org.planit.utils.network.physical.Node;
 import org.planit.utils.network.physical.macroscopic.MacroscopicLinkSegment;
 import org.planit.utils.network.physical.macroscopic.MacroscopicLinkSegmentType;
@@ -54,11 +55,6 @@ public class TntpInputBuilder extends InputBuilderListener {
 
   /** the logger */
   private static final Logger LOGGER = Logger.getLogger(TntpInputBuilder.class.getCanonicalName());
-
-  /**
-   * geoUtils
-   */
-  private PlanitJtsUtils planitGeoUtils;
 
   /**
    * network data file
@@ -123,7 +119,7 @@ public class TntpInputBuilder extends InputBuilderListener {
   /**
    * List of link segments in the network
    */
-  private PhysicalNetwork<?,?,? extends LinkSegment>.LinkSegments linkSegments;
+  private LinkSegments<? extends MacroscopicLinkSegment> linkSegments;
 
  /**
    * Map containing the BPR parameters for each link segment, if these are specified in the
@@ -302,7 +298,7 @@ public class TntpInputBuilder extends InputBuilderListener {
           final long nodeExternalId = Long.parseLong(cols[0]);
 
           final Node node = getNodeByExternalId(nodeExternalId);
-          Point nodePosition = planitGeoUtils.createPoint(Double.parseDouble(cols[1]), Double.parseDouble(cols[2]));          
+          Point nodePosition = PlanitJtsUtils.createPoint(Double.parseDouble(cols[1]), Double.parseDouble(cols[2]));          
           node.setPosition(nodePosition);
         }
       }
@@ -657,7 +653,6 @@ public class TntpInputBuilder extends InputBuilderListener {
       this.lengthUnits = lengthUnits;
       this.capacityPeriod = (capacityPeriod == null) ? CapacityPeriod.HOUR : capacityPeriod;
       this.defaultMaximumSpeed = defaultMaximumSpeed;
-      planitGeoUtils = new PlanitJtsUtils();
     } catch (final Exception e) {
       LOGGER.severe(e.getMessage());
       throw new PlanItException("Error in construction of TNTP",e);
