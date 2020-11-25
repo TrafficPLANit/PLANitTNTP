@@ -258,8 +258,8 @@ public class TntpInputBuilder extends InputBuilderListener {
 
     final MacroscopicLinkSegmentType existingLinkSegmentType = getLinkSegmentTypeByExternalId(linkSegmentTypeExternalId);
     if (existingLinkSegmentType == null) {
-      final MacroscopicLinkSegmentType macroscopicLinkSegmentType = macroscopicNetwork
-          .createAndRegisterNewMacroscopicLinkSegmentType(
+      final MacroscopicLinkSegmentType macroscopicLinkSegmentType = 
+          macroscopicNetwork.linkSegmentTypes.createAndRegisterNew(
               String.valueOf(linkSegmentTypeExternalId), 
               capacityPerLane,
               MacroscopicLinkSegmentType.DEFAULT_MAX_DENSITY_LANE,
