@@ -266,7 +266,7 @@ public class TntpInputBuilder extends InputBuilderListener {
     } else {
       linkSegment.setLinkSegmentType(existingLinkSegmentType);
     }
-    linkSegment.getLinkSegmentType().getModeProperties(mode).setMaximumSpeed(maxSpeed);
+    linkSegment.getLinkSegmentType().getModeProperties(mode).setMaximumSpeedKmH(maxSpeed);
     
     if (linkSegment.getExternalId() != null) {
       final boolean duplicateLinkSegmentExternalId = addLinkSegmentToExternalIdMap(linkSegment.getExternalId(),
