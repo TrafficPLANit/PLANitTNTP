@@ -76,9 +76,9 @@ public class TNTPTest {
       final TntpInputBuilder tntp = testOutput.second();
 
       final Map<Long, Map<Long, double[]>> resultsMap = TNTPTestHelper.parseStandardResultsFile(standardResultsFileLocation);
-      final TimePeriod timePeriod = tntp.getTimePeriodByExternalId((long) 1);
+      final TimePeriod timePeriod = tntp.getTimePeriodByXmlId((long) 1);
       final int iterationIndex = memoryOutputFormatter.getLastIteration();
-      final Mode mode = tntp.getModeByExternalId((long) 1);
+      final Mode mode = tntp.getModeByXmlId((long) 1);
       final int flowPosition = memoryOutputFormatter.getPositionOfOutputValueProperty(OutputType.LINK, OutputProperty.FLOW);
       final int costPosition = memoryOutputFormatter.getPositionOfOutputValueProperty(OutputType.LINK, OutputProperty.LINK_COST);
       final int linkTypePosition = memoryOutputFormatter.getPositionOfOutputValueProperty(OutputType.LINK, OutputProperty.LINK_TYPE);
