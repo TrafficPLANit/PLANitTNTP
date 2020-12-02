@@ -38,6 +38,7 @@ import org.planit.utils.network.physical.macroscopic.MacroscopicLinkSegment;
 import org.planit.utils.network.physical.macroscopic.MacroscopicLinkSegmentType;
 import org.planit.utils.network.physical.macroscopic.MacroscopicModeProperties;
 import org.planit.utils.network.virtual.Centroid;
+import org.planit.utils.network.virtual.Connectoid;
 import org.planit.utils.network.virtual.Zone;
 
 import org.locationtech.jts.geom.Point;
@@ -153,24 +154,20 @@ public class TntpInputBuilder extends InputBuilderListener {
   private Node createAndRegisterNode(final PhysicalNetwork<?,?,?> network, final String[] cols, final NetworkFileColumns networkFileColumn)
       throws PlanItException {
     
-    final long nodeExternalId = Long.parseLong(cols[networkFileColumns.get(networkFileColumn)]);
-    if (nodeExternalId > noPhysicalNodes) {
-      final String errorMessage = "Number of nodes is specified as " + noPhysicalNodes + " but found a reference to node " + nodeExternalId;
-      LOGGER.severe(errorMessage);
-      throw new PlanItException(errorMessage);
+    final String nodeSourceId = cols[networkFileColumns.get(networkFileColumn)];
+    if ( Long.parseLong(nodeSourceId) > noPhysicalNodes) {
+      throw new PlanItException("Number of nodes is specified as " + noPhysicalNodes + " but found a reference to node " + nodeSourceId);
     }
     Node node = null;
-    if (getNodeByXmlId(nodeExternalId) == null) {      
+    if (getNodeBySourceId(nodeSourceId) == null) {      
       node = network.nodes.registerNew();
-      node.setExternalId(nodeExternalId);
-      final boolean duplicateNodeExternalId = addNodeToXmlIdMap(nodeExternalId, node);
-      if (duplicateNodeExternalId && isErrorIfDuplicateXmlId()) {
-        final String errorMessage = "Duplicate node external id " + nodeExternalId + " found in network file.";
-        LOGGER.severe(errorMessage);
-        throw new PlanItException(errorMessage);
+      node.setExternalId(nodeSourceId);
+      final boolean duplicateNodeExternalId = addNodeToSourceIdMap(nodeSourceId, node);
+      if (duplicateNodeExternalId && isErrorIfDuplicateSourceId()) {
+        throw new PlanItException("Duplicate node external id " + nodeSourceId + " found in network file");
       }
     } else {
-      node = getNodeByXmlId(nodeExternalId);
+      node = getNodeBySourceId(nodeSourceId);
     }
     return node;
   }
@@ -197,46 +194,60 @@ public class TntpInputBuilder extends InputBuilderListener {
    * @param originZone the origin zone for all the demand values
    * @param odDemandMatrix the ODDemandMatrix object to be updated
    */
-  private void updateOdDemandMatrix(final Map<Integer, Double> demandToDestination, final Zoning zoning,
-      final Zone originZone,
-      final ODDemandMatrix odDemandMatrix) {
-    for (final Integer destinationZoneId : demandToDestination.keySet()) {
-      final Zone destinationZone = getZoneByXmlId((long) destinationZoneId);
-      odDemandMatrix.setValue(originZone, destinationZone, demandToDestination.get(destinationZoneId));
+  private void updateOdDemandMatrix(final Map<String, Double> demandToDestination, final Zoning zoning,
+      final Zone originZone, final ODDemandMatrix odDemandMatrix) {
+    
+    for (final String destinationZoneSourceId : demandToDestination.keySet()) {
+      final Zone destinationZone = getZoneBySourceId(destinationZoneSourceId);
+      odDemandMatrix.setValue(originZone, destinationZone, demandToDestination.get(destinationZoneSourceId));
     }
+    
   }
 
   /**
    * Create and register a new link segment
    *
    * February 2020: We do not understand how the flow times for link types 1 and 2 are calculated.
-   * Link type
-   * 3 is the only one for which our results match the published results.
+   * Link type 3 is the only one for which our results match the published results.
    *
    * @param network the current macroscopic network
    * @param link the current link
    * @param maxSpeed the maximum speed for this link
    * @param capacityPerLane the capacity per lane for this link
    * @param linkSegmentTypeExternalId the external Id of the type of this link segment
-   * @param externalId external Id of this link segment
    * @param length the length of this link segment
    * @param freeFlowTravelTime the free flow travel time for this link segment
    * @return the macroscopic link segment which has been created
    * @throws PlanItException thrown if there is an error
    */
-  private MacroscopicLinkSegment createAndRegisterLinkSegment( final MacroscopicNetwork network,
-       final Link link, final double maxSpeed, final double capacityPerLane,
-      final int linkSegmentTypeExternalId,
-      final long externalId, final double length, final double freeFlowTravelTime) throws PlanItException {
+  private MacroscopicLinkSegment createAndRegisterLinkSegment(
+      final MacroscopicNetwork network, final Link link, final long tntpLinkSegmentSourceId, final String[] cols) throws PlanItException {
     
+    /* max speed */
+    double maxSpeed = defaultMaximumSpeed;
+    final double speed = Double.parseDouble(cols[networkFileColumns.get(NetworkFileColumns.MAXIMUM_SPEED)]);
+    if (speed > Precision.EPSILON_6 && speed < Double.POSITIVE_INFINITY) {
+      maxSpeed = speed * speedUnits.getMultiplier();
+    }
+    
+    /* free flow travel time */
+    final double freeFlowTravelTime = Double.parseDouble(cols[networkFileColumns.get(NetworkFileColumns.FREE_FLOW_TRAVEL_TIME)]);    
+    
+    /* capacity */
+    final double capacityPerLane = Integer.parseInt(cols[networkFileColumns.get(NetworkFileColumns.CAPACITY_PER_LANE)]) * capacityPeriod.getMultiplier();
+    
+    /* link segment type */
+    final int linkSegmentTypeSourceId = Integer.parseInt(cols[networkFileColumns.get(NetworkFileColumns.LINK_TYPE)]);    
+    
+    /* mode properties */
     MacroscopicModeProperties macroscopicModeProperties = null;
     double freeflowSpeed = defaultMaximumSpeed * speedUnits.getMultiplier();
-    switch (linkSegmentTypeExternalId) {
+    switch (linkSegmentTypeSourceId) {
       case 1:
-        freeflowSpeed = (length / freeFlowTravelTime) * speedUnits.getMultiplier();
+        freeflowSpeed = (link.getLengthKm() / freeFlowTravelTime) * speedUnits.getMultiplier();
         break;
       case 2:
-        freeflowSpeed = (length / freeFlowTravelTime) * speedUnits.getMultiplier();
+        freeflowSpeed = (link.getLengthKm() / freeFlowTravelTime) * speedUnits.getMultiplier();
         break;
       case 3:
         // already correct fall through
@@ -248,38 +259,32 @@ public class TntpInputBuilder extends InputBuilderListener {
     macroscopicModeProperties = MacroscopicModePropertiesFactory.create(freeflowSpeed, freeflowSpeed);
     modePropertiesMap.put(mode, macroscopicModeProperties);
 
-    final MacroscopicLinkSegment linkSegment = (MacroscopicLinkSegment) network.linkSegments.registerNew(link, true, true);
-    linkSegment.setExternalId(externalId);
-    final MacroscopicNetwork macroscopicNetwork = network;
+    final MacroscopicLinkSegment linkSegment = network.linkSegments.registerNew(link, true, true);
+    /* external id */    
+    linkSegment.setExternalId(String.valueOf(tntpLinkSegmentSourceId));
+    if (linkSegment.getExternalId() != null) {
+      final boolean duplicateLinkSegmentExternalId = addLinkSegmentToSourceIdMap(linkSegment.getExternalId(),linkSegment);
+      if (duplicateLinkSegmentExternalId && isErrorIfDuplicateSourceId()) {
+        throw new PlanItException("Duplicate link segment external id " + linkSegment.getExternalId()+ " found in network file");
+      }
+    }    
 
-    final MacroscopicLinkSegmentType existingLinkSegmentType = getLinkSegmentTypeByXmlId(linkSegmentTypeExternalId);
-    if (existingLinkSegmentType == null) {
-      final MacroscopicLinkSegmentType macroscopicLinkSegmentType = 
-          macroscopicNetwork.linkSegmentTypes.createAndRegisterNew(
-              String.valueOf(linkSegmentTypeExternalId), 
-              capacityPerLane,
-              MacroscopicLinkSegmentType.DEFAULT_MAX_DENSITY_LANE,
-              linkSegmentTypeExternalId, 
-              modePropertiesMap);
-      addLinkSegmentTypeToXmlIdMap(macroscopicLinkSegmentType.getExternalId(), macroscopicLinkSegmentType);
-      linkSegment.setLinkSegmentType(macroscopicLinkSegmentType);
-    } else {
-      linkSegment.setLinkSegmentType(existingLinkSegmentType);
+    /** Link segment type **/
+    String linkSegmentTypeSourceIdString = String.valueOf(linkSegmentTypeSourceId);
+    MacroscopicLinkSegmentType linkSegmentType = getLinkSegmentTypeBySourceId(linkSegmentTypeSourceIdString);
+    if (linkSegmentType == null) {
+      linkSegmentType = network.linkSegmentTypes.createAndRegisterNew( 
+          linkSegmentTypeSourceIdString, capacityPerLane, MacroscopicLinkSegmentType.DEFAULT_MAX_DENSITY_LANE, modePropertiesMap);
+      linkSegmentType.setExternalId(linkSegmentTypeSourceIdString);
+      addLinkSegmentTypeToSourceIdMap(linkSegmentType.getExternalId(), linkSegmentType);
     }
+    linkSegment.setLinkSegmentType(linkSegmentType);    
     linkSegment.getLinkSegmentType().getModeProperties(mode).setMaximumSpeedKmH(maxSpeed);
     
-    if (linkSegment.getExternalId() != null) {
-      final boolean duplicateLinkSegmentExternalId = addLinkSegmentToXmlIdMap(linkSegment.getExternalId(),
-          linkSegment);
-      if (duplicateLinkSegmentExternalId && isErrorIfDuplicateXmlId()) {
-        final String errorMessage = "Duplicate link segment external id " + linkSegment.getExternalId()
-            + " found in network file.";
-        LOGGER.severe(errorMessage);
-        throw new PlanItException(errorMessage);
-      }
-    }
+
     return linkSegment;
   }
+
 
   /**
    * Update the node coordinates from the node coordinate file
@@ -295,9 +300,9 @@ public class TntpInputBuilder extends InputBuilderListener {
         final char firstChar = line.charAt(0);
         if (Character.isDigit(firstChar)) {
           final String[] cols = line.split("\\s+");
-          final long nodeExternalId = Long.parseLong(cols[0]);
+          final String nodeSourceId = cols[0];
 
-          final Node node = getNodeByXmlId(nodeExternalId);
+          final Node node = getNodeBySourceId(nodeSourceId);
           Point nodePosition = PlanitJtsUtils.createPoint(Double.parseDouble(cols[1]), Double.parseDouble(cols[2]));          
           node.setPosition(nodePosition);
         }
@@ -330,36 +335,26 @@ public class TntpInputBuilder extends InputBuilderListener {
    *
    * @param network the macroscopic network object to be populated from the input data
    * @param line the current line in the network input file
-   * @param linkSegmentExternalId the external Id for the current line segment
+   * @param tntpLinkSegmentSourceId the external Id for the current line segment
    * @throws PlanItException thrown if there is an error
    */
-  private void readLinkData(final MacroscopicNetwork network, final String line, final long linkSegmentExternalId)
+  private void readLinkData(final MacroscopicNetwork network, final String line, final long tntpLinkSegmentSourceId)
       throws PlanItException {
     final String[] cols = line.split("\\s+");
 
     final Node upstreamNode = createAndRegisterNode(network, cols, NetworkFileColumns.UPSTREAM_NODE_ID);
     final Node downstreamNode = createAndRegisterNode(network, cols, NetworkFileColumns.DOWNSTREAM_NODE_ID);
 
-    final double length =
-        Double.parseDouble(cols[networkFileColumns.get(NetworkFileColumns.LENGTH)]) * lengthUnits.getMultiplier();
-    final double freeFlowTravelTime =
-        Double.parseDouble(cols[networkFileColumns.get(NetworkFileColumns.FREE_FLOW_TRAVEL_TIME)]);
+    /** LINK **/
+    final double length = Double.parseDouble(cols[networkFileColumns.get(NetworkFileColumns.LENGTH)]) * lengthUnits.getMultiplier();
     final Link link = network.links.registerNew(upstreamNode, downstreamNode, length);
+    /* link source id */
+    link.setExternalId(String.valueOf(tntpLinkSegmentSourceId));
     
-    double maxSpeed = defaultMaximumSpeed;
-    final double speed = Double.parseDouble(cols[networkFileColumns.get(NetworkFileColumns.MAXIMUM_SPEED)]);
-    if (speed > Precision.EPSILON_6 && speed < Double.POSITIVE_INFINITY) {
-      maxSpeed = speed * speedUnits.getMultiplier();
-    }
-    
-    final double capacityPerLane =
-        Integer.parseInt(cols[networkFileColumns.get(NetworkFileColumns.CAPACITY_PER_LANE)]) * capacityPeriod.getMultiplier();
-    
-    final int linkSegmentTypeExternalId = Integer.parseInt(cols[networkFileColumns.get(NetworkFileColumns.LINK_TYPE)]);
-    final MacroscopicLinkSegment linkSegment =
-        createAndRegisterLinkSegment(
-            network, link, maxSpeed, capacityPerLane, linkSegmentTypeExternalId, linkSegmentExternalId, length, freeFlowTravelTime);
+    /** LINK SEGMENT/TYPE **/    
+    final MacroscopicLinkSegment linkSegment = createAndRegisterLinkSegment(network, link, tntpLinkSegmentSourceId, cols);
 
+    /** MODE PARAMETERS **/
     double alpha = BPRLinkTravelTimeCost.DEFAULT_ALPHA;
     double beta = BPRLinkTravelTimeCost.DEFAULT_BETA;
     boolean settingAlpha = false;
@@ -405,12 +400,13 @@ public class TntpInputBuilder extends InputBuilderListener {
     final MacroscopicNetwork network = (MacroscopicNetwork) physicalNetwork;
     // TNTP only has one mode, define it here
     mode = network.modes.registerNew(PredefinedModeType.CAR);
-    addModeToXmlIdMap(mode.getExternalId(), mode);
+    mode.setExternalId("1"); //TODO wrong because no external id is available, but tests use it --> refactor
+    addModeToSourceIdMap(mode.getExternalId(), mode);
 
     try (Scanner scanner = new Scanner(networkFile)) {
       boolean readingMetadata = true;
       boolean readingLinkData = false;
-      long linkSegmentExternalId = 0;
+      long tntpLinkSegmentSourceId = 0;
       while (scanner.hasNextLine()) {
         final String line = scanner.nextLine().trim();
         final char firstChar = (line.isEmpty()) ? 'x' : line.charAt(0);
@@ -424,14 +420,14 @@ public class TntpInputBuilder extends InputBuilderListener {
           if (firstChar == '~') {
             readingLinkData = true;
           } else if (readingLinkData) {
-            linkSegmentExternalId++;
-            readLinkData(network, line, linkSegmentExternalId);
+            tntpLinkSegmentSourceId++;
+            readLinkData(network, line, tntpLinkSegmentSourceId);
           }
         }
       }
 
-      if (linkSegmentExternalId != noLinks) {
-        final String errorMessage = "Header says " + noLinks + " links but " + linkSegmentExternalId+ " were actually defined.";
+      if (tntpLinkSegmentSourceId != noLinks) {
+        final String errorMessage = "Header says " + noLinks + " links but " + tntpLinkSegmentSourceId+ " were actually defined.";
         LOGGER.severe(errorMessage);
         throw new PlanItException(errorMessage);
       }
@@ -464,13 +460,14 @@ public class TntpInputBuilder extends InputBuilderListener {
     // TNTP only has one time period, define it here
     int wholeDaydurationSeconds = 24*3600;
     int startAtMidNightSeconds = 0;
-    timePeriod = demands.timePeriods.createAndRegisterNewTimePeriod((long) 1, "All Day", startAtMidNightSeconds, wholeDaydurationSeconds);
-    addTimePeriodToXmlIdMap(timePeriod.getExternalId(), timePeriod);    
+    timePeriod = demands.timePeriods.createAndRegisterNewTimePeriod("All Day", startAtMidNightSeconds, wholeDaydurationSeconds);
+    timePeriod.setExternalId("1"); //TODO wrong because no external id is available, but tests use it --> refactor
+    addTimePeriodToSourceIdMap(timePeriod.getExternalId(), timePeriod);    
     
     try (Scanner scanner = new Scanner(demandFile)) {
       boolean readingMetadata = true;
       Zone originZone = null;
-      Map<Integer, Double> demandToDestination = null;
+      Map<String, Double> demandToDestination = null;
       final ODDemandMatrix odDemandMatrix = new ODDemandMatrix(zoning.zones);
       while (scanner.hasNextLine()) {
         final String line = scanner.nextLine().trim();
@@ -483,9 +480,7 @@ public class TntpInputBuilder extends InputBuilderListener {
           if (line.startsWith(NUMBER_OF_ZONES_INDICATOR)) {
             final String subLine = line.substring(NUMBER_OF_ZONES_INDICATOR.length()).trim();
             if (noZones != Integer.parseInt(subLine)) {
-              final String errorMessage = "Network file indicates there are " + noZones + " but demand file indicates there are " + Integer.parseInt(subLine) + " zones.";
-              LOGGER.severe(errorMessage);
-              throw new PlanItException(errorMessage);
+              throw new PlanItException("Network file indicates there are " + noZones + " but demand file indicates there are " + Integer.parseInt(subLine) + " zones");
             }
           }
         } else if (!atEndOfMetadata) {
@@ -495,14 +490,13 @@ public class TntpInputBuilder extends InputBuilderListener {
                 updateOdDemandMatrix(demandToDestination, zoning, originZone, odDemandMatrix);
               }
               final String[] cols = line.split("\\s+");
-              final long originId = Long.parseLong(cols[1]);
-              originZone = getZoneByXmlId(originId);
-              demandToDestination = new HashMap<Integer, Double>();
+              originZone = getZoneBySourceId(cols[1]);
+              demandToDestination = new HashMap<String, Double>();
             } else {
               final String lineWithNoSpaces = line.replaceAll("\\s", "");
               final String[] destDemand = lineWithNoSpaces.split("[:;]");
               for (int i = 0; i < destDemand.length; i += 2) {
-                demandToDestination.put(Integer.parseInt(destDemand[i]), Double.parseDouble(destDemand[i + 1]));
+                demandToDestination.put(destDemand[i], Double.parseDouble(destDemand[i + 1]));
               }
             }
           }
@@ -529,14 +523,16 @@ public class TntpInputBuilder extends InputBuilderListener {
    */
   protected void populateZoning(final Zoning zoning, final Object parameter1) throws PlanItException {
     LOGGER.fine(LoggingUtils.getClassNameWithBrackets(this)+"populating zoning");
-    for (long zoneExternalId = 1; zoneExternalId <= noZones; zoneExternalId++) {
-      final Zone zone = zoning.zones.createAndRegisterNewZone(zoneExternalId);
-      addZoneToXmlIdMap(zone.getExternalId(), zone);
+    for (long zoneSourceId = 1; zoneSourceId <= noZones; zoneSourceId++) {
+      final Zone zone = zoning.zones.createAndRegisterNewZone();
+      zone.setExternalId(String.valueOf(zoneSourceId));
+      addZoneToSourceIdMap(zone.getExternalId(), zone);
       final Centroid centroid = zone.getCentroid();
-      final Node node = getNodeByXmlId(zoneExternalId);
+      final Node node = getNodeBySourceId(zone.getExternalId());
       // TODO - calculate connectoid length
       final double connectoidLength = 1.0;
-      zoning.getVirtualNetwork().connectoids.registerNewConnectoid(centroid, node, connectoidLength, zoneExternalId);
+      Connectoid connectoid = zoning.getVirtualNetwork().connectoids.registerNewConnectoid(centroid, node, connectoidLength);
+      connectoid.setExternalId(zone.getExternalId());
     }
   }
 
