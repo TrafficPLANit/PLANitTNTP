@@ -18,6 +18,7 @@ import org.planit.output.property.OutputProperty;
 import org.planit.time.TimePeriod;
 import org.planit.tntp.input.TntpInputBuilder;
 import org.planit.utils.id.IdGenerator;
+import org.planit.utils.math.Precision;
 import org.planit.utils.misc.Pair;
 import org.planit.utils.mode.Mode;
 
@@ -70,20 +71,21 @@ public class TNTPTest {
 
     try {
       final Pair<MemoryOutputFormatter, TntpInputBuilder> testOutput =
-          TNTPTestHelper.execute(networkFileLocation, demandFileLocation, maxIterations, epsilon, outputTimeUnit,
-              defaultMaximumSpeed);
+          TNTPTestHelper.execute(networkFileLocation, demandFileLocation, maxIterations, epsilon, outputTimeUnit, defaultMaximumSpeed);
       final MemoryOutputFormatter memoryOutputFormatter = testOutput.first();
       final TntpInputBuilder tntp = testOutput.second();
 
-      final Map<Long, Map<Long, double[]>> resultsMap = TNTPTestHelper.parseStandardResultsFile(standardResultsFileLocation);
+      final Map<String, Map<String, double[]>> resultsMap = TNTPTestHelper.parseStandardResultsFile(standardResultsFileLocation);
       final TimePeriod timePeriod = tntp.getTimePeriodBySourceId("1");
       final int iterationIndex = memoryOutputFormatter.getLastIteration();
       final Mode mode = tntp.getAllModesBySourceId().values().iterator().next();
+      
       final int flowPosition = memoryOutputFormatter.getPositionOfOutputValueProperty(OutputType.LINK, OutputProperty.FLOW);
       final int costPosition = memoryOutputFormatter.getPositionOfOutputValueProperty(OutputType.LINK, OutputProperty.LINK_COST);
       final int linkTypePosition = memoryOutputFormatter.getPositionOfOutputValueProperty(OutputType.LINK, OutputProperty.LINK_TYPE);
       final int downstreamNodeExternalIdPosition = memoryOutputFormatter.getPositionOfOutputKeyProperty(OutputType.LINK, OutputProperty.DOWNSTREAM_NODE_EXTERNAL_ID);
       final int upstreamNodeExternalIdPosition = memoryOutputFormatter.getPositionOfOutputKeyProperty(OutputType.LINK, OutputProperty.UPSTREAM_NODE_EXTERNAL_ID);
+      
       final MemoryOutputIterator memoryOutputIterator = memoryOutputFormatter.getIterator(mode, timePeriod, iterationIndex, OutputType.LINK);
       while (memoryOutputIterator.hasNext()) {
           memoryOutputIterator.next();
@@ -91,14 +93,14 @@ public class TNTPTest {
           final String runLinkType = (String) results[linkTypePosition];
           if (runLinkType.equals("3")) {
             final Object[] keys = memoryOutputIterator.getKeys();
-            final long downstreamNodeExternalId = (Long) keys[downstreamNodeExternalIdPosition];
-            final long upstreamNodeExternalId = (Long) keys[upstreamNodeExternalIdPosition];
+            final String downstreamNodeXmlId = (String) keys[downstreamNodeExternalIdPosition];
+            final String upstreamNodeXmlId = (String) keys[upstreamNodeExternalIdPosition];
             final double runFlow = (Double) results[flowPosition];
             final double runCost = (Double) results[costPosition];
-            final double standardResultsFlow = resultsMap.get(upstreamNodeExternalId).get(downstreamNodeExternalId)[0];
-            final double standardResultsCost = resultsMap.get(upstreamNodeExternalId).get(downstreamNodeExternalId)[1];
-            assertEquals(runFlow, standardResultsFlow, 0.001);
-            assertEquals(runCost, standardResultsCost, 0.001);
+            final double standardResultsFlow = resultsMap.get(upstreamNodeXmlId).get(downstreamNodeXmlId)[0];
+            final double standardResultsCost = resultsMap.get(upstreamNodeXmlId).get(downstreamNodeXmlId)[1];
+            assertEquals(runFlow, standardResultsFlow, Precision.EPSILON_3);
+            assertEquals(runCost, standardResultsCost, Precision.EPSILON_3);
           }
       }
 

@@ -161,6 +161,9 @@ public class TntpInputBuilder extends InputBuilderListener {
     Node node = null;
     if (getNodeBySourceId(nodeSourceId) == null) {      
       node = network.nodes.registerNew();
+      /* XML id */
+      node.setXmlId(Long.toString(node.getId()));    
+      /* external id */
       node.setExternalId(nodeSourceId);
       final boolean duplicateNodeExternalId = addNodeToSourceIdMap(nodeSourceId, node);
       if (duplicateNodeExternalId && isErrorIfDuplicateSourceId()) {
@@ -260,6 +263,8 @@ public class TntpInputBuilder extends InputBuilderListener {
     modePropertiesMap.put(mode, macroscopicModeProperties);
 
     final MacroscopicLinkSegment linkSegment = network.linkSegments.registerNew(link, true, true);
+    /* XML id */
+    linkSegment.setXmlId(Long.toString(linkSegment.getId()));
     /* external id */    
     linkSegment.setExternalId(String.valueOf(tntpLinkSegmentSourceId));
     if (linkSegment.getExternalId() != null) {
@@ -275,6 +280,9 @@ public class TntpInputBuilder extends InputBuilderListener {
     if (linkSegmentType == null) {
       linkSegmentType = network.linkSegmentTypes.createAndRegisterNew( 
           linkSegmentTypeSourceIdString, capacityPerLane, MacroscopicLinkSegmentType.DEFAULT_MAX_DENSITY_LANE, modePropertiesMap);
+      /* XML id */
+      linkSegmentType.setXmlId(Long.toString(linkSegmentType.getId()));
+      /* external id */
       linkSegmentType.setExternalId(linkSegmentTypeSourceIdString);
       addLinkSegmentTypeToSourceIdMap(linkSegmentType.getExternalId(), linkSegmentType);
     }
@@ -348,7 +356,9 @@ public class TntpInputBuilder extends InputBuilderListener {
     /** LINK **/
     final double length = Double.parseDouble(cols[networkFileColumns.get(NetworkFileColumns.LENGTH)]) * lengthUnits.getMultiplier();
     final Link link = network.links.registerNew(upstreamNode, downstreamNode, length);
-    /* link source id */
+    /* XML id */
+    link.setXmlId(Long.toString(link.getId()));
+    /* link external id */
     link.setExternalId(String.valueOf(tntpLinkSegmentSourceId));
     
     /** LINK SEGMENT/TYPE **/    
@@ -400,6 +410,7 @@ public class TntpInputBuilder extends InputBuilderListener {
     final MacroscopicNetwork network = (MacroscopicNetwork) physicalNetwork;
     // TNTP only has one mode, define it here
     mode = network.modes.registerNew(PredefinedModeType.CAR);
+    /* external id */
     mode.setExternalId("1"); //TODO wrong because no external id is available, but tests use it --> refactor
     addModeToSourceIdMap(mode.getExternalId(), mode);
 
@@ -461,6 +472,9 @@ public class TntpInputBuilder extends InputBuilderListener {
     int wholeDaydurationSeconds = 24*3600;
     int startAtMidNightSeconds = 0;
     timePeriod = demands.timePeriods.createAndRegisterNewTimePeriod("All Day", startAtMidNightSeconds, wholeDaydurationSeconds);
+    /* XML id */
+    timePeriod.setXmlId(Long.toString(timePeriod.getId()));
+    /* external id */
     timePeriod.setExternalId("1"); //TODO wrong because no external id is available, but tests use it --> refactor
     addTimePeriodToSourceIdMap(timePeriod.getExternalId(), timePeriod);    
     
@@ -524,14 +538,23 @@ public class TntpInputBuilder extends InputBuilderListener {
   protected void populateZoning(final Zoning zoning, final Object parameter1) throws PlanItException {
     LOGGER.fine(LoggingUtils.getClassNameWithBrackets(this)+"populating zoning");
     for (long zoneSourceId = 1; zoneSourceId <= noZones; zoneSourceId++) {
+      /* ZONE */
       final Zone zone = zoning.zones.createAndRegisterNewZone();
+      /* XML id */
+      zone.setXmlId(Long.toString(zone.getId()));      
+      /* external id */
       zone.setExternalId(String.valueOf(zoneSourceId));
       addZoneToSourceIdMap(zone.getExternalId(), zone);
       final Centroid centroid = zone.getCentroid();
+      
+      /* CONNECTOID */
       final Node node = getNodeBySourceId(zone.getExternalId());
       // TODO - calculate connectoid length
       final double connectoidLength = 1.0;
       Connectoid connectoid = zoning.getVirtualNetwork().connectoids.registerNewConnectoid(centroid, node, connectoidLength);
+      /* XML id */
+      connectoid.setXmlId(Long.toString(connectoid.getId()));
+      /* external id */
       connectoid.setExternalId(zone.getExternalId());
     }
   }

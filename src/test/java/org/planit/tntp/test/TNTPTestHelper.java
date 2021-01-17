@@ -54,19 +54,19 @@ public class TNTPTestHelper {
    * @return Map of containing flow and cost values for each upstream and downstream node
    * @throws PlanItException thrown if there is an error
    */
-  public static Map<Long, Map<Long, double[]>> parseStandardResultsFile(final String standardResultsFileLocation)
+  public static Map<String, Map<String, double[]>> parseStandardResultsFile(final String standardResultsFileLocation)
       throws PlanItException {
-    final Map<Long, Map<Long, double[]>> resultsMap = new HashMap<Long, Map<Long, double[]>>();
+    final Map<String, Map<String, double[]>> resultsMap = new HashMap<String, Map<String, double[]>>();
     try (Scanner scanner = new Scanner(new File(standardResultsFileLocation).getCanonicalFile())) {
       String line = scanner.nextLine();
       while (scanner.hasNextLine()) {
         line = scanner.nextLine().trim();
         final String[] cols = line.split("\\s+");
-        final long upstreamNodeExternalId = Long.parseLong(cols[0]);
+        final String upstreamNodeExternalId = cols[0];
         if (!resultsMap.containsKey(upstreamNodeExternalId)) {
-          resultsMap.put(upstreamNodeExternalId, new HashMap<Long, double[]>());
+          resultsMap.put(upstreamNodeExternalId, new HashMap<String, double[]>());
         }
-        final long downstreamNodeExternalId = Long.parseLong(cols[1]);
+        final String downstreamNodeExternalId = cols[1];
         if (!cols[2].trim().equals("0")) {
           final double[] flowCost = {Double.parseDouble(cols[2]), Double.parseDouble(cols[3])};
           resultsMap.get(upstreamNodeExternalId).put(downstreamNodeExternalId, flowCost);
@@ -147,18 +147,23 @@ public class TNTPTestHelper {
         (LinkOutputTypeConfiguration) outputConfiguration.getOutputTypeConfiguration(OutputType.LINK);
     linkOutputTypeConfiguration.addProperty(OutputProperty.LINK_TYPE);
     linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_ID);
-    linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_EXTERNAL_ID);
+    linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_XML_ID);
     linkOutputTypeConfiguration.removeProperty(OutputProperty.DOWNSTREAM_NODE_LOCATION);
     linkOutputTypeConfiguration.removeProperty(OutputProperty.DOWNSTREAM_NODE_ID);
+    linkOutputTypeConfiguration.removeProperty(OutputProperty.DOWNSTREAM_NODE_XML_ID);
     linkOutputTypeConfiguration.removeProperty(OutputProperty.UPSTREAM_NODE_LOCATION);
     linkOutputTypeConfiguration.removeProperty(OutputProperty.UPSTREAM_NODE_ID);
+    linkOutputTypeConfiguration.removeProperty(OutputProperty.UPSTREAM_NODE_XML_ID);
     linkOutputTypeConfiguration.removeProperty(OutputProperty.MODE_EXTERNAL_ID);
     linkOutputTypeConfiguration.removeProperty(OutputProperty.MODE_ID);
     linkOutputTypeConfiguration.removeProperty(OutputProperty.TIME_PERIOD_EXTERNAL_ID);
     linkOutputTypeConfiguration.removeProperty(OutputProperty.TIME_PERIOD_ID);
     linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_ID);
     linkOutputTypeConfiguration.removeProperty(OutputProperty.MAXIMUM_SPEED);
-
+    
+    linkOutputTypeConfiguration.addProperty(OutputProperty.DOWNSTREAM_NODE_EXTERNAL_ID);
+    linkOutputTypeConfiguration.addProperty(OutputProperty.UPSTREAM_NODE_EXTERNAL_ID);
+    
     // MemoryOutputFormatter - Links
     final MemoryOutputFormatter memoryOutputFormatter = (MemoryOutputFormatter)
         project.createAndRegisterOutputFormatter(OutputFormatter.MEMORY_OUTPUT_FORMATTER);
