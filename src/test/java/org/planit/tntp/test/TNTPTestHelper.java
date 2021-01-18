@@ -120,7 +120,7 @@ public class TNTPTestHelper {
 
     // RAW INPUT START --------------------------------
     final MacroscopicNetwork macroscopicNetwork =
-        (MacroscopicNetwork) project.createAndRegisterPhysicalNetwork(MacroscopicNetwork.class.getCanonicalName());
+        (MacroscopicNetwork) project.createAndRegisterInfrastructureNetwork(MacroscopicNetwork.class.getCanonicalName());
     final Zoning zoning = project.createAndRegisterZoning(macroscopicNetwork);
     final Demands demands = project.createAndRegisterDemands(zoning, macroscopicNetwork);
 

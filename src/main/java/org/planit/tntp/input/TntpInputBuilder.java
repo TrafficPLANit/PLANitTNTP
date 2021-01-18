@@ -159,7 +159,7 @@ public class TntpInputBuilder extends InputBuilderListener {
       throw new PlanItException("Number of nodes is specified as " + noPhysicalNodes + " but found a reference to node " + nodeSourceId);
     }
     Node node = null;
-    if (getNodeBySourceId(nodeSourceId) == null) {      
+    if (getNodeByXmlId(nodeSourceId) == null) {      
       node = network.nodes.registerNew();
       /* XML id */
       node.setXmlId(Long.toString(node.getId()));    
@@ -170,7 +170,7 @@ public class TntpInputBuilder extends InputBuilderListener {
         throw new PlanItException("Duplicate node external id " + nodeSourceId + " found in network file");
       }
     } else {
-      node = getNodeBySourceId(nodeSourceId);
+      node = getNodeByXmlId(nodeSourceId);
     }
     return node;
   }
@@ -310,7 +310,7 @@ public class TntpInputBuilder extends InputBuilderListener {
           final String[] cols = line.split("\\s+");
           final String nodeSourceId = cols[0];
 
-          final Node node = getNodeBySourceId(nodeSourceId);
+          final Node node = getNodeByXmlId(nodeSourceId);
           Point nodePosition = PlanitJtsUtils.createPoint(Double.parseDouble(cols[1]), Double.parseDouble(cols[2]));          
           node.setPosition(nodePosition);
         }
@@ -548,7 +548,7 @@ public class TntpInputBuilder extends InputBuilderListener {
       final Centroid centroid = zone.getCentroid();
       
       /* CONNECTOID */
-      final Node node = getNodeBySourceId(zone.getExternalId());
+      final Node node = getNodeByXmlId(zone.getExternalId());
       // TODO - calculate connectoid length
       final double connectoidLength = 1.0;
       Connectoid connectoid = zoning.getVirtualNetwork().connectoids.registerNewConnectoid(centroid, node, connectoidLength);
