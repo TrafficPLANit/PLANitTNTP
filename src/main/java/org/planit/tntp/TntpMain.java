@@ -10,7 +10,7 @@ import org.planit.cost.physical.BPRLinkTravelTimeCost;
 import org.planit.cost.virtual.FixedConnectoidTravelTimeCost;
 import org.planit.demands.Demands;
 import org.planit.logging.Logging;
-import org.planit.network.macroscopic.physical.MacroscopicNetwork;
+import org.planit.network.macroscopic.MacroscopicNetwork;
 import org.planit.network.virtual.Zoning;
 import org.planit.output.configuration.LinkOutputTypeConfiguration;
 import org.planit.output.configuration.ODOutputTypeConfiguration;
@@ -224,8 +224,7 @@ public class TntpMain {
         networkFileColumns, speedUnits, lengthUnits, capacityPeriod, defaultMaximumSpeed);
 
     // RAW INPUT START --------------------------------
-    final MacroscopicNetwork macroscopicNetwork =
-        (MacroscopicNetwork) project.createAndRegisterInfrastructureNetwork(MacroscopicNetwork.class.getCanonicalName());
+    final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) project.createAndRegisterInfrastructureNetwork(MacroscopicNetwork.class.getCanonicalName());
     final Zoning zoning = project.createAndRegisterZoning(macroscopicNetwork);
     final Demands demands = project.createAndRegisterDemands(zoning, macroscopicNetwork);
 

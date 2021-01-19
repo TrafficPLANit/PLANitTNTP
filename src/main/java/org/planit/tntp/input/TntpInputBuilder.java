@@ -14,8 +14,10 @@ import org.planit.cost.physical.AbstractPhysicalCost;
 import org.planit.demands.Demands;
 import org.planit.geo.PlanitJtsUtils;
 import org.planit.input.InputBuilderListener;
+import org.planit.network.InfrastructureNetwork;
+import org.planit.network.macroscopic.MacroscopicNetwork;
 import org.planit.network.macroscopic.physical.MacroscopicModePropertiesFactory;
-import org.planit.network.macroscopic.physical.MacroscopicNetwork;
+import org.planit.network.macroscopic.physical.MacroscopicPhysicalNetwork;
 import org.planit.network.physical.PhysicalNetwork;
 import org.planit.network.virtual.Zoning;
 import org.planit.od.odmatrix.demand.ODDemandMatrix;
@@ -213,7 +215,7 @@ public class TntpInputBuilder extends InputBuilderListener {
    * February 2020: We do not understand how the flow times for link types 1 and 2 are calculated.
    * Link type 3 is the only one for which our results match the published results.
    *
-   * @param network the current macroscopic network
+   * @param networkLayer the current macroscopic networkLayer
    * @param link the current link
    * @param maxSpeed the maximum speed for this link
    * @param capacityPerLane the capacity per lane for this link
@@ -224,7 +226,7 @@ public class TntpInputBuilder extends InputBuilderListener {
    * @throws PlanItException thrown if there is an error
    */
   private MacroscopicLinkSegment createAndRegisterLinkSegment(
-      final MacroscopicNetwork network, final Link link, final long tntpLinkSegmentSourceId, final String[] cols) throws PlanItException {
+      final MacroscopicPhysicalNetwork networkLayer, final Link link, final long tntpLinkSegmentSourceId, final String[] cols) throws PlanItException {
     
     /* max speed */
     double maxSpeed = defaultMaximumSpeed;
@@ -262,7 +264,7 @@ public class TntpInputBuilder extends InputBuilderListener {
     macroscopicModeProperties = MacroscopicModePropertiesFactory.create(freeflowSpeed, freeflowSpeed);
     modePropertiesMap.put(mode, macroscopicModeProperties);
 
-    final MacroscopicLinkSegment linkSegment = network.linkSegments.registerNew(link, true, true);
+    final MacroscopicLinkSegment linkSegment = networkLayer.linkSegments.registerNew(link, true, true);
     /* XML id */
     linkSegment.setXmlId(Long.toString(linkSegment.getId()));
     /* external id */    
@@ -278,7 +280,7 @@ public class TntpInputBuilder extends InputBuilderListener {
     String linkSegmentTypeSourceIdString = String.valueOf(linkSegmentTypeSourceId);
     MacroscopicLinkSegmentType linkSegmentType = getLinkSegmentTypeBySourceId(linkSegmentTypeSourceIdString);
     if (linkSegmentType == null) {
-      linkSegmentType = network.linkSegmentTypes.createAndRegisterNew( 
+      linkSegmentType = networkLayer.linkSegmentTypes.createAndRegisterNew( 
           linkSegmentTypeSourceIdString, capacityPerLane, MacroscopicLinkSegmentType.DEFAULT_MAX_DENSITY_LANE, modePropertiesMap);
       /* XML id */
       linkSegmentType.setXmlId(Long.toString(linkSegmentType.getId()));
@@ -341,28 +343,28 @@ public class TntpInputBuilder extends InputBuilderListener {
    * Create and register the nodes, links and link segments from the current line in the network
    * input file
    *
-   * @param network the macroscopic network object to be populated from the input data
+   * @param networkLayer the macroscopic networkLayer object to be populated from the input data
    * @param line the current line in the network input file
    * @param tntpLinkSegmentSourceId the external Id for the current line segment
    * @throws PlanItException thrown if there is an error
    */
-  private void readLinkData(final MacroscopicNetwork network, final String line, final long tntpLinkSegmentSourceId)
+  private void readLinkData(final MacroscopicPhysicalNetwork networkLayer, final String line, final long tntpLinkSegmentSourceId)
       throws PlanItException {
     final String[] cols = line.split("\\s+");
 
-    final Node upstreamNode = createAndRegisterNode(network, cols, NetworkFileColumns.UPSTREAM_NODE_ID);
-    final Node downstreamNode = createAndRegisterNode(network, cols, NetworkFileColumns.DOWNSTREAM_NODE_ID);
+    final Node upstreamNode = createAndRegisterNode(networkLayer, cols, NetworkFileColumns.UPSTREAM_NODE_ID);
+    final Node downstreamNode = createAndRegisterNode(networkLayer, cols, NetworkFileColumns.DOWNSTREAM_NODE_ID);
 
     /** LINK **/
     final double length = Double.parseDouble(cols[networkFileColumns.get(NetworkFileColumns.LENGTH)]) * lengthUnits.getMultiplier();
-    final Link link = network.links.registerNew(upstreamNode, downstreamNode, length);
+    final Link link = networkLayer.links.registerNew(upstreamNode, downstreamNode, length);
     /* XML id */
     link.setXmlId(Long.toString(link.getId()));
     /* link external id */
     link.setExternalId(String.valueOf(tntpLinkSegmentSourceId));
     
     /** LINK SEGMENT/TYPE **/    
-    final MacroscopicLinkSegment linkSegment = createAndRegisterLinkSegment(network, link, tntpLinkSegmentSourceId, cols);
+    final MacroscopicLinkSegment linkSegment = createAndRegisterLinkSegment(networkLayer, link, tntpLinkSegmentSourceId, cols);
 
     /** MODE PARAMETERS **/
     double alpha = BPRLinkTravelTimeCost.DEFAULT_ALPHA;
@@ -401,19 +403,27 @@ public class TntpInputBuilder extends InputBuilderListener {
   /**
    * Creates the physical network object from the data in the input file
    *
-   * @param physicalNetwork the physical network object to be populated from the input data
+   * @param network the network object to be populated from the input data
    * @throws PlanItException thrown if there is an error reading the input file
    */
-  protected void populatePhysicalNetwork( final PhysicalNetwork<?,?,?> physicalNetwork) throws PlanItException {
+  protected void populateInfrastructureNetwork( final InfrastructureNetwork network) throws PlanItException {
     LOGGER.fine(LoggingUtils.getClassNameWithBrackets(this)+"populating Physical Network");
 
-    final MacroscopicNetwork network = (MacroscopicNetwork) physicalNetwork;
-    // TNTP only has one mode, define it here
-    mode = network.modes.registerNew(PredefinedModeType.CAR);
+    if (!(network instanceof MacroscopicNetwork)) {
+      throw new PlanItException("TNTP reader currently only supports writing macroscopic networks");
+    }
+    final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) network;
+    
+    /* TNTP only has one mode, define it here */
+    mode = macroscopicNetwork.modes.registerNew(PredefinedModeType.CAR);
     /* external id */
     mode.setExternalId("1"); //TODO wrong because no external id is available, but tests use it --> refactor
-    addModeToSourceIdMap(mode.getExternalId(), mode);
-
+    addModeToSourceIdMap(mode.getExternalId(), mode);    
+    
+    /* TNTP only compatible with parsing a single network layer, so create it */
+    final MacroscopicPhysicalNetwork networkLayer = macroscopicNetwork.infrastructureLayers.registerNew();
+    networkLayer.registerSupportedMode(mode);
+   
     try (Scanner scanner = new Scanner(networkFile)) {
       boolean readingMetadata = true;
       boolean readingLinkData = false;
@@ -432,7 +442,7 @@ public class TntpInputBuilder extends InputBuilderListener {
             readingLinkData = true;
           } else if (readingLinkData) {
             tntpLinkSegmentSourceId++;
-            readLinkData(network, line, tntpLinkSegmentSourceId);
+            readLinkData(networkLayer, line, tntpLinkSegmentSourceId);
           }
         }
       }
@@ -450,11 +460,10 @@ public class TntpInputBuilder extends InputBuilderListener {
     }
 
     if (nodeCoordinateFile != null) {
-      updateNodeCoordinatesFromFile(network);
+      updateNodeCoordinatesFromFile(networkLayer);
     }
 
-    linkSegments = network.linkSegments;
-
+    linkSegments = networkLayer.linkSegments;
   }
 
   /**
@@ -694,8 +703,8 @@ public class TntpInputBuilder extends InputBuilderListener {
       // parameters (second parameter)
       final Object[] parameters = (Object[]) content[1];
       try {
-        if (projectComponent instanceof PhysicalNetwork<?,?,?>) {
-          populatePhysicalNetwork((PhysicalNetwork<?,?,?>) projectComponent);
+        if (projectComponent instanceof InfrastructureNetwork) {
+          populateInfrastructureNetwork((InfrastructureNetwork) projectComponent);
         } else if (projectComponent instanceof Zoning) {
           populateZoning((Zoning) projectComponent, parameters[0]);
         } else if (projectComponent instanceof Demands) {
