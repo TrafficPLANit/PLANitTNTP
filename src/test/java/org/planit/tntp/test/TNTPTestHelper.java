@@ -12,7 +12,6 @@ import org.planit.cost.physical.BPRLinkTravelTimeCost;
 import org.planit.cost.virtual.FixedConnectoidTravelTimeCost;
 import org.planit.demands.Demands;
 import org.planit.network.macroscopic.MacroscopicNetwork;
-import org.planit.network.virtual.Zoning;
 import org.planit.output.configuration.LinkOutputTypeConfiguration;
 import org.planit.output.configuration.OutputConfiguration;
 import org.planit.output.enums.OutputTimeUnit;
@@ -29,6 +28,7 @@ import org.planit.tntp.input.TntpInputBuilder;
 import org.planit.tntp.project.TntpProject;
 import org.planit.utils.exceptions.PlanItException;
 import org.planit.utils.misc.Pair;
+import org.planit.zoning.Zoning;
 
 /**
  * Helper class for TNTP unit tests

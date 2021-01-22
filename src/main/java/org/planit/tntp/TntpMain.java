@@ -11,7 +11,6 @@ import org.planit.cost.virtual.FixedConnectoidTravelTimeCost;
 import org.planit.demands.Demands;
 import org.planit.logging.Logging;
 import org.planit.network.macroscopic.MacroscopicNetwork;
-import org.planit.network.virtual.Zoning;
 import org.planit.output.configuration.LinkOutputTypeConfiguration;
 import org.planit.output.configuration.ODOutputTypeConfiguration;
 import org.planit.output.configuration.OutputConfiguration;
@@ -29,6 +28,7 @@ import org.planit.tntp.output.formatter.CSVOutputFormatter;
 import org.planit.tntp.project.TntpProject;
 import org.planit.utils.args.ArgumentParser;
 import org.planit.utils.exceptions.PlanItException;
+import org.planit.zoning.Zoning;
 
 /**
  * Main class for running TNTP models

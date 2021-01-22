@@ -19,7 +19,6 @@ import org.planit.network.macroscopic.MacroscopicNetwork;
 import org.planit.network.macroscopic.physical.MacroscopicModePropertiesFactory;
 import org.planit.network.macroscopic.physical.MacroscopicPhysicalNetwork;
 import org.planit.network.physical.PhysicalNetwork;
-import org.planit.network.virtual.Zoning;
 import org.planit.od.odmatrix.demand.ODDemandMatrix;
 import org.planit.time.TimePeriod;
 import org.planit.tntp.enums.CapacityPeriod;
@@ -39,10 +38,9 @@ import org.planit.utils.network.physical.Node;
 import org.planit.utils.network.physical.macroscopic.MacroscopicLinkSegment;
 import org.planit.utils.network.physical.macroscopic.MacroscopicLinkSegmentType;
 import org.planit.utils.network.physical.macroscopic.MacroscopicModeProperties;
-import org.planit.utils.network.virtual.Centroid;
 import org.planit.utils.network.virtual.Connectoid;
-import org.planit.utils.network.virtual.Zone;
-
+import org.planit.utils.zoning.Zone;
+import org.planit.zoning.Zoning;
 import org.locationtech.jts.geom.Point;
 
 /**
@@ -491,7 +489,7 @@ public class TntpInputBuilder extends InputBuilderListener {
       boolean readingMetadata = true;
       Zone originZone = null;
       Map<String, Double> demandToDestination = null;
-      final ODDemandMatrix odDemandMatrix = new ODDemandMatrix(zoning.zones);
+      final ODDemandMatrix odDemandMatrix = new ODDemandMatrix(zoning.odZones);
       while (scanner.hasNextLine()) {
         final String line = scanner.nextLine().trim();
         final char firstChar = (line.isEmpty()) ? 'x' : line.charAt(0);
@@ -548,19 +546,18 @@ public class TntpInputBuilder extends InputBuilderListener {
     LOGGER.fine(LoggingUtils.getClassNameWithBrackets(this)+"populating zoning");
     for (long zoneSourceId = 1; zoneSourceId <= noZones; zoneSourceId++) {
       /* ZONE */
-      final Zone zone = zoning.zones.createAndRegisterNewZone();
+      final Zone zone = zoning.odZones.registerNew();
       /* XML id */
       zone.setXmlId(Long.toString(zone.getId()));      
       /* external id */
       zone.setExternalId(String.valueOf(zoneSourceId));
       addZoneToSourceIdMap(zone.getExternalId(), zone);
-      final Centroid centroid = zone.getCentroid();
       
       /* CONNECTOID */
       final Node node = getNodeByXmlId(zone.getExternalId());
       // TODO - calculate connectoid length
       final double connectoidLength = 1.0;
-      Connectoid connectoid = zoning.getVirtualNetwork().connectoids.registerNewConnectoid(centroid, node, connectoidLength);
+      Connectoid connectoid = zoning.connectoids.registerNew(zone, node, connectoidLength);
       /* XML id */
       connectoid.setXmlId(Long.toString(connectoid.getId()));
       /* external id */
