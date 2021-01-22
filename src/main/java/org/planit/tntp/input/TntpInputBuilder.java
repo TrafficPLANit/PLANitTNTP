@@ -168,7 +168,7 @@ public class TntpInputBuilder extends InputBuilderListener {
       /* external id */
       node.setExternalId(nodeSourceId);
       final boolean duplicateNodeExternalId = addNodeToSourceIdMap(nodeSourceId, node);
-      if (duplicateNodeExternalId && isErrorIfDuplicateSourceId()) {
+      if (duplicateNodeExternalId) {
         throw new PlanItException("Duplicate node external id " + nodeSourceId + " found in network file");
       }
     } else {
@@ -271,7 +271,7 @@ public class TntpInputBuilder extends InputBuilderListener {
     linkSegment.setExternalId(String.valueOf(tntpLinkSegmentSourceId));
     if (linkSegment.getExternalId() != null) {
       final boolean duplicateLinkSegmentExternalId = addLinkSegmentToSourceIdMap(linkSegment.getExternalId(),linkSegment);
-      if (duplicateLinkSegmentExternalId && isErrorIfDuplicateSourceId()) {
+      if (duplicateLinkSegmentExternalId) {
         throw new PlanItException("Duplicate link segment external id " + linkSegment.getExternalId()+ " found in network file");
       }
     }    
