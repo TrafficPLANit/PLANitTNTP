@@ -38,7 +38,7 @@ import org.planit.utils.network.physical.Node;
 import org.planit.utils.network.physical.macroscopic.MacroscopicLinkSegment;
 import org.planit.utils.network.physical.macroscopic.MacroscopicLinkSegmentType;
 import org.planit.utils.network.physical.macroscopic.MacroscopicModeProperties;
-import org.planit.utils.network.virtual.Connectoid;
+import org.planit.utils.zoning.Connectoid;
 import org.planit.utils.zoning.Zone;
 import org.planit.zoning.Zoning;
 import org.locationtech.jts.geom.Point;
@@ -557,7 +557,7 @@ public class TntpInputBuilder extends InputBuilderListener {
       final Node node = getNodeByXmlId(zone.getExternalId());
       // TODO - calculate connectoid length
       final double connectoidLength = 1.0;
-      Connectoid connectoid = zoning.connectoids.registerNew(zone, node, connectoidLength);
+      Connectoid connectoid = zoning.connectoids.registerNew(node, zone, connectoidLength);
       /* XML id */
       connectoid.setXmlId(Long.toString(connectoid.getId()));
       /* external id */
