@@ -227,7 +227,7 @@ public class TntpInputBuilder extends InputBuilderListener {
       final MacroscopicPhysicalNetwork networkLayer, final Link link, final long tntpLinkSegmentSourceId, final String[] cols) throws PlanItException {
     
     /* max speed */
-    double maxSpeed = defaultMaximumSpeed;
+    double maxSpeed = defaultMaximumSpeed * speedUnits.getMultiplier();
     final double speed = Double.parseDouble(cols[networkFileColumns.get(NetworkFileColumns.MAXIMUM_SPEED)]);
     if (speed > Precision.EPSILON_6 && speed < Double.POSITIVE_INFINITY) {
       maxSpeed = speed * speedUnits.getMultiplier();
