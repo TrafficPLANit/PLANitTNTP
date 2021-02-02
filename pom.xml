@@ -4,9 +4,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>org.planit.all</groupId>
-		<artifactId>PLANitAll</artifactId>
-		<version>0.1.1a1</version>
+    <groupId>org.planit.parentpom</groupId>
+    <artifactId>PLANitParentPom</artifactId>
+		<version>0.2.0</version>
 	</parent>
 
 
