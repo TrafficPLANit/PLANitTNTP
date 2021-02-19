@@ -404,7 +404,7 @@ public class TntpInputBuilder extends InputBuilderListener {
    * @param network the network object to be populated from the input data
    * @throws PlanItException thrown if there is an error reading the input file
    */
-  protected void populateInfrastructureNetwork( final InfrastructureNetwork<?> network) throws PlanItException {
+  protected void populateInfrastructureNetwork( final InfrastructureNetwork<?,?> network) throws PlanItException {
     LOGGER.fine(LoggingUtils.getClassNameWithBrackets(this)+"populating Physical Network");
 
     if (!(network instanceof MacroscopicNetwork)) {
@@ -701,7 +701,7 @@ public class TntpInputBuilder extends InputBuilderListener {
       final Object[] parameters = (Object[]) content[1];
       try {
         if (projectComponent instanceof InfrastructureNetwork) {
-          populateInfrastructureNetwork((InfrastructureNetwork<?>) projectComponent);
+          populateInfrastructureNetwork((InfrastructureNetwork<?,?>) projectComponent);
         } else if (projectComponent instanceof Zoning) {
           populateZoning((Zoning) projectComponent, parameters[0]);
         } else if (projectComponent instanceof Demands) {
