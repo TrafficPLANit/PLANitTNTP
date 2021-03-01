@@ -394,7 +394,7 @@ public class TntpInputBuilder extends InputBuilderListener {
     if (bprParametersForLinkSegmentAndMode == null) {
       bprParametersForLinkSegmentAndMode = new HashMap<LinkSegment, Pair<Double, Double>>();
     }
-    final Pair<Double, Double> alphaBeta = Pair.create(alpha, beta);
+    final Pair<Double, Double> alphaBeta = Pair.of(alpha, beta);
     bprParametersForLinkSegmentAndMode.put(linkSegment, alphaBeta);
   }
 
