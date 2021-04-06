@@ -557,7 +557,7 @@ public class TntpInputBuilder extends InputBuilderListener {
       final Node node = getNodeByXmlId(zone.getExternalId());
       // TODO - calculate connectoid length
       final double connectoidLength = 1.0;
-      Connectoid connectoid = zoning.connectoids.registerNew(node, zone, connectoidLength);
+      Connectoid connectoid = zoning.odConnectoids.registerNew(node, zone, connectoidLength);
       /* XML id */
       connectoid.setXmlId(Long.toString(connectoid.getId()));
       /* external id */
