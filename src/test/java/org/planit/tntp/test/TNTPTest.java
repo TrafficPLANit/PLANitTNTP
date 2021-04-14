@@ -15,7 +15,7 @@ import org.planit.output.enums.OutputType;
 import org.planit.output.formatter.MemoryOutputFormatter;
 import org.planit.output.formatter.MemoryOutputIterator;
 import org.planit.output.property.OutputProperty;
-import org.planit.time.TimePeriod;
+import org.planit.utils.time.TimePeriod;
 import org.planit.tntp.input.TntpInputBuilder;
 import org.planit.utils.id.IdGenerator;
 import org.planit.utils.math.Precision;

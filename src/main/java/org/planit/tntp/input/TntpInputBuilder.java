@@ -19,7 +19,7 @@ import org.planit.network.macroscopic.physical.MacroscopicModePropertiesFactory;
 import org.planit.network.macroscopic.physical.MacroscopicPhysicalNetwork;
 import org.planit.network.physical.PhysicalNetwork;
 import org.planit.od.odmatrix.demand.ODDemandMatrix;
-import org.planit.time.TimePeriod;
+import org.planit.utils.time.TimePeriod;
 import org.planit.tntp.enums.CapacityPeriod;
 import org.planit.tntp.enums.LengthUnits;
 import org.planit.tntp.enums.NetworkFileColumns;

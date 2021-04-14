@@ -5,12 +5,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.logging.Logger;
 
 import org.apache.commons.csv.CSVPrinter;
-import org.planit.output.adapter.LinkOutputTypeAdapter;
+import org.planit.output.adapter.MacroscopicLinkOutputTypeAdapter;
 import org.planit.output.adapter.OutputAdapter;
 import org.planit.output.configuration.OutputConfiguration;
 import org.planit.output.configuration.OutputTypeConfiguration;
@@ -19,11 +20,11 @@ import org.planit.output.enums.OutputTypeEnum;
 import org.planit.output.formatter.CsvFileOutputFormatter;
 import org.planit.output.formatter.CsvTextFileOutputFormatter;
 import org.planit.output.property.BaseOutputProperty;
-import org.planit.time.TimePeriod;
+import org.planit.utils.time.TimePeriod;
 import org.planit.utils.exceptions.PlanItException;
 import org.planit.utils.id.IdGroupingToken;
 import org.planit.utils.mode.Mode;
-import org.planit.utils.network.physical.LinkSegment;
+import org.planit.utils.network.physical.macroscopic.MacroscopicLinkSegment;
 import org.planit.utils.output.OutputUtils;
 
 /**
@@ -73,23 +74,31 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	 * @param iterationIndex current iteration index
 	 * @throws PlanItException thrown if there is an error
 	 */
-	@Override
+	@SuppressWarnings("unchecked")
+  @Override
 	protected void writeLinkResultsForCurrentTimePeriod(final OutputConfiguration outputConfiguration,
 	            final OutputTypeConfiguration outputTypeConfiguration, final OutputTypeEnum currentOutputType, final OutputAdapter outputAdapter, final Set<Mode> modes, final TimePeriod timePeriod, final int iterationIndex) throws PlanItException {
 
-		final LinkOutputTypeAdapter linkOutputTypeAdapter = (LinkOutputTypeAdapter) outputAdapter.getOutputTypeAdapter(outputTypeConfiguration.getOutputType());
+		final MacroscopicLinkOutputTypeAdapter<MacroscopicLinkSegment> linkOutputTypeAdapter = 
+		    (MacroscopicLinkOutputTypeAdapter<MacroscopicLinkSegment>) outputAdapter.getOutputTypeAdapter(outputTypeConfiguration.getOutputType());
+		
 		final SortedSet<BaseOutputProperty> outputProperties = outputTypeConfiguration.getOutputProperties();
 		try {
 			for (final Mode mode : modes) {
-			  long layerId = linkOutputTypeAdapter.getInfrastructureLayerIdForMode(mode);
-				for (final LinkSegment linkSegment : linkOutputTypeAdapter.getPhysicalLinkSegments(layerId)) {
-					if (outputConfiguration.isPersistZeroFlow() || linkOutputTypeAdapter.isFlowPositive(linkSegment, mode)) {
+			  Optional<Long> layerId = linkOutputTypeAdapter.getInfrastructureLayerIdForMode(mode);
+			  layerId.orElseThrow(() -> new PlanItException("unable to retrieve layer id for mode"));
+			  
+				for (final MacroscopicLinkSegment linkSegment : linkOutputTypeAdapter.getPhysicalLinkSegments(layerId.get())) {
+				  Optional<Boolean> flowPositive = linkOutputTypeAdapter.isFlowPositive(linkSegment, mode);
+				  flowPositive.orElseThrow(() -> new PlanItException("unable to determine if flow is positive for link segment and mode"));
+				  
+					if (outputConfiguration.isPersistZeroFlow() || flowPositive.get()) {
 					  final List<Object> rowValues = new ArrayList<Object>();						
 					  for (final BaseOutputProperty outputProperty : outputProperties) {
               rowValues.add(
                   OutputUtils.formatObject(
-                      linkOutputTypeAdapter.getLinkOutputPropertyValue(
-                          outputProperty.getOutputProperty(), linkSegment, mode, timePeriod, outputTimeUnit.getMultiplier())));
+                      linkOutputTypeAdapter.getLinkSegmentOutputPropertyValue(
+                          outputProperty.getOutputProperty(), linkSegment, mode, timePeriod, outputTimeUnit.getMultiplier()).get()));
  						}
 						printer.get(outputTypeConfiguration.getOutputType()).printRecord(rowValues);
 					}
