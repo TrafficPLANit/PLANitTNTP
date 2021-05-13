@@ -144,7 +144,7 @@ public class TNTPTestHelper {
     // OUTPUT FORMAT CONFIGURATION - LINKS
     final LinkOutputTypeConfiguration linkOutputTypeConfiguration =
         (LinkOutputTypeConfiguration) outputConfiguration.getOutputTypeConfiguration(OutputType.LINK);
-    linkOutputTypeConfiguration.addProperty(OutputProperty.LINK_TYPE);
+    linkOutputTypeConfiguration.addProperty(OutputProperty.LINK_SEGMENT_TYPE_NAME);
     linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_ID);
     linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_XML_ID);
     linkOutputTypeConfiguration.removeProperty(OutputProperty.DOWNSTREAM_NODE_LOCATION);

@@ -249,7 +249,7 @@ public class TntpMain {
     // OUTPUT FORMAT CONFIGURATION - LINKS
     if (isLinkOutputActive) {
       final LinkOutputTypeConfiguration linkOutputTypeConfiguration = (LinkOutputTypeConfiguration) outputConfiguration.getOutputTypeConfiguration(OutputType.LINK);
-      linkOutputTypeConfiguration.addProperty(OutputProperty.LINK_TYPE);
+      linkOutputTypeConfiguration.addProperty(OutputProperty.LINK_SEGMENT_TYPE_NAME);
       linkOutputTypeConfiguration.addProperty(OutputProperty.VC_RATIO);
       linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_ID);
       linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_EXTERNAL_ID);
