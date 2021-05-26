@@ -9,12 +9,6 @@ For example, the GoldCoast network file (https://github.com/bstabler/Transportat
 
 For more information on PLANit such as the user the manual, licensing, installation, getting started, reference documentation, and more, please visit [https://trafficplanit.github.io/PLANitManual/](https://trafficplanit.github.io/PLANitManual/)
 
-## Maven parent
-
-Projects need to be built from Maven before they can be run. The common maven configuration can be found in the PLANitParentPom project which acts as the parent for this project's pom.xml.
-
-> Make sure you install the PLANitParentPom pom.xml before conducting a maven build (in Eclipse) on this project, otherwise it cannot find the references dependencies, plugins, and other resources.
-
 # Data Files 
 
 Comment lines in files begin with the tilde symbol '~' and are ignored.
@@ -233,3 +227,13 @@ So the full list of column headers is:-
 February 2020:  We use ChicagoSketch for the unit tests.  We compare our results against the ChicagoSketch_flow.tntp file.  This file was created on 13 March 2016 (https://github.com/bstabler/TransportationNetworks/blob/master/Chicago-Sketch/ChicagoSketch_flow.tntp)
 
 We have been able to replicate the link cost modelling for Type 3 links in the Chicago Sketch data files.  These use a BPR cost function with a standard maximum speed of 25 miles per hour.  We have not been able to determine how the costs for links of types 1 and 2 are calculated.
+
+## Maven parent
+
+Projects need to be built from Maven before they can be run. The common maven configuration can be found in the PLANitParentPom project which acts as the parent for this project's pom.xml.
+
+> Make sure you install the PLANitParentPom pom.xml before conducting a maven build (in Eclipse) on this project, otherwise it cannot find the references dependencies, plugins, and other resources.
+
+## Git Branching model
+
+We adopt GitFlow as per https://nvie.com/posts/a-successful-git-branching-model/
