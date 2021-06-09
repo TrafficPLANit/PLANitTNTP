@@ -16,7 +16,6 @@ import org.planit.output.formatter.MemoryOutputFormatter;
 import org.planit.output.formatter.MemoryOutputIterator;
 import org.planit.output.property.OutputProperty;
 import org.planit.utils.time.TimePeriod;
-import org.planit.tntp.input.TntpInputBuilder;
 import org.planit.utils.id.IdGenerator;
 import org.planit.utils.math.Precision;
 import org.planit.utils.misc.Pair;
@@ -70,15 +69,15 @@ public class TNTPTest {
     IdGenerator.reset();
 
     try {
-      final Pair<MemoryOutputFormatter, TntpInputBuilder> testOutput =
+      final Pair<MemoryOutputFormatter, TntpInputBuilder4Testing> testOutput =
           TNTPTestHelper.execute(networkFileLocation, demandFileLocation, maxIterations, epsilon, outputTimeUnit, defaultMaximumSpeed);
       final MemoryOutputFormatter memoryOutputFormatter = testOutput.first();
-      final TntpInputBuilder tntp = testOutput.second();
+      final TntpInputBuilder4Testing tntp = testOutput.second();
 
       final Map<String, Map<String, double[]>> resultsMap = TNTPTestHelper.parseStandardResultsFile(standardResultsFileLocation);
-      final TimePeriod timePeriod = tntp.getTimePeriodBySourceId("1");
+      final TimePeriod timePeriod = tntp.getTntpDemandsReader().getTimePeriodBySourceId("1");
       final int iterationIndex = memoryOutputFormatter.getLastIteration();
-      final Mode mode = tntp.getAllModesBySourceId().values().iterator().next();
+      final Mode mode = tntp.getTntpNetworkReader().getAllModesBySourceId().values().iterator().next();
       
       final int flowPosition = memoryOutputFormatter.getPositionOfOutputValueProperty(OutputType.LINK, OutputProperty.FLOW);
       final int costPosition = memoryOutputFormatter.getPositionOfOutputValueProperty(OutputType.LINK, OutputProperty.LINK_SEGMENT_COST);

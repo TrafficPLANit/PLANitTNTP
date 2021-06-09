@@ -5,7 +5,7 @@ import java.util.Map;
 import org.planit.project.CustomPlanItProject;
 import org.planit.tntp.enums.CapacityPeriod;
 import org.planit.tntp.enums.LengthUnits;
-import org.planit.tntp.enums.NetworkFileColumns;
+import org.planit.tntp.enums.NetworkFileColumnType;
 import org.planit.tntp.enums.SpeedUnits;
 import org.planit.tntp.input.TntpInputBuilder;
 import org.planit.utils.exceptions.PlanItException;
@@ -32,7 +32,7 @@ public class TntpProject extends CustomPlanItProject {
   * @throws PlanItException thrown if there is an error
   */
   public TntpProject(final String networkFileLocation, final String demandFileLocation, final String nodeCoordinateFileLocation,
-      final Map<NetworkFileColumns, Integer> networkFileColumns, final SpeedUnits speedUnits, final LengthUnits lengthUnits,
+      final Map<NetworkFileColumnType, Integer> networkFileColumns, final SpeedUnits speedUnits, final LengthUnits lengthUnits,
       final CapacityPeriod capacityPeriod, final double defaultMaximumSpeed) throws PlanItException {
     super(new TntpInputBuilder(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, networkFileColumns, speedUnits, lengthUnits,capacityPeriod, defaultMaximumSpeed));
   }
@@ -50,7 +50,7 @@ public class TntpProject extends CustomPlanItProject {
    * @throws PlanItException thrown if there is an error
    */
   public TntpProject(final String networkFileLocation, final String demandFileLocation,
-      final Map<NetworkFileColumns, Integer> networkFileColumns, final SpeedUnits speedUnits, final LengthUnits lengthUnits,
+      final Map<NetworkFileColumnType, Integer> networkFileColumns, final SpeedUnits speedUnits, final LengthUnits lengthUnits,
       final CapacityPeriod capacityPeriod, final double defaultMaximumSpeed) throws PlanItException {
     super(new TntpInputBuilder(networkFileLocation, demandFileLocation, null, networkFileColumns, speedUnits, lengthUnits, capacityPeriod, defaultMaximumSpeed));
   }

@@ -6,7 +6,7 @@ package org.planit.tntp.enums;
  * @author gman6028
  *
  */
-public enum NetworkFileColumns {
+public enum NetworkFileColumnType {
 	
 	UPSTREAM_NODE_ID,
 	DOWNSTREAM_NODE_ID,

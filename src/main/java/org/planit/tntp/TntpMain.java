@@ -22,7 +22,7 @@ import org.planit.output.property.OutputProperty;
 import org.planit.sdinteraction.smoothing.MSASmoothing;
 import org.planit.tntp.enums.CapacityPeriod;
 import org.planit.tntp.enums.LengthUnits;
-import org.planit.tntp.enums.NetworkFileColumns;
+import org.planit.tntp.enums.NetworkFileColumnType;
 import org.planit.tntp.enums.SpeedUnits;
 import org.planit.tntp.output.formatter.CSVOutputFormatter;
 import org.planit.tntp.project.TntpProject;
@@ -204,17 +204,17 @@ public class TntpMain {
     final boolean isOdPathOutputActive = (odPathOutputFilename != null);
 
     //TODO - The following arrangement of columns is correct for Chicago Sketch and Philadelphia.  For some other cities the arrangement is different.
-    final Map<NetworkFileColumns, Integer> networkFileColumns = new HashMap<NetworkFileColumns, Integer>();
-    networkFileColumns.put(NetworkFileColumns.UPSTREAM_NODE_ID, 0);
-    networkFileColumns.put(NetworkFileColumns.DOWNSTREAM_NODE_ID, 1);
-    networkFileColumns.put(NetworkFileColumns.CAPACITY_PER_LANE, 2);
-    networkFileColumns.put(NetworkFileColumns.LENGTH, 3);
-    networkFileColumns.put(NetworkFileColumns.FREE_FLOW_TRAVEL_TIME, 4);
-    networkFileColumns.put(NetworkFileColumns.B, 5);
-    networkFileColumns.put(NetworkFileColumns.POWER, 6);
-    networkFileColumns.put(NetworkFileColumns.MAXIMUM_SPEED, 7);
-    networkFileColumns.put(NetworkFileColumns.TOLL, 8);
-    networkFileColumns.put(NetworkFileColumns.LINK_TYPE, 9);
+    final Map<NetworkFileColumnType, Integer> networkFileColumns = new HashMap<NetworkFileColumnType, Integer>();
+    networkFileColumns.put(NetworkFileColumnType.UPSTREAM_NODE_ID, 0);
+    networkFileColumns.put(NetworkFileColumnType.DOWNSTREAM_NODE_ID, 1);
+    networkFileColumns.put(NetworkFileColumnType.CAPACITY_PER_LANE, 2);
+    networkFileColumns.put(NetworkFileColumnType.LENGTH, 3);
+    networkFileColumns.put(NetworkFileColumnType.FREE_FLOW_TRAVEL_TIME, 4);
+    networkFileColumns.put(NetworkFileColumnType.B, 5);
+    networkFileColumns.put(NetworkFileColumnType.POWER, 6);
+    networkFileColumns.put(NetworkFileColumnType.MAXIMUM_SPEED, 7);
+    networkFileColumns.put(NetworkFileColumnType.TOLL, 8);
+    networkFileColumns.put(NetworkFileColumnType.LINK_TYPE, 9);
 
     final SpeedUnits speedUnits = SpeedUnits.MILES_H;
     final LengthUnits lengthUnits = LengthUnits.MILES; // Both Chicago-Sketch and Philadelphia use miles
