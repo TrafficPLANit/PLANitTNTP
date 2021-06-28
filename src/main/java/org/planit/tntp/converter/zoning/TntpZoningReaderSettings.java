@@ -3,7 +3,7 @@ package org.planit.tntp.converter.zoning;
 import java.util.Map;
 
 import org.planit.converter.ConverterReaderSettings;
-import org.planit.network.InfrastructureNetwork;
+import org.planit.network.TransportLayerNetwork;
 import org.planit.utils.network.physical.Node;
 import org.planit.utils.network.physical.macroscopic.MacroscopicLinkSegment;
 import org.planit.zoning.Zoning;
@@ -17,7 +17,7 @@ import org.planit.zoning.Zoning;
 public class TntpZoningReaderSettings implements ConverterReaderSettings {
   
   /** the network this zoning relates to */
-  protected InfrastructureNetwork<?,?> referenceNetwork;  
+  protected TransportLayerNetwork<?,?> referenceNetwork;  
   
   /** the zoning to populate */
   protected Zoning zoningToPopulate;
@@ -44,7 +44,7 @@ public class TntpZoningReaderSettings implements ConverterReaderSettings {
    * 
    * @return reference network
    */
-  public InfrastructureNetwork<?, ?> getReferenceNetwork() {
+  public TransportLayerNetwork<?, ?> getReferenceNetwork() {
     return referenceNetwork;
   }
 
@@ -52,7 +52,7 @@ public class TntpZoningReaderSettings implements ConverterReaderSettings {
    * 
    * @param referenceNetwork to use
    */
-  public void setReferenceNetwork(InfrastructureNetwork<?, ?> referenceNetwork) {
+  public void setReferenceNetwork(TransportLayerNetwork<?, ?> referenceNetwork) {
     this.referenceNetwork = referenceNetwork;
   }  
 

@@ -11,7 +11,7 @@ import org.planit.cost.physical.BPRLinkTravelTimeCost;
 import org.planit.cost.physical.AbstractPhysicalCost;
 import org.planit.demands.Demands;
 import org.planit.input.InputBuilderListener;
-import org.planit.network.InfrastructureNetwork;
+import org.planit.network.TransportLayerNetwork;
 import org.planit.network.macroscopic.MacroscopicNetwork;
 import org.planit.tntp.converter.demands.TntpDemandsReader;
 import org.planit.tntp.converter.network.TntpNetworkReader;
@@ -49,7 +49,7 @@ public class TntpInputBuilder extends InputBuilderListener {
    * @param network the network object to be populated from the input data
    * @throws PlanItException thrown if there is an error reading the input file
    */
-  protected void populateInfrastructureNetwork( final InfrastructureNetwork<?,?> network) throws PlanItException {
+  protected void populateInfrastructureNetwork( final TransportLayerNetwork<?,?> network) throws PlanItException {
     
     if (!(network instanceof MacroscopicNetwork)) {
       throw new PlanItException("TNTP reader currently only supports writing macroscopic networks");
@@ -124,7 +124,7 @@ public class TntpInputBuilder extends InputBuilderListener {
   protected void populatePhysicalCost( final AbstractPhysicalCost costComponent) throws PlanItException {
     LOGGER.info(LoggingUtils.getClassNameWithBrackets(this)+"populating BPR link costs");
     
-    Mode mode = getTntpZoningReader().getSettings().getReferenceNetwork().infrastructureLayers.getFirst().getFirstSupportedMode();
+    Mode mode = getTntpZoningReader().getSettings().getReferenceNetwork().transportLayers.getFirst().getFirstSupportedMode();
     Map<LinkSegment, Pair<Double, Double>> bprParametersForLinkSegmentAndMode = getTntpNetworkReader().getParsedBprParameters();
     if (bprParametersForLinkSegmentAndMode != null) {
       final BPRLinkTravelTimeCost bprLinkTravelTimeCost = (BPRLinkTravelTimeCost) costComponent;
@@ -274,8 +274,8 @@ public class TntpInputBuilder extends InputBuilderListener {
       // parameters (second parameter)
       final Object[] parameters = (Object[]) content[1];
       try {
-        if (projectComponent instanceof InfrastructureNetwork) {
-          populateInfrastructureNetwork((InfrastructureNetwork<?,?>) projectComponent);
+        if (projectComponent instanceof TransportLayerNetwork) {
+          populateInfrastructureNetwork((TransportLayerNetwork<?,?>) projectComponent);
         } else if (projectComponent instanceof Zoning) {
           populateZoning((Zoning) projectComponent, parameters[0]);
         } else if (projectComponent instanceof Demands) {

@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 
 import org.planit.converter.demands.DemandsReaderBase;
 import org.planit.demands.Demands;
-import org.planit.network.InfrastructureNetwork;
+import org.planit.network.TransportLayerNetwork;
 import org.planit.od.odmatrix.demand.ODDemandMatrix;
 import org.planit.tntp.TntpHeaderConstants;
 import org.planit.utils.exceptions.PlanItException;
@@ -95,7 +95,7 @@ public class TntpDemandsReader extends DemandsReaderBase{
     LOGGER.fine(LoggingUtils.getClassNameWithBrackets(this)+"populating Demands");
     final Zoning zoning = getSettings().getReferenceZoning();
     final Demands demands = getSettings().getDemandsToPopulate();
-    final InfrastructureNetwork<?, ?> network = getSettings().getReferenceNetwork();
+    final TransportLayerNetwork<?, ?> network = getSettings().getReferenceNetwork();
     
     // TNTP only has one time period, define it here
     int wholeDaydurationSeconds = 24*3600;
@@ -147,7 +147,7 @@ public class TntpDemandsReader extends DemandsReaderBase{
       }
       scanner.close();
       updateOdDemandMatrix(demandToDestination, zoning, originZone, odDemandMatrix);
-      demands.registerODDemand(timePeriod, network.infrastructureLayers.getFirst().getFirstSupportedMode(), odDemandMatrix);
+      demands.registerODDemand(timePeriod, network.transportLayers.getFirst().getFirstSupportedMode(), odDemandMatrix);
     } catch (final Exception e) {
       LOGGER.severe(e.getMessage());
       throw new PlanItException("Error when populating demands in TNTP",e);

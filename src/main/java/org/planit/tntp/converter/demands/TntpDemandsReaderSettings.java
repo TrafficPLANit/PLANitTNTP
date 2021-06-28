@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.planit.converter.ConverterReaderSettings;
 import org.planit.demands.Demands;
-import org.planit.network.InfrastructureNetwork;
+import org.planit.network.TransportLayerNetwork;
 import org.planit.utils.mode.Mode;
 import org.planit.utils.zoning.Zone;
 import org.planit.zoning.Zoning;
@@ -18,7 +18,7 @@ import org.planit.zoning.Zoning;
 public class TntpDemandsReaderSettings implements ConverterReaderSettings {
   
   /** the network these demands relates to */
-  protected InfrastructureNetwork<?,?> referenceNetwork;  
+  protected TransportLayerNetwork<?,?> referenceNetwork;  
   
   /** the zoning these demands relate to*/
   protected Zoning referenceZoning;
@@ -76,7 +76,7 @@ public class TntpDemandsReaderSettings implements ConverterReaderSettings {
    * 
    * @return reference network
    */
-  public InfrastructureNetwork<?, ?> getReferenceNetwork() {
+  public TransportLayerNetwork<?, ?> getReferenceNetwork() {
     return referenceNetwork;
   }
 
@@ -84,7 +84,7 @@ public class TntpDemandsReaderSettings implements ConverterReaderSettings {
    * 
    * @param referenceNetwork to use
    */
-  public void setReferenceNetwork(final InfrastructureNetwork<?, ?> referenceNetwork) {
+  public void setReferenceNetwork(final TransportLayerNetwork<?, ?> referenceNetwork) {
     this.referenceNetwork = referenceNetwork;
   }  
   

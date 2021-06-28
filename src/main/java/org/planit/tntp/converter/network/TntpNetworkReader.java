@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 import org.locationtech.jts.geom.Point;
 import org.planit.converter.network.NetworkReaderBase;
 import org.planit.cost.physical.BPRLinkTravelTimeCost;
-import org.planit.network.InfrastructureNetwork;
+import org.planit.network.TransportLayerNetwork;
 import org.planit.network.macroscopic.MacroscopicNetwork;
 import org.planit.network.macroscopic.physical.MacroscopicModePropertiesFactory;
 import org.planit.network.macroscopic.physical.MacroscopicPhysicalNetwork;
@@ -337,7 +337,7 @@ public class TntpNetworkReader extends NetworkReaderBase {
    * {@inheritDoc}
    */  
   @Override
-  public InfrastructureNetwork<?, ?> read() throws PlanItException {
+  public TransportLayerNetwork<?, ?> read() throws PlanItException {
     LOGGER.fine(LoggingUtils.getClassNameWithBrackets(this)+"populating Physical Network");
 
     final MacroscopicNetwork network = getSettings().getNetworkToPopulate();
@@ -349,7 +349,7 @@ public class TntpNetworkReader extends NetworkReaderBase {
     addModeToSourceIdMap(mode.getExternalId(), mode);    
     
     /* TNTP only compatible with parsing a single network layer, so create it */
-    final MacroscopicPhysicalNetwork networkLayer = network.infrastructureLayers.registerNew();
+    final MacroscopicPhysicalNetwork networkLayer = network.transportLayers.registerNew();
     networkLayer.registerSupportedMode(mode);
    
     try (Scanner scanner = new Scanner(networkFile)) {
