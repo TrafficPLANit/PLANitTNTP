@@ -11,10 +11,10 @@ import org.locationtech.jts.geom.Point;
 import org.planit.converter.network.NetworkReaderBase;
 import org.planit.cost.physical.BPRLinkTravelTimeCost;
 import org.planit.network.TransportLayerNetwork;
+import org.planit.network.layer.macroscopic.MacroscopicModePropertiesFactory;
+import org.planit.network.layer.macroscopic.MacroscopicPhysicalLayer;
+import org.planit.network.layer.physical.PhysicalLayerImpl;
 import org.planit.network.macroscopic.MacroscopicNetwork;
-import org.planit.network.macroscopic.physical.MacroscopicModePropertiesFactory;
-import org.planit.network.macroscopic.physical.MacroscopicPhysicalNetwork;
-import org.planit.network.physical.PhysicalNetwork;
 import org.planit.tntp.TntpHeaderConstants;
 import org.planit.tntp.enums.LengthUnits;
 import org.planit.tntp.enums.NetworkFileColumnType;
@@ -26,12 +26,13 @@ import org.planit.utils.misc.LoggingUtils;
 import org.planit.utils.misc.Pair;
 import org.planit.utils.mode.Mode;
 import org.planit.utils.mode.PredefinedModeType;
-import org.planit.utils.network.physical.Link;
-import org.planit.utils.network.physical.LinkSegment;
-import org.planit.utils.network.physical.Node;
-import org.planit.utils.network.physical.macroscopic.MacroscopicLinkSegment;
-import org.planit.utils.network.physical.macroscopic.MacroscopicLinkSegmentType;
-import org.planit.utils.network.physical.macroscopic.MacroscopicModeProperties;
+import org.planit.utils.network.layer.macroscopic.MacroscopicLinkSegment;
+import org.planit.utils.network.layer.macroscopic.MacroscopicLinkSegmentType;
+import org.planit.utils.network.layer.macroscopic.MacroscopicModeProperties;
+import org.planit.utils.network.layer.physical.Link;
+import org.planit.utils.network.layer.physical.LinkSegment;
+import org.planit.utils.network.layer.physical.Node;
+import org.planit.utils.network.layer.physical.PhysicalLayer;
 
 /**
  * Network reader component for TNTP data format
@@ -87,7 +88,7 @@ public class TntpNetworkReader extends NetworkReaderBase {
    * @return the node corresponding to this external ID
    * @throws PlanItException thrown if there is an error registering the node
    */
-  private Node createAndRegisterNode(final PhysicalNetwork<?,?,?> network, final String[] cols, final NetworkFileColumnType networkFileColumn)
+  private Node createAndRegisterNode(final PhysicalLayerImpl<?,?,?> network, final String[] cols, final NetworkFileColumnType networkFileColumn)
       throws PlanItException {
         
     final String nodeSourceId = cols[getSettings().getNetworkFileColumns().get(networkFileColumn)];
@@ -128,7 +129,7 @@ public class TntpNetworkReader extends NetworkReaderBase {
    * @throws PlanItException thrown if there is an error
    */
   private MacroscopicLinkSegment createAndRegisterLinkSegment(
-      final MacroscopicPhysicalNetwork networkLayer, final Link link, final long tntpLinkSegmentSourceId, final String[] cols) throws PlanItException {
+      final MacroscopicPhysicalLayer networkLayer, final Link link, final long tntpLinkSegmentSourceId, final String[] cols) throws PlanItException {
     
     Map<NetworkFileColumnType, Integer> supportedColumns = getSettings().getNetworkFileColumns();
     SpeedUnits speedUnits = getSettings().getSpeedUnits();
@@ -207,7 +208,7 @@ public class TntpNetworkReader extends NetworkReaderBase {
    * @param network the physical network object to be populated from the input data
    * @throws PlanItException thrown if there is an error reading the input file
    */
-  private void updateNodeCoordinatesFromFile(final PhysicalNetwork<?,?,?> network) throws PlanItException {
+  private void updateNodeCoordinatesFromFile(final PhysicalLayer<?, ?, ?> network) throws PlanItException {
     try (Scanner scanner = new Scanner(nodeCoordinateFile)) {
       while (scanner.hasNextLine()) {
         final String line = scanner.nextLine().trim();
@@ -251,7 +252,7 @@ public class TntpNetworkReader extends NetworkReaderBase {
    * @param tntpLinkSegmentSourceId the external Id for the current line segment
    * @throws PlanItException thrown if there is an error
    */
-  private void readLinkData(final MacroscopicPhysicalNetwork networkLayer, final String line, final long tntpLinkSegmentSourceId)
+  private void readLinkData(final MacroscopicPhysicalLayer networkLayer, final String line, final long tntpLinkSegmentSourceId)
       throws PlanItException {
     final String[] cols = line.split("\\s+");
     
@@ -349,7 +350,7 @@ public class TntpNetworkReader extends NetworkReaderBase {
     addModeToSourceIdMap(mode.getExternalId(), mode);    
     
     /* TNTP only compatible with parsing a single network layer, so create it */
-    final MacroscopicPhysicalNetwork networkLayer = network.transportLayers.registerNew();
+    final MacroscopicPhysicalLayer networkLayer = network.transportLayers.registerNew();
     networkLayer.registerSupportedMode(mode);
    
     try (Scanner scanner = new Scanner(networkFile)) {

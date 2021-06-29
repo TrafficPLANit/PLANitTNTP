@@ -4,8 +4,8 @@ import java.util.Map;
 
 import org.planit.converter.ConverterReaderSettings;
 import org.planit.network.TransportLayerNetwork;
-import org.planit.utils.network.physical.Node;
-import org.planit.utils.network.physical.macroscopic.MacroscopicLinkSegment;
+import org.planit.utils.network.layer.macroscopic.MacroscopicLinkSegment;
+import org.planit.utils.network.layer.physical.Node;
 import org.planit.zoning.Zoning;
 
 /**

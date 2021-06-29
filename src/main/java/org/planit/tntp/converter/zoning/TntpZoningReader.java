@@ -8,7 +8,7 @@ import org.planit.converter.zoning.ZoningReaderBase;
 import org.planit.tntp.TntpHeaderConstants;
 import org.planit.utils.exceptions.PlanItException;
 import org.planit.utils.misc.LoggingUtils;
-import org.planit.utils.network.physical.Node;
+import org.planit.utils.network.layer.physical.Node;
 import org.planit.utils.zoning.Connectoid;
 import org.planit.utils.zoning.Zone;
 import org.planit.zoning.Zoning;
