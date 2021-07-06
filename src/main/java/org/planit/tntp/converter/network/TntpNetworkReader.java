@@ -12,7 +12,7 @@ import org.planit.converter.network.NetworkReaderBase;
 import org.planit.cost.physical.BPRLinkTravelTimeCost;
 import org.planit.network.TransportLayerNetwork;
 import org.planit.network.layer.macroscopic.MacroscopicModePropertiesFactory;
-import org.planit.network.layer.macroscopic.MacroscopicPhysicalLayerImpl;
+import org.planit.network.layer.macroscopic.MacroscopicNetworkLayerImpl;
 import org.planit.network.layer.physical.PhysicalLayerImpl;
 import org.planit.network.macroscopic.MacroscopicNetwork;
 import org.planit.tntp.TntpHeaderConstants;
@@ -129,7 +129,7 @@ public class TntpNetworkReader extends NetworkReaderBase {
    * @throws PlanItException thrown if there is an error
    */
   private MacroscopicLinkSegment createAndRegisterLinkSegment(
-      final MacroscopicPhysicalLayerImpl networkLayer, final Link link, final long tntpLinkSegmentSourceId, final String[] cols) throws PlanItException {
+      final MacroscopicNetworkLayerImpl networkLayer, final Link link, final long tntpLinkSegmentSourceId, final String[] cols) throws PlanItException {
     
     Map<NetworkFileColumnType, Integer> supportedColumns = getSettings().getNetworkFileColumns();
     SpeedUnits speedUnits = getSettings().getSpeedUnits();
@@ -252,7 +252,7 @@ public class TntpNetworkReader extends NetworkReaderBase {
    * @param tntpLinkSegmentSourceId the external Id for the current line segment
    * @throws PlanItException thrown if there is an error
    */
-  private void readLinkData(final MacroscopicPhysicalLayerImpl networkLayer, final String line, final long tntpLinkSegmentSourceId)
+  private void readLinkData(final MacroscopicNetworkLayerImpl networkLayer, final String line, final long tntpLinkSegmentSourceId)
       throws PlanItException {
     final String[] cols = line.split("\\s+");
     
@@ -350,7 +350,7 @@ public class TntpNetworkReader extends NetworkReaderBase {
     addModeToSourceIdMap(mode.getExternalId(), mode);    
     
     /* TNTP only compatible with parsing a single network layer, so create it */
-    final MacroscopicPhysicalLayerImpl networkLayer = network.transportLayers.registerNew();
+    final MacroscopicNetworkLayerImpl networkLayer = network.transportLayers.registerNew();
     networkLayer.registerSupportedMode(mode);
    
     try (Scanner scanner = new Scanner(networkFile)) {
