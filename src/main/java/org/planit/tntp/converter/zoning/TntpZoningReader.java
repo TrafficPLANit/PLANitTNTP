@@ -105,7 +105,7 @@ public class TntpZoningReader extends ZoningReaderBase{
     LOGGER.fine(LoggingUtils.getClassNameWithBrackets(this)+"populating zoning");
     for (long zoneSourceId = 1; zoneSourceId <= noZones; zoneSourceId++) {
       /* ZONE */
-      final Zone zone = zoning.odZones.registerNew();
+      final Zone zone = zoning.odZones.getFactory().registerNew();
       /* XML id */
       zone.setXmlId(Long.toString(zone.getId()));      
       /* external id */
@@ -116,7 +116,7 @@ public class TntpZoningReader extends ZoningReaderBase{
       final Node node = getSettings().getNodeBySourceId(zone.getExternalId());
       // TODO - calculate connectoid length
       final double connectoidLength = 1.0;
-      Connectoid connectoid = zoning.odConnectoids.registerNew(node, zone, connectoidLength);
+      Connectoid connectoid = zoning.odConnectoids.getFactory().registerNew(node, zone, connectoidLength);
       /* XML id */
       connectoid.setXmlId(Long.toString(connectoid.getId()));
       /* external id */

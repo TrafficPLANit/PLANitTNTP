@@ -74,13 +74,12 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	 * @param iterationIndex current iteration index
 	 * @throws PlanItException thrown if there is an error
 	 */
-	@SuppressWarnings("unchecked")
   @Override
 	protected void writeLinkResultsForCurrentTimePeriod(final OutputConfiguration outputConfiguration,
 	            final OutputTypeConfiguration outputTypeConfiguration, final OutputTypeEnum currentOutputType, final OutputAdapter outputAdapter, final Set<Mode> modes, final TimePeriod timePeriod, final int iterationIndex) throws PlanItException {
 
-		final MacroscopicLinkOutputTypeAdapter<MacroscopicLinkSegment> linkOutputTypeAdapter = 
-		    (MacroscopicLinkOutputTypeAdapter<MacroscopicLinkSegment>) outputAdapter.getOutputTypeAdapter(outputTypeConfiguration.getOutputType());
+		final MacroscopicLinkOutputTypeAdapter linkOutputTypeAdapter = 
+		    (MacroscopicLinkOutputTypeAdapter) outputAdapter.getOutputTypeAdapter(outputTypeConfiguration.getOutputType());
 		
 		final SortedSet<BaseOutputProperty> outputProperties = outputTypeConfiguration.getOutputProperties();
 		try {

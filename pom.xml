@@ -65,6 +65,11 @@
 		</dependency>
 		
 		<dependency>
+			<groupId>org.planit.utils</groupId>
+			<artifactId>planit-utils</artifactId>
+		</dependency>		
+		
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<!-- only used locally for testing so not an actual dependency for using the API -->
