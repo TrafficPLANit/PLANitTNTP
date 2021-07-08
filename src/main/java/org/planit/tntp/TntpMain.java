@@ -10,7 +10,7 @@ import org.planit.cost.physical.BPRLinkTravelTimeCost;
 import org.planit.cost.virtual.FixedConnectoidTravelTimeCost;
 import org.planit.demands.Demands;
 import org.planit.logging.Logging;
-import org.planit.network.macroscopic.MacroscopicNetwork;
+import org.planit.network.MacroscopicNetwork;
 import org.planit.output.configuration.LinkOutputTypeConfiguration;
 import org.planit.output.configuration.ODOutputTypeConfiguration;
 import org.planit.output.configuration.OutputConfiguration;

@@ -147,7 +147,7 @@ public class TntpDemandsReader extends DemandsReaderBase{
       }
       scanner.close();
       updateOdDemandMatrix(demandToDestination, zoning, originZone, odDemandMatrix);
-      demands.registerODDemand(timePeriod, network.transportLayers.getFirst().getFirstSupportedMode(), odDemandMatrix);
+      demands.registerODDemand(timePeriod, network.getTransportLayers().getFirst().getFirstSupportedMode(), odDemandMatrix);
     } catch (final Exception e) {
       LOGGER.severe(e.getMessage());
       throw new PlanItException("Error when populating demands in TNTP",e);

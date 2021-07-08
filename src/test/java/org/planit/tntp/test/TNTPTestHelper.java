@@ -11,7 +11,7 @@ import org.planit.assignment.traditionalstatic.TraditionalStaticAssignmentConfig
 import org.planit.cost.physical.BPRLinkTravelTimeCost;
 import org.planit.cost.virtual.FixedConnectoidTravelTimeCost;
 import org.planit.demands.Demands;
-import org.planit.network.macroscopic.MacroscopicNetwork;
+import org.planit.network.MacroscopicNetwork;
 import org.planit.output.configuration.LinkOutputTypeConfiguration;
 import org.planit.output.configuration.OutputConfiguration;
 import org.planit.output.enums.OutputTimeUnit;

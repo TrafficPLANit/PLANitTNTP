@@ -10,9 +10,9 @@ import java.util.logging.Logger;
 import org.locationtech.jts.geom.Point;
 import org.planit.converter.network.NetworkReaderBase;
 import org.planit.cost.physical.BPRLinkTravelTimeCost;
+import org.planit.network.MacroscopicNetwork;
 import org.planit.network.TransportLayerNetwork;
 import org.planit.network.layer.macroscopic.MacroscopicModePropertiesFactory;
-import org.planit.network.macroscopic.MacroscopicNetwork;
 import org.planit.tntp.TntpHeaderConstants;
 import org.planit.tntp.enums.LengthUnits;
 import org.planit.tntp.enums.NetworkFileColumnType;
@@ -24,10 +24,10 @@ import org.planit.utils.misc.LoggingUtils;
 import org.planit.utils.misc.Pair;
 import org.planit.utils.mode.Mode;
 import org.planit.utils.mode.PredefinedModeType;
+import org.planit.utils.network.layer.MacroscopicNetworkLayer;
 import org.planit.utils.network.layer.macroscopic.MacroscopicLinkSegment;
 import org.planit.utils.network.layer.macroscopic.MacroscopicLinkSegmentType;
 import org.planit.utils.network.layer.macroscopic.MacroscopicModeProperties;
-import org.planit.utils.network.layer.macroscopic.MacroscopicNetworkLayer;
 import org.planit.utils.network.layer.physical.Link;
 import org.planit.utils.network.layer.physical.LinkSegment;
 import org.planit.utils.network.layer.physical.Node;
@@ -342,13 +342,13 @@ public class TntpNetworkReader extends NetworkReaderBase {
     final MacroscopicNetwork network = getSettings().getNetworkToPopulate();
     
     /* TNTP only has one mode, define it here */
-    Mode mode = network.modes.getFactory().registerNew(PredefinedModeType.CAR);
+    Mode mode = network.getModes().getFactory().registerNew(PredefinedModeType.CAR);
     /* external id */
     mode.setExternalId("1"); //TODO wrong because no external id is available, but tests use it --> refactor
     addModeToSourceIdMap(mode.getExternalId(), mode);    
     
     /* TNTP only compatible with parsing a single network layer, so create it */
-    final MacroscopicNetworkLayer networkLayer = network.transportLayers.registerNew();
+    final MacroscopicNetworkLayer networkLayer = network.getTransportLayers().getFactory().registerNew();
     networkLayer.registerSupportedMode(mode);
    
     try (Scanner scanner = new Scanner(networkFile)) {

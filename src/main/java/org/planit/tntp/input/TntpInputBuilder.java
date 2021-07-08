@@ -11,8 +11,8 @@ import org.planit.cost.physical.BPRLinkTravelTimeCost;
 import org.planit.cost.physical.AbstractPhysicalCost;
 import org.planit.demands.Demands;
 import org.planit.input.InputBuilderListener;
+import org.planit.network.MacroscopicNetwork;
 import org.planit.network.TransportLayerNetwork;
-import org.planit.network.macroscopic.MacroscopicNetwork;
 import org.planit.tntp.converter.demands.TntpDemandsReader;
 import org.planit.tntp.converter.network.TntpNetworkReader;
 import org.planit.tntp.converter.zoning.TntpZoningReader;
@@ -124,7 +124,7 @@ public class TntpInputBuilder extends InputBuilderListener {
   protected void populatePhysicalCost( final AbstractPhysicalCost costComponent) throws PlanItException {
     LOGGER.info(LoggingUtils.getClassNameWithBrackets(this)+"populating BPR link costs");
     
-    Mode mode = getTntpZoningReader().getSettings().getReferenceNetwork().transportLayers.getFirst().getFirstSupportedMode();
+    Mode mode = getTntpZoningReader().getSettings().getReferenceNetwork().getTransportLayers().getFirst().getFirstSupportedMode();
     Map<LinkSegment, Pair<Double, Double>> bprParametersForLinkSegmentAndMode = getTntpNetworkReader().getParsedBprParameters();
     if (bprParametersForLinkSegmentAndMode != null) {
       final BPRLinkTravelTimeCost bprLinkTravelTimeCost = (BPRLinkTravelTimeCost) costComponent;

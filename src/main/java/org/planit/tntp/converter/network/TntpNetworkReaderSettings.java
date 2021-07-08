@@ -3,7 +3,7 @@ package org.planit.tntp.converter.network;
 import java.util.Map;
 
 import org.planit.converter.ConverterReaderSettings;
-import org.planit.network.macroscopic.MacroscopicNetwork;
+import org.planit.network.MacroscopicNetwork;
 import org.planit.tntp.enums.CapacityPeriod;
 import org.planit.tntp.enums.LengthUnits;
 import org.planit.tntp.enums.NetworkFileColumnType;
