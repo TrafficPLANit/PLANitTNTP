@@ -6,8 +6,9 @@ import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import org.djutils.event.EventInterface;
-import org.planit.assignment.TrafficAssignmentComponentFactory;
 import org.planit.cost.physical.BPRLinkTravelTimeCost;
+import org.planit.component.PlanitComponentFactory;
+import org.planit.component.event.PlanitComponentEvent;
 import org.planit.cost.physical.AbstractPhysicalCost;
 import org.planit.demands.Demands;
 import org.planit.input.InputBuilderListener;
@@ -35,9 +36,6 @@ import org.planit.zoning.Zoning;
  *
  */
 public class TntpInputBuilder extends InputBuilderListener {
-
-  /** generated UID */
-  private static final long serialVersionUID = 1L;
 
   /** the logger */
   private static final Logger LOGGER = Logger.getLogger(TntpInputBuilder.class.getCanonicalName());
@@ -265,9 +263,9 @@ public class TntpInputBuilder extends InputBuilderListener {
    * @throws RemoteException thrown if there is an error
    */
   @Override
-  public void notify(final EventInterface event) throws RemoteException {
+  public void onPlanitComponentEvent(final PlanitComponentEvent event) throws RemoteException {
     // registered for create notifications
-    if (event.getType() == TrafficAssignmentComponentFactory.TRAFFICCOMPONENT_CREATE) {
+    if (event.getType() == PlanitComponentFactory.TRAFFICCOMPONENT_CREATE) {
       final Object[] content = (Object[]) event.getContent();
       final Object projectComponent = content[0];
       // the content consists of the actual traffic assignment component and an array of object
