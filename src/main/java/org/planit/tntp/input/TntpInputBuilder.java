@@ -1,19 +1,19 @@
 package org.planit.tntp.input;
 
-import java.rmi.RemoteException;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-import org.djutils.event.EventInterface;
 import org.planit.cost.physical.BPRLinkTravelTimeCost;
-import org.planit.component.PlanitComponentFactory;
 import org.planit.component.event.PlanitComponentEvent;
+import org.planit.component.event.PopulateDemandsEvent;
+import org.planit.component.event.PopulateNetworkEvent;
+import org.planit.component.event.PopulatePhysicalCostEvent;
+import org.planit.component.event.PopulateZoningEvent;
 import org.planit.cost.physical.AbstractPhysicalCost;
 import org.planit.demands.Demands;
 import org.planit.input.InputBuilderListener;
 import org.planit.network.MacroscopicNetwork;
-import org.planit.network.TransportLayerNetwork;
 import org.planit.tntp.converter.demands.TntpDemandsReader;
 import org.planit.tntp.converter.network.TntpNetworkReader;
 import org.planit.tntp.converter.zoning.TntpZoningReader;
@@ -47,13 +47,8 @@ public class TntpInputBuilder extends InputBuilderListener {
    * @param network the network object to be populated from the input data
    * @throws PlanItException thrown if there is an error reading the input file
    */
-  protected void populateInfrastructureNetwork( final TransportLayerNetwork<?,?> network) throws PlanItException {
-    
-    if (!(network instanceof MacroscopicNetwork)) {
-      throw new PlanItException("TNTP reader currently only supports writing macroscopic networks");
-    }
-    final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) network;
-    
+  protected void populateMacroscopicNetwork( final MacroscopicNetwork macroscopicNetwork) throws PlanItException {
+       
     /* prep */
     getTntpNetworkReader().getSettings().setNetworkToPopulate(macroscopicNetwork);
 
@@ -65,18 +60,16 @@ public class TntpInputBuilder extends InputBuilderListener {
    * Populates the Demands object from the input file
    *
    * @param demands the Demands object to be populated from the input data
-   * @param parameter1 Zoning object previously defined
+   * @param zoning Zoning object previously defined
    * @param parameter2 Network to use
    * @throws PlanItException thrown if there is an error reading the input file
    */
-  protected void populateDemands( final Demands demands, final Object parameter1, Object parameter2) throws PlanItException {
-    PlanItException.throwIf(!(parameter1 instanceof Zoning),"Parameter 1 of call to populateDemands() is not of class Zoning");
-    PlanItException.throwIf(!(parameter2 instanceof MacroscopicNetwork),"Parameter 2 of call to populateDemands() is not of class MacroscopicNetwork");
+  protected void populateDemands( final Demands demands, final Zoning zoning, final MacroscopicNetwork network) throws PlanItException {
     
     /* prep */
     getTntpDemandsReader().getSettings().setDemandsToPopulate(demands);
-    getTntpDemandsReader().getSettings().setReferenceNetwork((MacroscopicNetwork)parameter2);
-    getTntpDemandsReader().getSettings().setReferenceZoning((Zoning)parameter1);
+    getTntpDemandsReader().getSettings().setReferenceNetwork(network);
+    getTntpDemandsReader().getSettings().setReferenceZoning(zoning);
     
     getTntpDemandsReader().getSettings().setMapToIndexModeBySourceIds(getTntpNetworkReader().getAllModesBySourceId());
     getTntpDemandsReader().getSettings().setMapToIndexZoneBySourceIds(getTntpZoningReader().getAllZonesBySourceId());
@@ -260,33 +253,25 @@ public class TntpInputBuilder extends InputBuilderListener {
    * Whenever a project component is created this method will be invoked
    *
    * @param event event containing the created (and empty) project component
-   * @throws RemoteException thrown if there is an error
+   * @throws PlanItException thrown if there is an error
    */
   @Override
-  public void onPlanitComponentEvent(final PlanitComponentEvent event) throws RemoteException {
+  public void onPlanitComponentEvent(final PlanitComponentEvent event) throws PlanItException {
     // registered for create notifications
-    if (event.getType() == PlanitComponentFactory.TRAFFICCOMPONENT_CREATE) {
-      final Object[] content = (Object[]) event.getContent();
-      final Object projectComponent = content[0];
-      // the content consists of the actual traffic assignment component and an array of object
-      // parameters (second parameter)
-      final Object[] parameters = (Object[]) content[1];
-      try {
-        if (projectComponent instanceof TransportLayerNetwork) {
-          populateInfrastructureNetwork((TransportLayerNetwork<?,?>) projectComponent);
-        } else if (projectComponent instanceof Zoning) {
-          populateZoning((Zoning) projectComponent, parameters[0]);
-        } else if (projectComponent instanceof Demands) {
-          populateDemands((Demands) projectComponent, parameters[0], parameters[1]);
-        } else if (projectComponent instanceof AbstractPhysicalCost) {
-          populatePhysicalCost((AbstractPhysicalCost) projectComponent);
-        } else {
-          LOGGER.fine(LoggingUtils.getClassNameWithBrackets(this)+"event component is " + projectComponent.getClass().getCanonicalName()+ " which is not handled by PlanItInputBuilder.");
-        }
-      } catch (final PlanItException e) {
-        LOGGER.severe(e.getMessage());
-        throw new RemoteException("error rethrown as RemoteException in notify of TNTP",e);
-      }
+    if (event.getType().equals(PopulateNetworkEvent.EVENT_TYPE)) {
+      populateMacroscopicNetwork(((PopulateNetworkEvent)event).getNetworkToPopulate());
+    }else if(event.getType().equals(PopulateZoningEvent.EVENT_TYPE)){
+      PopulateZoningEvent zoningEvent = ((PopulateZoningEvent) event);
+      populateZoning(zoningEvent.getZoningToPopulate(), zoningEvent.getParentNetwork());
+    }else if(event.getType().equals(PopulateDemandsEvent.EVENT_TYPE)){
+      PopulateDemandsEvent demandsEvent = ((PopulateDemandsEvent) event);
+      populateDemands(demandsEvent.getDemandsToPopulate(), demandsEvent.getParentZoning(), demandsEvent.getParentNetwork());
+    }else if(event.getType().equals(PopulatePhysicalCostEvent.EVENT_TYPE)){
+      PopulatePhysicalCostEvent physicalCostEvent = ((PopulatePhysicalCostEvent) event);
+      populatePhysicalCost(physicalCostEvent.getPhysicalCostToPopulate());
+    } else {      
+      /* generic case */
+      LOGGER.fine("Event component " + event.getClass().getCanonicalName() + " ignored by TNTP InputBuilder");
     }
   }
 
