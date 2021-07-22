@@ -127,7 +127,7 @@ public class TntpMain {
 
       //If the user has specified a logging properties file use that, otherwise use the default
       if (loggingPropertiesFileLocation != null) {
-        LOGGER = Logging.createLogger(TntpMain.class, loggingPropertiesFileLocation);
+        LOGGER = Logging.createLogger(TntpMain.class, loggingPropertiesFileLocation).orElseThrow(() -> new PlanItException("Unable to create TNTP logger"));
       } else {
         LOGGER = Logging.createLogger(TntpMain.class);
       }

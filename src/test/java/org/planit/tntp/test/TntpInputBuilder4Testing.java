@@ -20,8 +20,6 @@ import org.planit.utils.exceptions.PlanItException;
  */
 public class TntpInputBuilder4Testing extends TntpInputBuilder{
   
-  private static final long serialVersionUID = -2291921157378532120L;
-
   /** Constructor 
    * @param networkFileLocation to use
    * @param demandFileLocation to use
