@@ -8,7 +8,7 @@ import java.util.Scanner;
 import java.util.logging.Logger;
 
 import org.locationtech.jts.geom.Point;
-import org.planit.converter.network.NetworkReaderBase;
+import org.planit.converter.network.NetworkReaderImpl;
 import org.planit.cost.physical.BPRLinkTravelTimeCost;
 import org.planit.network.MacroscopicNetwork;
 import org.planit.network.TransportLayerNetwork;
@@ -38,7 +38,7 @@ import org.planit.utils.network.layer.physical.Node;
  * @author gman, markr
  *
  */
-public class TntpNetworkReader extends NetworkReaderBase {
+public class TntpNetworkReader extends NetworkReaderImpl {
   
   /** logger to use */
   private static final Logger LOGGER = Logger.getLogger(TntpNetworkReader.class.getCanonicalName());
