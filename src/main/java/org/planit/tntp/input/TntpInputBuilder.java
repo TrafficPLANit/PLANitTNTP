@@ -16,6 +16,7 @@ import org.planit.input.InputBuilderListener;
 import org.planit.network.MacroscopicNetwork;
 import org.planit.tntp.converter.demands.TntpDemandsReader;
 import org.planit.tntp.converter.network.TntpNetworkReader;
+import org.planit.tntp.converter.network.TntpNetworkReaderSettings;
 import org.planit.tntp.converter.zoning.TntpZoningReader;
 import org.planit.tntp.enums.CapacityPeriod;
 import org.planit.tntp.enums.LengthUnits;
@@ -39,6 +40,14 @@ public class TntpInputBuilder extends InputBuilderListener {
 
   /** the logger */
   private static final Logger LOGGER = Logger.getLogger(TntpInputBuilder.class.getCanonicalName());
+  
+  private final String networkFileLocation;
+  
+  private final String nodeCoordinateFileLocation;
+  
+  private final TntpNetworkReaderSettings networkSettings;
+  
+  private final String demandsFileLocation;
 
   
   /**
@@ -49,11 +58,11 @@ public class TntpInputBuilder extends InputBuilderListener {
    */
   protected void populateMacroscopicNetwork( final MacroscopicNetwork macroscopicNetwork) throws PlanItException {
        
-    /* prep */
-    getTntpNetworkReader().getSettings().setNetworkToPopulate(macroscopicNetwork);
+    TntpNetworkReader networkReader = new TntpNetworkReader(networkFileLocation, nodeCoordinateFileLocation, networkSettings);    
+    networkReader.getSettings().setNetworkToPopulate(macroscopicNetwork);
 
     /* parse */
-    getTntpNetworkReader().read();
+    networkReader.read();
   }
 
   /**
@@ -66,16 +75,14 @@ public class TntpInputBuilder extends InputBuilderListener {
    */
   protected void populateDemands( final Demands demands, final Zoning zoning, final MacroscopicNetwork network) throws PlanItException {
     
+    TntpDemandsReader demandsReader = new TntpDemandsReader(demandsFileLocation);
     /* prep */
-    getTntpDemandsReader().getSettings().setDemandsToPopulate(demands);
-    getTntpDemandsReader().getSettings().setReferenceNetwork(network);
-    getTntpDemandsReader().getSettings().setReferenceZoning(zoning);
-    
-    getTntpDemandsReader().getSettings().setMapToIndexModeBySourceIds(getTntpNetworkReader().getAllModesBySourceId());
-    getTntpDemandsReader().getSettings().setMapToIndexZoneBySourceIds(getTntpZoningReader().getAllZonesBySourceId());
-    
+    demandsReader.getSettings().setDemandsToPopulate(demands);
+    demandsReader.getSettings().setReferenceNetwork(network);
+    demandsReader.getSettings().setReferenceZoning(zoning);
+        
     /* parse */
-    getTntpDemandsReader().read();
+    demandsReader.read();
   }
 
   /**
@@ -95,15 +102,13 @@ public class TntpInputBuilder extends InputBuilderListener {
     }
     final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) parameter1;
     
+    TntpZoningReader zoningReader = new TntpZoningReader(networkFileLocation);    
     /* prep */
-    getTntpZoningReader().getSettings().setZoningToPopulate(zoning);
-    getTntpZoningReader().getSettings().setReferenceNetwork(macroscopicNetwork);
-    
-    getTntpZoningReader().getSettings().setNodesBySourceId(getTntpNetworkReader().getAllNodesBySourceId());
-    getTntpZoningReader().getSettings().setLinkSegmentsBySourceId(getTntpNetworkReader().getAllLinkSegmentsBySourceId());
-    
+    zoningReader.getSettings().setZoningToPopulate(zoning);
+    zoningReader.getSettings().setReferenceNetwork(macroscopicNetwork);
+        
     /* parse */
-    getTntpZoningReader().read();
+    zoningReader.read();
   }
 
   /**
@@ -126,30 +131,6 @@ public class TntpInputBuilder extends InputBuilderListener {
       }
     }
   }
-  
-  /** get TNTP network reader instance
-   * 
-   * @return TNTP network reader
-   */
-  protected TntpNetworkReader getTntpNetworkReader() {
-    return (TntpNetworkReader)getNetworkReader();
-  }
-  
-  /** get TNTP zoning reader instance
-   * 
-   * @return TNTP zoning reader
-   */
-  protected TntpZoningReader getTntpZoningReader() {
-    return (TntpZoningReader) getZoningReader();
-  }  
-  
-  /** get TNTP demands reader instance
-   * 
-   * @return TNTP demands reader
-   */
-  protected TntpDemandsReader getTntpDemandsReader() {
-    return (TntpDemandsReader) getDemandsReader();
-  }  
 
   /**
    * Constructor
@@ -235,18 +216,17 @@ public class TntpInputBuilder extends InputBuilderListener {
     super();
 
     /* network reader */
-    setNetworkReader(new TntpNetworkReader(networkFileLocation, nodeCoordinateFileLocation));
-    getTntpNetworkReader().getSettings().setCapacityPeriod((capacityPeriod == null) ? CapacityPeriod.HOUR : capacityPeriod);
-    getTntpNetworkReader().getSettings().setLengthUnits(lengthUnits);
-    getTntpNetworkReader().getSettings().setNetworkFileColumns(networkFileColumns);
-    getTntpNetworkReader().getSettings().setSpeedUnits(speedUnits);
-    getTntpNetworkReader().getSettings().setDefaultMaximumSpeed(defaultMaximumSpeed);
+    this.networkSettings = new TntpNetworkReaderSettings();
+    this.networkFileLocation = networkFileLocation;
+    this.nodeCoordinateFileLocation = nodeCoordinateFileLocation;
     
-    /* zoning reader */
-    setZoningReader(new TntpZoningReader(networkFileLocation));
-    
-    /* demands reader */
-    setDemandsReader(new TntpDemandsReader(demandFileLocation));
+    networkSettings.setCapacityPeriod((capacityPeriod == null) ? CapacityPeriod.HOUR : capacityPeriod);
+    networkSettings.setLengthUnits(lengthUnits);
+    networkSettings.setNetworkFileColumns(networkFileColumns);
+    networkSettings.setSpeedUnits(speedUnits);
+    networkSettings.setDefaultMaximumSpeed(defaultMaximumSpeed);
+        
+    this.demandsFileLocation = demandsFileLocation;
   }
 
   /**

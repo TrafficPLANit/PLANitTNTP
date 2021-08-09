@@ -8,7 +8,8 @@ import java.util.Scanner;
 import java.util.logging.Logger;
 
 import org.locationtech.jts.geom.Point;
-import org.planit.converter.network.NetworkReaderImpl;
+import org.planit.converter.BaseReaderImpl;
+import org.planit.converter.network.NetworkReader;
 import org.planit.cost.physical.BPRLinkTravelTimeCost;
 import org.planit.network.MacroscopicNetwork;
 import org.planit.network.TransportLayerNetwork;
@@ -38,7 +39,7 @@ import org.planit.utils.network.layer.physical.Node;
  * @author gman, markr
  *
  */
-public class TntpNetworkReader extends NetworkReaderImpl {
+public class TntpNetworkReader extends BaseReaderImpl<TransportLayerNetwork<?,?>> implements NetworkReader {
   
   /** logger to use */
   private static final Logger LOGGER = Logger.getLogger(TntpNetworkReader.class.getCanonicalName());
@@ -54,7 +55,7 @@ public class TntpNetworkReader extends NetworkReaderImpl {
   private final File nodeCoordinateFile;  
   
   /** settings to use */
-  private final TntpNetworkReaderSettings settings = new TntpNetworkReaderSettings();
+  private final TntpNetworkReaderSettings settings;
     
   /**
    * The number of nodes in the network according to TNTP
@@ -75,7 +76,18 @@ public class TntpNetworkReader extends NetworkReaderImpl {
   
   public static final int ONE_WAY_AB = 1;
   public static final int ONE_WAY_BA = 2;
-  public static final int TWO_WAY = 3;      
+  public static final int TWO_WAY = 3;  
+  
+  /**
+   * initialise the source id trackers, so we can lay indices on the source id as well for quick lookups
+   */
+  private void initialiseSourceIdTrackers() {
+    initialiseSourceIdMap(Mode.class, Mode::getExternalId);
+    initialiseSourceIdMap(Link.class, Link::getExternalId);
+    initialiseSourceIdMap(MacroscopicLinkSegment.class, MacroscopicLinkSegment::getExternalId);
+    initialiseSourceIdMap(MacroscopicLinkSegmentType.class, MacroscopicLinkSegmentType::getExternalId);
+    initialiseSourceIdMap(Node.class, Node::getExternalId);
+  }  
   
   /**
    * Create and register a new node if it does not already exist
@@ -94,18 +106,15 @@ public class TntpNetworkReader extends NetworkReaderImpl {
       throw new PlanItException("Number of nodes is specified as " + noPhysicalNodes + " but found a reference to node " + nodeSourceId);
     }
     Node node = null;
-    if (getNodeBySourceId(nodeSourceId) == null) {      
+    if (getBySourceId(Node.class, nodeSourceId) == null) {      
       node = network.getNodes().getFactory().registerNew();
       /* XML id */
       node.setXmlId(Long.toString(node.getId()));    
       /* external id */
       node.setExternalId(nodeSourceId);
-      final boolean duplicateNodeExternalId = addNodeToSourceIdMap(nodeSourceId, node);
-      if (duplicateNodeExternalId) {
-        throw new PlanItException("Duplicate node external id " + nodeSourceId + " found in network file");
-      }
+      registerBySourceId(Node.class, node);      
     } else {
-      node = getNodeBySourceId(nodeSourceId);
+      node = getBySourceId(Node.class, nodeSourceId);
     }
     return node;
   }
@@ -175,15 +184,12 @@ public class TntpNetworkReader extends NetworkReaderImpl {
     /* external id */    
     linkSegment.setExternalId(String.valueOf(tntpLinkSegmentSourceId));
     if (linkSegment.getExternalId() != null) {
-      final boolean duplicateLinkSegmentExternalId = addLinkSegmentToSourceIdMap(linkSegment.getExternalId(),linkSegment);
-      if (duplicateLinkSegmentExternalId) {
-        throw new PlanItException("Duplicate link segment external id " + linkSegment.getExternalId()+ " found in network file");
-      }
+      registerBySourceId(MacroscopicLinkSegment.class, linkSegment);      
     }    
   
     /** Link segment type **/
     String linkSegmentTypeSourceIdString = String.valueOf(linkSegmentTypeSourceId);
-    MacroscopicLinkSegmentType linkSegmentType = getLinkSegmentTypeBySourceId(linkSegmentTypeSourceIdString);
+    MacroscopicLinkSegmentType linkSegmentType = getBySourceId(MacroscopicLinkSegmentType.class, linkSegmentTypeSourceIdString);
     if (linkSegmentType == null) {
       linkSegmentType = networkLayer.getLinkSegmentTypes().getFactory().registerNew( 
           linkSegmentTypeSourceIdString, capacityPerLane, MacroscopicLinkSegmentType.DEFAULT_MAX_DENSITY_LANE, modePropertiesMap);
@@ -191,7 +197,7 @@ public class TntpNetworkReader extends NetworkReaderImpl {
       linkSegmentType.setXmlId(Long.toString(linkSegmentType.getId()));
       /* external id */
       linkSegmentType.setExternalId(linkSegmentTypeSourceIdString);
-      addLinkSegmentTypeToSourceIdMap(linkSegmentType.getExternalId(), linkSegmentType);
+      registerBySourceId(MacroscopicLinkSegmentType.class, linkSegmentType);
     }
     linkSegment.setLinkSegmentType(linkSegmentType);    
     linkSegment.getLinkSegmentType().getModeProperties(networkLayer.getFirstSupportedMode()).setMaximumSpeedKmH(maxSpeed);
@@ -216,7 +222,7 @@ public class TntpNetworkReader extends NetworkReaderImpl {
           final String[] cols = line.split("\\s+");
           final String nodeSourceId = cols[0];
   
-          final Node node = getNodeBySourceId(nodeSourceId);
+          final Node node = getBySourceId(Node.class, nodeSourceId);
           Point nodePosition = PlanitJtsUtils.createPoint(Double.parseDouble(cols[1]), Double.parseDouble(cols[2]));          
           node.setPosition(nodePosition);
         }
@@ -313,6 +319,23 @@ public class TntpNetworkReader extends NetworkReaderImpl {
    * @throws PlanItException thrown if error
    */
   public TntpNetworkReader(String networkFileLocation, String nodeCoordinateFileLocation) throws PlanItException {    
+    this(networkFileLocation, nodeCoordinateFileLocation, null);
+  }
+  
+  /**
+   * Constructor
+   * 
+   * @param networkFileLocation to use
+   * @param nodeCoordinateFileLocation to use 
+   * @param networkSettings to use, when null new instance is created
+   * @throws PlanItException thrown if error
+   */
+  public TntpNetworkReader(String networkFileLocation, String nodeCoordinateFileLocation, TntpNetworkReaderSettings networkSettings) throws PlanItException {
+    if(networkSettings==null) {
+      this.settings = new TntpNetworkReaderSettings();
+    }else {
+      this.settings = networkSettings;
+    }
     
     try {
       networkFile = new File(networkFileLocation).getCanonicalFile();
@@ -321,9 +344,8 @@ public class TntpNetworkReader extends NetworkReaderImpl {
       LOGGER.severe(e.getMessage());
       throw new PlanItException("Error in construction of TNTP",e);
     }
-    
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -340,12 +362,13 @@ public class TntpNetworkReader extends NetworkReaderImpl {
     LOGGER.fine(LoggingUtils.getClassNameWithBrackets(this)+"populating Physical Network");
 
     final MacroscopicNetwork network = getSettings().getNetworkToPopulate();
+    initialiseSourceIdTrackers();
     
     /* TNTP only has one mode, define it here */
     Mode mode = network.getModes().getFactory().registerNew(PredefinedModeType.CAR);
     /* external id */
     mode.setExternalId("1"); //TODO wrong because no external id is available, but tests use it --> refactor
-    addModeToSourceIdMap(mode.getExternalId(), mode);    
+    registerBySourceId(Mode.class, mode);    
     
     /* TNTP only compatible with parsing a single network layer, so create it */
     final MacroscopicNetworkLayer networkLayer = network.getTransportLayers().getFactory().registerNew();

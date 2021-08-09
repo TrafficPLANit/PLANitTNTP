@@ -6,13 +6,15 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
-import org.planit.converter.demands.DemandsReaderBase;
+import org.planit.converter.BaseReaderImpl;
+import org.planit.converter.demands.DemandsReader;
 import org.planit.demands.Demands;
-import org.planit.network.TransportLayerNetwork;
+import org.planit.network.MacroscopicNetwork;
 import org.planit.od.odmatrix.demand.ODDemandMatrix;
 import org.planit.tntp.TntpHeaderConstants;
 import org.planit.utils.exceptions.PlanItException;
 import org.planit.utils.misc.LoggingUtils;
+import org.planit.utils.mode.Mode;
 import org.planit.utils.time.TimePeriod;
 import org.planit.utils.zoning.Zone;
 import org.planit.zoning.Zoning;
@@ -23,7 +25,7 @@ import org.planit.zoning.Zoning;
  * @author gman, markr
  *
  */
-public class TntpDemandsReader extends DemandsReaderBase{
+public class TntpDemandsReader extends BaseReaderImpl<Demands> implements DemandsReader{
   
   /** logger to use */
   private static final Logger LOGGER = Logger.getLogger(TntpDemandsReader.class.getCanonicalName());
@@ -41,7 +43,29 @@ public class TntpDemandsReader extends DemandsReaderBase{
   /**
    * TNTP only has one time period
    */
-  private TimePeriod timePeriod;  
+  private TimePeriod timePeriod;
+  
+  /**
+   * initialise the source id trackers and populate them for the network and or zoning references, 
+   * so we can lay indices on the source id as well for quick lookups
+   * 
+   * @param network to use
+   * @param zoning to use
+   */
+  private void initialiseParentSourceIdTrackers(MacroscopicNetwork network, Zoning zoning) {    
+    initialiseSourceIdMap(Mode.class, Mode::getXmlId, network.getModes());
+    
+    initialiseSourceIdMap(Zone.class, Zone::getExternalId);
+    getSourceIdContainer(Zone.class).addAll(zoning.odZones);
+  } 
+  
+  /**
+   * initialise the source id trackers of generated PLANit entity types so we can lay indices on the source id as well for quick lookups
+   * 
+   */
+  private void initialiseSourceIdTrackers() {    
+    initialiseSourceIdMap(TimePeriod.class, TimePeriod::getExternalId);
+  }  
     
   /**
    * Update the OD demand matrix with demands from a specified origin zone
@@ -56,7 +80,7 @@ public class TntpDemandsReader extends DemandsReaderBase{
       final Zone originZone, final ODDemandMatrix odDemandMatrix) {
     
     for (final String destinationZoneSourceId : demandToDestination.keySet()) {
-      final Zone destinationZone = getSettings().getMapToIndexZoneBySourceIds().get(destinationZoneSourceId);
+      final Zone destinationZone = getBySourceId(Zone.class, destinationZoneSourceId);
       odDemandMatrix.setValue(originZone, destinationZone, demandToDestination.get(destinationZoneSourceId));
     }
     
@@ -95,7 +119,10 @@ public class TntpDemandsReader extends DemandsReaderBase{
     LOGGER.fine(LoggingUtils.getClassNameWithBrackets(this)+"populating Demands");
     final Zoning zoning = getSettings().getReferenceZoning();
     final Demands demands = getSettings().getDemandsToPopulate();
-    final TransportLayerNetwork<?, ?> network = getSettings().getReferenceNetwork();
+    final MacroscopicNetwork network = getSettings().getReferenceNetwork();
+    
+    initialiseSourceIdTrackers();
+    initialiseParentSourceIdTrackers(network, zoning);
     
     // TNTP only has one time period, define it here
     int wholeDaydurationSeconds = 24*3600;
@@ -104,8 +131,8 @@ public class TntpDemandsReader extends DemandsReaderBase{
     /* XML id */
     timePeriod.setXmlId(Long.toString(timePeriod.getId()));
     /* external id */
-    timePeriod.setExternalId("1"); //TODO wrong because no external id is available, but tests use it --> refactor
-    addTimePeriodToSourceIdMap(timePeriod.getExternalId(), timePeriod);    
+    timePeriod.setExternalId("1"); //TODO wrong because no external id is available, but tests use it --> refactor    
+    registerBySourceId(TimePeriod.class, timePeriod);    
     
     try (Scanner scanner = new Scanner(demandFile)) {
       boolean readingMetadata = true;
@@ -133,7 +160,7 @@ public class TntpDemandsReader extends DemandsReaderBase{
                 updateOdDemandMatrix(demandToDestination, zoning, originZone, odDemandMatrix);
               }
               final String[] cols = line.split("\\s+");
-              originZone = getSettings().getMapToIndexZoneBySourceIds().get(cols[1]);
+              originZone = getBySourceId(Zone.class, cols[1]);
               demandToDestination = new HashMap<String, Double>();
             } else {
               final String lineWithNoSpaces = line.replaceAll("\\s", "");
