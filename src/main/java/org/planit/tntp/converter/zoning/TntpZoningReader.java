@@ -148,6 +148,7 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
       connectoid.setXmlId(Long.toString(connectoid.getId()));
       /* external id */
       connectoid.setExternalId(zone.getExternalId());
+      registerBySourceId(Connectoid.class, connectoid);
     }
     
     return zoning;

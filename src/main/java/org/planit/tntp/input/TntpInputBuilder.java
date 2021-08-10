@@ -48,6 +48,9 @@ public class TntpInputBuilder extends InputBuilderListener {
   private final TntpNetworkReaderSettings networkSettings;
   
   private final String demandsFileLocation;
+  
+  /** track parsed BPR parameters from network parsing and make available to cost initialisation */
+  private Map<LinkSegment, Pair<Double, Double>> bprParametersPerLinkSegment;
 
   
   /**
@@ -63,6 +66,9 @@ public class TntpInputBuilder extends InputBuilderListener {
 
     /* parse */
     networkReader.read();
+    this.bprParametersPerLinkSegment = networkReader.getParsedBprParameters();
+    
+    networkReader.reset();
   }
 
   /**
@@ -83,6 +89,7 @@ public class TntpInputBuilder extends InputBuilderListener {
         
     /* parse */
     demandsReader.read();
+    demandsReader.reset();
   }
 
   /**
@@ -109,26 +116,34 @@ public class TntpInputBuilder extends InputBuilderListener {
         
     /* parse */
     zoningReader.read();
+    zoningReader.reset();
   }
 
   /**
    * Populate the BPR parameters
    *
    * @param costComponent the BPRLinkTravelTimeCost to be populated
+   * @param parentNetwork top use for costs
    * @throws PlanItException thrown if there is an error
    */
-  protected void populatePhysicalCost( final AbstractPhysicalCost costComponent) throws PlanItException {
+  protected void populatePhysicalCost( final AbstractPhysicalCost costComponent, final MacroscopicNetwork parentNetwork) throws PlanItException {
     LOGGER.info(LoggingUtils.getClassNameWithBrackets(this)+"populating BPR link costs");
     
-    Mode mode = getTntpZoningReader().getSettings().getReferenceNetwork().getTransportLayers().getFirst().getFirstSupportedMode();
-    Map<LinkSegment, Pair<Double, Double>> bprParametersForLinkSegmentAndMode = getTntpNetworkReader().getParsedBprParameters();
-    if (bprParametersForLinkSegmentAndMode != null) {
-      final BPRLinkTravelTimeCost bprLinkTravelTimeCost = (BPRLinkTravelTimeCost) costComponent;
-      for (final Entry<LinkSegment, Pair<Double, Double>> entry : bprParametersForLinkSegmentAndMode.entrySet()) {
-        final Pair<Double, Double> alphaBeta = entry.getValue();
-        final MacroscopicLinkSegment macroscopicLinkSegment = (MacroscopicLinkSegment) entry.getKey();
-        bprLinkTravelTimeCost.setParameters(macroscopicLinkSegment, mode, alphaBeta.first(), alphaBeta.second());
-      }
+    Mode mode = parentNetwork.getModes().getFirst();
+    if (bprParametersPerLinkSegment == null) {
+      LOGGER.warning("BPR parameters not available upon populating physical costs in TNTP input builder, ignore");
+      return;
+    }
+    if(!(costComponent instanceof BPRLinkTravelTimeCost)) {
+      LOGGER.warning(String.format("Expected BPR cost to be populated by found %s, ignore", costComponent.getClass().getCanonicalName()));
+      return;
+    }
+    
+    final BPRLinkTravelTimeCost bprLinkTravelTimeCost = (BPRLinkTravelTimeCost) costComponent;
+    for (final Entry<LinkSegment, Pair<Double, Double>> entry : bprParametersPerLinkSegment.entrySet()) {
+      final Pair<Double, Double> alphaBeta = entry.getValue();
+      final MacroscopicLinkSegment macroscopicLinkSegment = (MacroscopicLinkSegment) entry.getKey();
+      bprLinkTravelTimeCost.setParameters(macroscopicLinkSegment, mode, alphaBeta.first(), alphaBeta.second());
     }
   }
 
@@ -199,7 +214,7 @@ public class TntpInputBuilder extends InputBuilderListener {
    * Constructor
    *
    * @param networkFileLocation network file location
-   * @param demandFileLocation demand file location
+   * @param demandsFileLocation demand file location
    * @param nodeCoordinateFileLocation node coordinate file location
    * @param networkFileColumns Map specifying which columns in the network file contain which values
    * @param speedUnits speed units being used
@@ -208,7 +223,7 @@ public class TntpInputBuilder extends InputBuilderListener {
    * @param defaultMaximumSpeed default maximum speed along links
    * @throws PlanItException thrown if there is an error during running
    */
-  public TntpInputBuilder(final String networkFileLocation, final String demandFileLocation,
+  public TntpInputBuilder(final String networkFileLocation, final String demandsFileLocation,
       final String nodeCoordinateFileLocation, final Map<NetworkFileColumnType, Integer> networkFileColumns,
       final SpeedUnits speedUnits, final LengthUnits lengthUnits, final CapacityPeriod capacityPeriod,
       final double defaultMaximumSpeed) throws PlanItException {
@@ -248,7 +263,7 @@ public class TntpInputBuilder extends InputBuilderListener {
       populateDemands(demandsEvent.getDemandsToPopulate(), demandsEvent.getParentZoning(), demandsEvent.getParentNetwork());
     }else if(event.getType().equals(PopulatePhysicalCostEvent.EVENT_TYPE)){
       PopulatePhysicalCostEvent physicalCostEvent = ((PopulatePhysicalCostEvent) event);
-      populatePhysicalCost(physicalCostEvent.getPhysicalCostToPopulate());
+      populatePhysicalCost(physicalCostEvent.getPhysicalCostToPopulate(), physicalCostEvent.getParentNetwork());
     } else {      
       /* generic case */
       LOGGER.fine("Event component " + event.getClass().getCanonicalName() + " ignored by TNTP InputBuilder");

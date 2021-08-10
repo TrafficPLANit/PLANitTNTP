@@ -2,15 +2,15 @@ package org.planit.tntp.test;
 
 import java.util.Map;
 
-import org.planit.tntp.converter.demands.TntpDemandsReader;
-import org.planit.tntp.converter.network.TntpNetworkReader;
-import org.planit.tntp.converter.zoning.TntpZoningReader;
+import org.planit.demands.Demands;
+import org.planit.network.MacroscopicNetwork;
 import org.planit.tntp.enums.CapacityPeriod;
 import org.planit.tntp.enums.LengthUnits;
 import org.planit.tntp.enums.NetworkFileColumnType;
 import org.planit.tntp.enums.SpeedUnits;
 import org.planit.tntp.input.TntpInputBuilder;
 import org.planit.utils.exceptions.PlanItException;
+import org.planit.zoning.Zoning;
 
 /**
  * Input builder exposing internals for testing purposes only within this package
@@ -19,6 +19,10 @@ import org.planit.utils.exceptions.PlanItException;
  *
  */
 public class TntpInputBuilder4Testing extends TntpInputBuilder{
+  
+  protected MacroscopicNetwork macroscopicNetwork;
+  protected Zoning zoning;
+  protected Demands demands;
   
   /** Constructor 
    * @param networkFileLocation to use
@@ -38,29 +42,23 @@ public class TntpInputBuilder4Testing extends TntpInputBuilder{
         capacityPeriod, defaultMaximumSpeed);
   }
 
-  /** get TNTP network reader instance
-   * 
-   * @return TNTP network reader
-   */
-  public TntpNetworkReader getTntpNetworkReader() {
-    return super.getTntpNetworkReader();
+  public void setCreatedInputs(MacroscopicNetwork macroscopicNetwork, Zoning zoning, Demands demands) {
+    this.macroscopicNetwork = macroscopicNetwork;
+    this.zoning = zoning;
+    this.demands = demands;    
   }
   
-  /** get TNTP zoning reader instance
-   * 
-   * @return TNTP zoning reader
-   */
-  public TntpZoningReader getTntpZoningReader() {
-    return super.getTntpZoningReader();
+  public MacroscopicNetwork getMacroscopicNetwork() {
+    return macroscopicNetwork;
+  }
+
+  public Zoning getZoning() {
+    return zoning;
+  }
+
+  public Demands getDemands() {
+    return demands;
   }  
   
-  /** get TNTP demands reader instance
-   * 
-   * @return TNTP demands reader
-   */
-  public TntpDemandsReader getTntpDemandsReader() {
-    return super.getTntpDemandsReader();
-  }   
-
   
 }
