@@ -10,7 +10,7 @@ import org.planit.converter.BaseReaderImpl;
 import org.planit.converter.demands.DemandsReader;
 import org.planit.demands.Demands;
 import org.planit.network.MacroscopicNetwork;
-import org.planit.od.odmatrix.demand.ODDemandMatrix;
+import org.planit.od.demand.OdDemandMatrix;
 import org.planit.tntp.TntpHeaderConstants;
 import org.planit.utils.exceptions.PlanItException;
 import org.planit.utils.misc.LoggingUtils;
@@ -77,7 +77,7 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
    * @param odDemandMatrix the ODDemandMatrix object to be updated
    */
   private void updateOdDemandMatrix(final Map<String, Double> demandToDestination, final Zoning zoning,
-      final Zone originZone, final ODDemandMatrix odDemandMatrix) {
+      final Zone originZone, final OdDemandMatrix odDemandMatrix) {
     
     for (final String destinationZoneSourceId : demandToDestination.keySet()) {
       final Zone destinationZone = getBySourceId(Zone.class, destinationZoneSourceId);
@@ -138,7 +138,7 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
       boolean readingMetadata = true;
       Zone originZone = null;
       Map<String, Double> demandToDestination = null;
-      final ODDemandMatrix odDemandMatrix = new ODDemandMatrix(zoning.odZones);
+      final OdDemandMatrix odDemandMatrix = new OdDemandMatrix(zoning.odZones);
       while (scanner.hasNextLine()) {
         final String line = scanner.nextLine().trim();
         final char firstChar = (line.isEmpty()) ? 'x' : line.charAt(0);
