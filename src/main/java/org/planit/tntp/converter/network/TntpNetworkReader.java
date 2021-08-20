@@ -13,7 +13,7 @@ import org.planit.converter.network.NetworkReader;
 import org.planit.cost.physical.BPRLinkTravelTimeCost;
 import org.planit.network.MacroscopicNetwork;
 import org.planit.network.TransportLayerNetwork;
-import org.planit.network.layer.macroscopic.MacroscopicModePropertiesFactory;
+import org.planit.network.layer.macroscopic.LinkSegmentTypeAccessPropertiesFactory;
 import org.planit.tntp.TntpHeaderConstants;
 import org.planit.tntp.enums.LengthUnits;
 import org.planit.tntp.enums.NetworkFileColumnType;
@@ -28,7 +28,7 @@ import org.planit.utils.mode.PredefinedModeType;
 import org.planit.utils.network.layer.MacroscopicNetworkLayer;
 import org.planit.utils.network.layer.macroscopic.MacroscopicLinkSegment;
 import org.planit.utils.network.layer.macroscopic.MacroscopicLinkSegmentType;
-import org.planit.utils.network.layer.macroscopic.MacroscopicModeProperties;
+import org.planit.utils.network.layer.macroscopic.AccessGroupProperties;
 import org.planit.utils.network.layer.physical.Link;
 import org.planit.utils.network.layer.physical.LinkSegment;
 import org.planit.utils.network.layer.physical.Node;
@@ -159,7 +159,6 @@ public class TntpNetworkReader extends BaseReaderImpl<TransportLayerNetwork<?,?>
     final int linkSegmentTypeSourceId = Integer.parseInt(cols[supportedColumns.get(NetworkFileColumnType.LINK_TYPE)]);    
     
     /* mode properties */
-    MacroscopicModeProperties macroscopicModeProperties = null;
     double freeflowSpeed = defaultMaximumSpeed * speedUnits.getMultiplier();
     switch (linkSegmentTypeSourceId) {
       case 1:
@@ -173,10 +172,8 @@ public class TntpNetworkReader extends BaseReaderImpl<TransportLayerNetwork<?,?>
         break;
       default:
         throw new PlanItException("incorrect external id type encountered");
-    }
-    final Map<Mode, MacroscopicModeProperties> modePropertiesMap = new HashMap<Mode, MacroscopicModeProperties>();    
-    macroscopicModeProperties = MacroscopicModePropertiesFactory.create(freeflowSpeed, freeflowSpeed);
-    modePropertiesMap.put(networkLayer.getFirstSupportedMode(), macroscopicModeProperties);
+    }   
+    final AccessGroupProperties modeAccessProperties = LinkSegmentTypeAccessPropertiesFactory.create(freeflowSpeed, freeflowSpeed, networkLayer.getFirstSupportedMode());
   
     final MacroscopicLinkSegment linkSegment = networkLayer.getLinkSegments().getFactory().registerNew(link, true, true);
     /* XML id */
@@ -192,7 +189,7 @@ public class TntpNetworkReader extends BaseReaderImpl<TransportLayerNetwork<?,?>
     MacroscopicLinkSegmentType linkSegmentType = getBySourceId(MacroscopicLinkSegmentType.class, linkSegmentTypeSourceIdString);
     if (linkSegmentType == null) {
       linkSegmentType = networkLayer.getLinkSegmentTypes().getFactory().registerNew( 
-          linkSegmentTypeSourceIdString, capacityPerLane, MacroscopicLinkSegmentType.DEFAULT_MAX_DENSITY_LANE, modePropertiesMap);
+          linkSegmentTypeSourceIdString, capacityPerLane, MacroscopicLinkSegmentType.DEFAULT_MAX_DENSITY_LANE, modeAccessProperties);
       /* XML id */
       linkSegmentType.setXmlId(Long.toString(linkSegmentType.getId()));
       /* external id */
@@ -200,7 +197,7 @@ public class TntpNetworkReader extends BaseReaderImpl<TransportLayerNetwork<?,?>
       registerBySourceId(MacroscopicLinkSegmentType.class, linkSegmentType);
     }
     linkSegment.setLinkSegmentType(linkSegmentType);    
-    linkSegment.getLinkSegmentType().getModeProperties(networkLayer.getFirstSupportedMode()).setMaximumSpeedKmH(maxSpeed);
+    linkSegment.getLinkSegmentType().getAccessProperties(networkLayer.getFirstSupportedMode()).setMaximumSpeedKmH(maxSpeed);
     
   
     return linkSegment;

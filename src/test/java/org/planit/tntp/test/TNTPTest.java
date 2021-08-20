@@ -47,6 +47,7 @@ public class TNTPTest {
   public void tearDown() {
     Logging.closeLogger(LOGGER);
   }
+  
   /**
    * Compare the results for Chicago-Sketch TNTP network with previous results.
    *
