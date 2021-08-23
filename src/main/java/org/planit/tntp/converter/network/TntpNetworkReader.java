@@ -13,7 +13,7 @@ import org.planit.converter.network.NetworkReader;
 import org.planit.cost.physical.BPRLinkTravelTimeCost;
 import org.planit.network.MacroscopicNetwork;
 import org.planit.network.TransportLayerNetwork;
-import org.planit.network.layer.macroscopic.LinkSegmentTypeAccessPropertiesFactory;
+import org.planit.network.layer.macroscopic.AccessGroupPropertiesFactory;
 import org.planit.tntp.TntpHeaderConstants;
 import org.planit.tntp.enums.LengthUnits;
 import org.planit.tntp.enums.NetworkFileColumnType;
@@ -173,7 +173,7 @@ public class TntpNetworkReader extends BaseReaderImpl<TransportLayerNetwork<?,?>
       default:
         throw new PlanItException("incorrect external id type encountered");
     }   
-    final AccessGroupProperties modeAccessProperties = LinkSegmentTypeAccessPropertiesFactory.create(freeflowSpeed, freeflowSpeed, networkLayer.getFirstSupportedMode());
+    final AccessGroupProperties modeAccessProperties = AccessGroupPropertiesFactory.create(freeflowSpeed, freeflowSpeed, networkLayer.getFirstSupportedMode());
   
     final MacroscopicLinkSegment linkSegment = networkLayer.getLinkSegments().getFactory().registerNew(link, true, true);
     /* XML id */
