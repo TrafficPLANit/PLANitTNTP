@@ -14,7 +14,6 @@ import org.planit.demands.Demands;
 import org.planit.network.MacroscopicNetwork;
 import org.planit.output.configuration.LinkOutputTypeConfiguration;
 import org.planit.output.configuration.OutputConfiguration;
-import org.planit.output.enums.OutputTimeUnit;
 import org.planit.output.enums.OutputType;
 import org.planit.output.formatter.MemoryOutputFormatter;
 import org.planit.output.formatter.OutputFormatter;
@@ -27,6 +26,7 @@ import org.planit.tntp.enums.SpeedUnits;
 import org.planit.tntp.project.TntpProject;
 import org.planit.utils.exceptions.PlanItException;
 import org.planit.utils.misc.Pair;
+import org.planit.utils.unit.Units;
 import org.planit.zoning.Zoning;
 
 /**
@@ -93,7 +93,7 @@ public class TNTPTestHelper {
   public static Pair<MemoryOutputFormatter, TntpInputBuilder4Testing> execute(final String networkFileLocation,
       final String demandFileLocation,
       final int maxIterations,
-      final double epsilon, final OutputTimeUnit outputTimeUnit, final double defaultMaximumSpeed) throws PlanItException {
+      final double epsilon, final Units outputTimeUnit, final double defaultMaximumSpeed) throws PlanItException {
 
     // TODO - The following arrangement of columns is correct for Chicago Sketch and Philadelphia.
     // For some other cities the arrangement is different.

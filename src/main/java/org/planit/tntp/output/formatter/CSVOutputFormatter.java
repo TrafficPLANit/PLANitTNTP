@@ -97,7 +97,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
               rowValues.add(
                   OutputUtils.formatObject(
                       linkOutputTypeAdapter.getLinkSegmentOutputPropertyValue(
-                          outputProperty.getOutputProperty(), linkSegment, mode, timePeriod, outputTimeUnit.getMultiplier()).get()));
+                          outputProperty.getOutputProperty(), linkSegment, mode, timePeriod).get()));
  						}
 						printer.get(outputTypeConfiguration.getOutputType()).printRecord(rowValues);
 					}

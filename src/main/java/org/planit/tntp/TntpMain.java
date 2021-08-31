@@ -12,10 +12,9 @@ import org.planit.demands.Demands;
 import org.planit.logging.Logging;
 import org.planit.network.MacroscopicNetwork;
 import org.planit.output.configuration.LinkOutputTypeConfiguration;
-import org.planit.output.configuration.ODOutputTypeConfiguration;
+import org.planit.output.configuration.OdOutputTypeConfiguration;
 import org.planit.output.configuration.OutputConfiguration;
 import org.planit.output.configuration.PathOutputTypeConfiguration;
-import org.planit.output.enums.OutputTimeUnit;
 import org.planit.output.enums.OutputType;
 import org.planit.output.enums.PathOutputIdentificationType;
 import org.planit.output.property.OutputProperty;
@@ -28,6 +27,7 @@ import org.planit.tntp.output.formatter.CSVOutputFormatter;
 import org.planit.tntp.project.TntpProject;
 import org.planit.utils.args.ArgumentParser;
 import org.planit.utils.exceptions.PlanItException;
+import org.planit.utils.unit.Units;
 import org.planit.zoning.Zoning;
 
 /**
@@ -59,7 +59,7 @@ public class TntpMain {
     String linkOutputFilename = null;
     String loggingPropertiesFileLocation = null;
     String outputTimeUnitValue = null;
-    OutputTimeUnit outputTimeUnit = null;
+    Units outputTimeUnit = null;
     String odOutputFilename = null;
     String odPathOutputFilename = null;
     int maxIterations = DEFAULT_MAX_ITERATIONS;
@@ -136,13 +136,13 @@ public class TntpMain {
         final String outputSelection = outputTimeUnitValue.substring(0, 1).toUpperCase();
         switch (outputSelection) {
           case "H":
-            outputTimeUnit = OutputTimeUnit.HOURS;
+            outputTimeUnit = Units.HOUR;
             break;
           case "M":
-            outputTimeUnit = OutputTimeUnit.MINUTES;
+            outputTimeUnit = Units.MINUTE;
             break;
           case "S":
-            outputTimeUnit = OutputTimeUnit.SECONDS;
+            outputTimeUnit = Units.SECOND;
             break;
           default:
             final String errorMessage = "Argument OutputTimeUnit included but does not start with h, m or s.";
@@ -196,7 +196,7 @@ public class TntpMain {
       final boolean persistZeroFlow, 
       final int maxIterations, 
       final double epsilon,
-      final OutputTimeUnit outputTimeUnit, 
+      final Units outputTimeUnit, 
       final double defaultMaximumSpeed) throws PlanItException {
 
     final boolean isLinkOutputActive = (linkOutputFilename != null);
@@ -266,8 +266,8 @@ public class TntpMain {
     }
     // OUTPUT FORMAT CONFIGURATION - ORIGIN-DESTINATION
     if (isOdOutputActive) {
-      final ODOutputTypeConfiguration originDestinationOutputTypeConfiguration =
-          (ODOutputTypeConfiguration) outputConfiguration.getOutputTypeConfiguration(OutputType.OD);
+      final OdOutputTypeConfiguration originDestinationOutputTypeConfiguration =
+          (OdOutputTypeConfiguration) outputConfiguration.getOutputTypeConfiguration(OutputType.OD);
       originDestinationOutputTypeConfiguration.removeProperty(OutputProperty.RUN_ID);
       originDestinationOutputTypeConfiguration.addProperty(OutputProperty.ORIGIN_ZONE_ID);
       originDestinationOutputTypeConfiguration.addProperty(OutputProperty.DESTINATION_ZONE_ID);
