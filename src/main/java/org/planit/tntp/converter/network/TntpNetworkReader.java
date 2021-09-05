@@ -20,6 +20,7 @@ import org.planit.tntp.enums.NetworkFileColumnType;
 import org.planit.tntp.enums.SpeedUnits;
 import org.planit.utils.exceptions.PlanItException;
 import org.planit.utils.geo.PlanitJtsUtils;
+import org.planit.utils.macroscopic.MacroscopicConstants;
 import org.planit.utils.math.Precision;
 import org.planit.utils.misc.LoggingUtils;
 import org.planit.utils.misc.Pair;
@@ -189,7 +190,7 @@ public class TntpNetworkReader extends BaseReaderImpl<TransportLayerNetwork<?,?>
     MacroscopicLinkSegmentType linkSegmentType = getBySourceId(MacroscopicLinkSegmentType.class, linkSegmentTypeSourceIdString);
     if (linkSegmentType == null) {
       linkSegmentType = networkLayer.getLinkSegmentTypes().getFactory().registerNew( 
-          linkSegmentTypeSourceIdString, capacityPerLane, MacroscopicLinkSegmentType.DEFAULT_MAX_DENSITY_LANE, modeAccessProperties);
+          linkSegmentTypeSourceIdString, capacityPerLane, MacroscopicConstants.DEFAULT_MAX_DENSITY_PCU_KM_LANE, modeAccessProperties);
       /* XML id */
       linkSegmentType.setXmlId(Long.toString(linkSegmentType.getId()));
       /* external id */
