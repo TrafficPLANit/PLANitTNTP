@@ -189,8 +189,9 @@ public class TntpNetworkReader extends BaseReaderImpl<TransportLayerNetwork<?,?>
     String linkSegmentTypeSourceIdString = String.valueOf(linkSegmentTypeSourceId);
     MacroscopicLinkSegmentType linkSegmentType = getBySourceId(MacroscopicLinkSegmentType.class, linkSegmentTypeSourceIdString);
     if (linkSegmentType == null) {
-      linkSegmentType = networkLayer.getLinkSegmentTypes().getFactory().registerNew( 
-          linkSegmentTypeSourceIdString, capacityPerLane, MacroscopicConstants.DEFAULT_MAX_DENSITY_PCU_KM_LANE, modeAccessProperties);
+      linkSegmentType = networkLayer.getLinkSegmentTypes().getFactory().registerNew(linkSegmentTypeSourceIdString, capacityPerLane, MacroscopicConstants.DEFAULT_MAX_DENSITY_PCU_KM_LANE);
+      linkSegmentType.setAccessGroupProperties(modeAccessProperties);
+      
       /* XML id */
       linkSegmentType.setXmlId(Long.toString(linkSegmentType.getId()));
       /* external id */
