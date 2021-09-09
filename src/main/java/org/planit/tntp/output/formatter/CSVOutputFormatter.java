@@ -19,7 +19,7 @@ import org.planit.output.enums.OutputType;
 import org.planit.output.enums.OutputTypeEnum;
 import org.planit.output.formatter.CsvFileOutputFormatter;
 import org.planit.output.formatter.CsvTextFileOutputFormatter;
-import org.planit.output.property.BaseOutputProperty;
+import org.planit.output.property.OutputProperty;
 import org.planit.utils.time.TimePeriod;
 import org.planit.utils.exceptions.PlanItException;
 import org.planit.utils.id.IdGroupingToken;
@@ -81,7 +81,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 		final MacroscopicLinkOutputTypeAdapter linkOutputTypeAdapter = 
 		    (MacroscopicLinkOutputTypeAdapter) outputAdapter.getOutputTypeAdapter(outputTypeConfiguration.getOutputType());
 		
-		final SortedSet<BaseOutputProperty> outputProperties = outputTypeConfiguration.getOutputProperties();
+		final SortedSet<OutputProperty> outputProperties = outputTypeConfiguration.getOutputProperties();
 		try {
 			for (final Mode mode : modes) {
 			  Optional<Long> layerId = linkOutputTypeAdapter.getInfrastructureLayerIdForMode(mode);
@@ -93,11 +93,10 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 				  
 					if (outputConfiguration.isPersistZeroFlow() || flowPositive.get()) {
 					  final List<Object> rowValues = new ArrayList<Object>();						
-					  for (final BaseOutputProperty outputProperty : outputProperties) {
+					  for (final OutputProperty outputProperty : outputProperties) {
               rowValues.add(
                   OutputUtils.formatObject(
-                      linkOutputTypeAdapter.getLinkSegmentOutputPropertyValue(
-                          outputProperty.getOutputProperty(), linkSegment, mode, timePeriod).get()));
+                      linkOutputTypeAdapter.getLinkSegmentOutputPropertyValue(outputProperty, linkSegment, mode, timePeriod).get()));
  						}
 						printer.get(outputTypeConfiguration.getOutputType()).printRecord(rowValues);
 					}

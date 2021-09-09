@@ -17,7 +17,7 @@ import org.planit.output.configuration.OutputConfiguration;
 import org.planit.output.configuration.PathOutputTypeConfiguration;
 import org.planit.output.enums.OutputType;
 import org.planit.output.enums.PathOutputIdentificationType;
-import org.planit.output.property.OutputProperty;
+import org.planit.output.property.OutputPropertyType;
 import org.planit.sdinteraction.smoothing.MSASmoothing;
 import org.planit.tntp.enums.CapacityPeriod;
 import org.planit.tntp.enums.LengthUnits;
@@ -249,36 +249,36 @@ public class TntpMain {
     // OUTPUT FORMAT CONFIGURATION - LINKS
     if (isLinkOutputActive) {
       final LinkOutputTypeConfiguration linkOutputTypeConfiguration = (LinkOutputTypeConfiguration) outputConfiguration.getOutputTypeConfiguration(OutputType.LINK);
-      linkOutputTypeConfiguration.addProperty(OutputProperty.LINK_SEGMENT_TYPE_NAME);
-      linkOutputTypeConfiguration.addProperty(OutputProperty.VC_RATIO);
-      linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_ID);
-      linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_EXTERNAL_ID);
-      linkOutputTypeConfiguration.removeProperty(OutputProperty.DOWNSTREAM_NODE_LOCATION);
-      linkOutputTypeConfiguration.removeProperty(OutputProperty.DOWNSTREAM_NODE_ID);
-      linkOutputTypeConfiguration.removeProperty(OutputProperty.UPSTREAM_NODE_LOCATION);
-      linkOutputTypeConfiguration.removeProperty(OutputProperty.UPSTREAM_NODE_ID);
-      linkOutputTypeConfiguration.removeProperty(OutputProperty.MODE_EXTERNAL_ID);
-      linkOutputTypeConfiguration.removeProperty(OutputProperty.MODE_ID);
-      linkOutputTypeConfiguration.removeProperty(OutputProperty.TIME_PERIOD_EXTERNAL_ID);
-      linkOutputTypeConfiguration.removeProperty(OutputProperty.TIME_PERIOD_ID);
-      linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_ID);
-      linkOutputTypeConfiguration.removeProperty(OutputProperty.MAXIMUM_SPEED);
+      linkOutputTypeConfiguration.addProperty(OutputPropertyType.LINK_SEGMENT_TYPE_NAME);
+      linkOutputTypeConfiguration.addProperty(OutputPropertyType.VC_RATIO);
+      linkOutputTypeConfiguration.removeProperty(OutputPropertyType.LINK_SEGMENT_ID);
+      linkOutputTypeConfiguration.removeProperty(OutputPropertyType.LINK_SEGMENT_EXTERNAL_ID);
+      linkOutputTypeConfiguration.removeProperty(OutputPropertyType.DOWNSTREAM_NODE_LOCATION);
+      linkOutputTypeConfiguration.removeProperty(OutputPropertyType.DOWNSTREAM_NODE_ID);
+      linkOutputTypeConfiguration.removeProperty(OutputPropertyType.UPSTREAM_NODE_LOCATION);
+      linkOutputTypeConfiguration.removeProperty(OutputPropertyType.UPSTREAM_NODE_ID);
+      linkOutputTypeConfiguration.removeProperty(OutputPropertyType.MODE_EXTERNAL_ID);
+      linkOutputTypeConfiguration.removeProperty(OutputPropertyType.MODE_ID);
+      linkOutputTypeConfiguration.removeProperty(OutputPropertyType.TIME_PERIOD_EXTERNAL_ID);
+      linkOutputTypeConfiguration.removeProperty(OutputPropertyType.TIME_PERIOD_ID);
+      linkOutputTypeConfiguration.removeProperty(OutputPropertyType.LINK_SEGMENT_ID);
+      linkOutputTypeConfiguration.removeProperty(OutputPropertyType.MAXIMUM_SPEED);
     }
     // OUTPUT FORMAT CONFIGURATION - ORIGIN-DESTINATION
     if (isOdOutputActive) {
       final OdOutputTypeConfiguration originDestinationOutputTypeConfiguration =
           (OdOutputTypeConfiguration) outputConfiguration.getOutputTypeConfiguration(OutputType.OD);
-      originDestinationOutputTypeConfiguration.removeProperty(OutputProperty.RUN_ID);
-      originDestinationOutputTypeConfiguration.addProperty(OutputProperty.ORIGIN_ZONE_ID);
-      originDestinationOutputTypeConfiguration.addProperty(OutputProperty.DESTINATION_ZONE_ID);
+      originDestinationOutputTypeConfiguration.removeProperty(OutputPropertyType.RUN_ID);
+      originDestinationOutputTypeConfiguration.addProperty(OutputPropertyType.ORIGIN_ZONE_ID);
+      originDestinationOutputTypeConfiguration.addProperty(OutputPropertyType.DESTINATION_ZONE_ID);
     }
     // OUTPUT FORMAT CONFIGURATION - PATH
     if (isOdPathOutputActive) {
       final PathOutputTypeConfiguration pathOutputTypeConfiguration =
           (PathOutputTypeConfiguration) outputConfiguration.getOutputTypeConfiguration(OutputType.PATH);
-      pathOutputTypeConfiguration.removeProperty(OutputProperty.RUN_ID);
-      pathOutputTypeConfiguration.addProperty(OutputProperty.ORIGIN_ZONE_ID);
-      pathOutputTypeConfiguration.addProperty(OutputProperty.DESTINATION_ZONE_ID);
+      pathOutputTypeConfiguration.removeProperty(OutputPropertyType.RUN_ID);
+      pathOutputTypeConfiguration.addProperty(OutputPropertyType.ORIGIN_ZONE_ID);
+      pathOutputTypeConfiguration.addProperty(OutputPropertyType.DESTINATION_ZONE_ID);
       pathOutputTypeConfiguration.setPathIdentificationType(PathOutputIdentificationType.LINK_SEGMENT_EXTERNAL_ID);
     }
 

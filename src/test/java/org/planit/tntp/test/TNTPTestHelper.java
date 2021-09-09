@@ -17,7 +17,7 @@ import org.planit.output.configuration.OutputConfiguration;
 import org.planit.output.enums.OutputType;
 import org.planit.output.formatter.MemoryOutputFormatter;
 import org.planit.output.formatter.OutputFormatter;
-import org.planit.output.property.OutputProperty;
+import org.planit.output.property.OutputPropertyType;
 import org.planit.sdinteraction.smoothing.MSASmoothing;
 import org.planit.tntp.enums.CapacityPeriod;
 import org.planit.tntp.enums.LengthUnits;
@@ -152,24 +152,24 @@ public class TNTPTestHelper {
     // OUTPUT FORMAT CONFIGURATION - LINKS
     final LinkOutputTypeConfiguration linkOutputTypeConfiguration =
         (LinkOutputTypeConfiguration) outputConfiguration.getOutputTypeConfiguration(OutputType.LINK);
-    linkOutputTypeConfiguration.addProperty(OutputProperty.LINK_SEGMENT_TYPE_NAME);
-    linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_ID);
-    linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_XML_ID);
-    linkOutputTypeConfiguration.removeProperty(OutputProperty.DOWNSTREAM_NODE_LOCATION);
-    linkOutputTypeConfiguration.removeProperty(OutputProperty.DOWNSTREAM_NODE_ID);
-    linkOutputTypeConfiguration.removeProperty(OutputProperty.DOWNSTREAM_NODE_XML_ID);
-    linkOutputTypeConfiguration.removeProperty(OutputProperty.UPSTREAM_NODE_LOCATION);
-    linkOutputTypeConfiguration.removeProperty(OutputProperty.UPSTREAM_NODE_ID);
-    linkOutputTypeConfiguration.removeProperty(OutputProperty.UPSTREAM_NODE_XML_ID);
-    linkOutputTypeConfiguration.removeProperty(OutputProperty.MODE_EXTERNAL_ID);
-    linkOutputTypeConfiguration.removeProperty(OutputProperty.MODE_ID);
-    linkOutputTypeConfiguration.removeProperty(OutputProperty.TIME_PERIOD_EXTERNAL_ID);
-    linkOutputTypeConfiguration.removeProperty(OutputProperty.TIME_PERIOD_ID);
-    linkOutputTypeConfiguration.removeProperty(OutputProperty.LINK_SEGMENT_ID);
-    linkOutputTypeConfiguration.removeProperty(OutputProperty.MAXIMUM_SPEED);
+    linkOutputTypeConfiguration.addProperty(OutputPropertyType.LINK_SEGMENT_TYPE_NAME);
+    linkOutputTypeConfiguration.removeProperty(OutputPropertyType.LINK_SEGMENT_ID);
+    linkOutputTypeConfiguration.removeProperty(OutputPropertyType.LINK_SEGMENT_XML_ID);
+    linkOutputTypeConfiguration.removeProperty(OutputPropertyType.DOWNSTREAM_NODE_LOCATION);
+    linkOutputTypeConfiguration.removeProperty(OutputPropertyType.DOWNSTREAM_NODE_ID);
+    linkOutputTypeConfiguration.removeProperty(OutputPropertyType.DOWNSTREAM_NODE_XML_ID);
+    linkOutputTypeConfiguration.removeProperty(OutputPropertyType.UPSTREAM_NODE_LOCATION);
+    linkOutputTypeConfiguration.removeProperty(OutputPropertyType.UPSTREAM_NODE_ID);
+    linkOutputTypeConfiguration.removeProperty(OutputPropertyType.UPSTREAM_NODE_XML_ID);
+    linkOutputTypeConfiguration.removeProperty(OutputPropertyType.MODE_EXTERNAL_ID);
+    linkOutputTypeConfiguration.removeProperty(OutputPropertyType.MODE_ID);
+    linkOutputTypeConfiguration.removeProperty(OutputPropertyType.TIME_PERIOD_EXTERNAL_ID);
+    linkOutputTypeConfiguration.removeProperty(OutputPropertyType.TIME_PERIOD_ID);
+    linkOutputTypeConfiguration.removeProperty(OutputPropertyType.LINK_SEGMENT_ID);
+    linkOutputTypeConfiguration.removeProperty(OutputPropertyType.MAXIMUM_SPEED);
     
-    linkOutputTypeConfiguration.addProperty(OutputProperty.DOWNSTREAM_NODE_EXTERNAL_ID);
-    linkOutputTypeConfiguration.addProperty(OutputProperty.UPSTREAM_NODE_EXTERNAL_ID);
+    linkOutputTypeConfiguration.addProperty(OutputPropertyType.DOWNSTREAM_NODE_EXTERNAL_ID);
+    linkOutputTypeConfiguration.addProperty(OutputPropertyType.UPSTREAM_NODE_EXTERNAL_ID);
     
     // MemoryOutputFormatter - Links
     final MemoryOutputFormatter memoryOutputFormatter = (MemoryOutputFormatter)
