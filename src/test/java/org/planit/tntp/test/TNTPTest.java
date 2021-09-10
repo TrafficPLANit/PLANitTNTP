@@ -15,7 +15,7 @@ import org.planit.output.formatter.MemoryOutputFormatter;
 import org.planit.output.formatter.MemoryOutputIterator;
 import org.planit.output.property.OutputPropertyType;
 import org.planit.utils.time.TimePeriod;
-import org.planit.utils.unit.Units;
+import org.planit.utils.unit.Unit;
 import org.planit.utils.id.IdGenerator;
 import org.planit.utils.math.Precision;
 import org.planit.utils.misc.Pair;
@@ -63,7 +63,7 @@ public class TNTPTest {
     final String networkFileLocation = "src\\test\\resources\\ChicagoSketch\\ChicagoSketch_net.tntp";
     final String demandFileLocation = "src\\test\\resources\\ChicagoSketch\\ChicagoSketch_trips.tntp";
     final String standardResultsFileLocation = "src\\test\\resources\\ChicagoSketch\\ChicagoSketch_flow.tntp";
-    final Units outputTimeUnit = null;
+    final Unit outputTimeUnit = null;
     final int maxIterations = 100;
     final double epsilon = TNTPTestHelper.DEFAULT_CONVERGENCE_EPSILON;
     final double defaultMaximumSpeed = 25.0;

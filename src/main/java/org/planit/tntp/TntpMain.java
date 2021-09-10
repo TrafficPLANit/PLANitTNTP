@@ -27,7 +27,7 @@ import org.planit.tntp.output.formatter.CSVOutputFormatter;
 import org.planit.tntp.project.TntpProject;
 import org.planit.utils.args.ArgumentParser;
 import org.planit.utils.exceptions.PlanItException;
-import org.planit.utils.unit.Units;
+import org.planit.utils.unit.Unit;
 import org.planit.zoning.Zoning;
 
 /**
@@ -59,7 +59,7 @@ public class TntpMain {
     String linkOutputFilename = null;
     String loggingPropertiesFileLocation = null;
     String outputTimeUnitValue = null;
-    Units outputTimeUnit = null;
+    Unit outputTimeUnit = null;
     String odOutputFilename = null;
     String odPathOutputFilename = null;
     int maxIterations = DEFAULT_MAX_ITERATIONS;
@@ -136,13 +136,13 @@ public class TntpMain {
         final String outputSelection = outputTimeUnitValue.substring(0, 1).toUpperCase();
         switch (outputSelection) {
           case "H":
-            outputTimeUnit = Units.HOUR;
+            outputTimeUnit = Unit.HOUR;
             break;
           case "M":
-            outputTimeUnit = Units.MINUTE;
+            outputTimeUnit = Unit.MINUTE;
             break;
           case "S":
-            outputTimeUnit = Units.SECOND;
+            outputTimeUnit = Unit.SECOND;
             break;
           default:
             final String errorMessage = "Argument OutputTimeUnit included but does not start with h, m or s.";
@@ -182,7 +182,7 @@ public class TntpMain {
    * @param persistZeroFlow if true record
    * @param maxIterations the maximum number of iterations
    * @param epsilon the epsilon used for convergence
-   * @param outputTimeUnit the output time units
+   * @param outputCostTimeUnit the output time units
    * @param defaultMaximumSpeed the default maximum speed along links
    * @throws PlanItException thrown if there is an error
    */
@@ -196,7 +196,7 @@ public class TntpMain {
       final boolean persistZeroFlow, 
       final int maxIterations, 
       final double epsilon,
-      final Units outputTimeUnit, 
+      final Unit outputCostTimeUnit, 
       final double defaultMaximumSpeed) throws PlanItException {
 
     final boolean isLinkOutputActive = (linkOutputFilename != null);
@@ -239,6 +239,11 @@ public class TntpMain {
     ta.createAndRegisterPhysicalCost(BPRLinkTravelTimeCost.class.getCanonicalName());
     ta.createAndRegisterVirtualCost(FixedConnectoidTravelTimeCost.class.getCanonicalName());
     ta.createAndRegisterSmoothing(MSASmoothing.class.getCanonicalName());
+    
+    boolean adjustCostOutputTimeUnit = false;
+    if (outputCostTimeUnit != null) {
+      adjustCostOutputTimeUnit = true;
+    }     
 
     // DATA OUTPUT CONFIGURATION
     ta.activateOutput(OutputType.LINK);
@@ -263,6 +268,10 @@ public class TntpMain {
       linkOutputTypeConfiguration.removeProperty(OutputPropertyType.TIME_PERIOD_ID);
       linkOutputTypeConfiguration.removeProperty(OutputPropertyType.LINK_SEGMENT_ID);
       linkOutputTypeConfiguration.removeProperty(OutputPropertyType.MAXIMUM_SPEED);
+      
+      if(adjustCostOutputTimeUnit == true) {
+        linkOutputTypeConfiguration.overrideOutputPropertyUnits(OutputPropertyType.LINK_SEGMENT_COST, outputCostTimeUnit);
+      }      
     }
     // OUTPUT FORMAT CONFIGURATION - ORIGIN-DESTINATION
     if (isOdOutputActive) {
@@ -271,6 +280,10 @@ public class TntpMain {
       originDestinationOutputTypeConfiguration.removeProperty(OutputPropertyType.RUN_ID);
       originDestinationOutputTypeConfiguration.addProperty(OutputPropertyType.ORIGIN_ZONE_ID);
       originDestinationOutputTypeConfiguration.addProperty(OutputPropertyType.DESTINATION_ZONE_ID);
+      
+      if(adjustCostOutputTimeUnit == true) {
+        originDestinationOutputTypeConfiguration.overrideOutputPropertyUnits(OutputPropertyType.OD_COST, outputCostTimeUnit);
+      }       
     }
     // OUTPUT FORMAT CONFIGURATION - PATH
     if (isOdPathOutputActive) {
@@ -285,9 +298,6 @@ public class TntpMain {
     // CSVOutputFormatter - Links
     final CSVOutputFormatter csvOutputFormatter =
         (CSVOutputFormatter) project.createAndRegisterOutputFormatter(CSVOutputFormatter.class.getCanonicalName());
-    if (outputTimeUnit != null) {
-      csvOutputFormatter.setOutputTimeUnit(outputTimeUnit);
-    }
     if (isLinkOutputActive) {
       csvOutputFormatter.addCsvFileNamePerOutputType(OutputType.LINK, linkOutputFilename);
     }

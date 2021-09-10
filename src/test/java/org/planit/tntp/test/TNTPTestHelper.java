@@ -26,7 +26,7 @@ import org.planit.tntp.enums.SpeedUnits;
 import org.planit.tntp.project.TntpProject;
 import org.planit.utils.exceptions.PlanItException;
 import org.planit.utils.misc.Pair;
-import org.planit.utils.unit.Units;
+import org.planit.utils.unit.Unit;
 import org.planit.zoning.Zoning;
 
 /**
@@ -85,7 +85,7 @@ public class TNTPTestHelper {
    * @param demandFileLocation the input trips file (required)
    * @param maxIterations the maximum number of iterations
    * @param epsilon the epsilon used for convergence
-   * @param outputTimeUnit the output time units
+   * @param outputCostTimeUnit the output time units
    * @param defaultMaximumSpeed the default maximum speed along links
    * @return a Pair containing the MemoryOutputFormatter and the Tntp object
    * @throws PlanItException thrown if there is an error
@@ -93,7 +93,7 @@ public class TNTPTestHelper {
   public static Pair<MemoryOutputFormatter, TntpInputBuilder4Testing> execute(final String networkFileLocation,
       final String demandFileLocation,
       final int maxIterations,
-      final double epsilon, final Units outputTimeUnit, final double defaultMaximumSpeed) throws PlanItException {
+      final double epsilon, final Unit outputCostTimeUnit, final double defaultMaximumSpeed) throws PlanItException {
 
     // TODO - The following arrangement of columns is correct for Chicago Sketch and Philadelphia.
     // For some other cities the arrangement is different.
@@ -142,6 +142,11 @@ public class TNTPTestHelper {
     ta.createAndRegisterPhysicalCost(BPRLinkTravelTimeCost.class.getCanonicalName());
     ta.createAndRegisterVirtualCost(FixedConnectoidTravelTimeCost.class.getCanonicalName());
     ta.createAndRegisterSmoothing(MSASmoothing.class.getCanonicalName());
+    
+    boolean adjustCostOutputTimeUnit = false;
+    if (outputCostTimeUnit != null) {
+      adjustCostOutputTimeUnit = true;
+    }        
 
     // DATA OUTPUT CONFIGURATION
     ta.activateOutput(OutputType.LINK);
@@ -171,12 +176,13 @@ public class TNTPTestHelper {
     linkOutputTypeConfiguration.addProperty(OutputPropertyType.DOWNSTREAM_NODE_EXTERNAL_ID);
     linkOutputTypeConfiguration.addProperty(OutputPropertyType.UPSTREAM_NODE_EXTERNAL_ID);
     
+    if(adjustCostOutputTimeUnit == true) {
+      linkOutputTypeConfiguration.overrideOutputPropertyUnits(OutputPropertyType.LINK_SEGMENT_COST, outputCostTimeUnit);
+    }     
+    
     // MemoryOutputFormatter - Links
     final MemoryOutputFormatter memoryOutputFormatter = (MemoryOutputFormatter)
         project.createAndRegisterOutputFormatter(OutputFormatter.MEMORY_OUTPUT_FORMATTER);
-    if (outputTimeUnit != null) {
-      memoryOutputFormatter.setOutputTimeUnit(outputTimeUnit);
-    }
 
     // taBuilder.registerOutputFormatter(csvOutputFormatter);
     ta.registerOutputFormatter(memoryOutputFormatter);
