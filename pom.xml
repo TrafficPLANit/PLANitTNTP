@@ -4,13 +4,13 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-    <groupId>org.planit.parentpom</groupId>
+    <groupId>org.goplanit.parentpom</groupId>
     <artifactId>planit-parentpom</artifactId>
 		<version>0.2.1a1</version>
 	</parent>
 
 
-	<groupId>org.planit.tntp</groupId>
+	<groupId>org.goplanit.tntp</groupId>
 	<artifactId>planit-tntp</artifactId>
 	<description>PLANIt Interface For TNTP Format</description>
 
@@ -60,12 +60,12 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>org.planit</groupId>
+			<groupId>org.goplanit</groupId>
 			<artifactId>planit-core</artifactId>
 		</dependency>
 		
 		<dependency>
-			<groupId>org.planit.utils</groupId>
+			<groupId>org.goplanit.utils</groupId>
 			<artifactId>planit-utils</artifactId>
 		</dependency>		
 		
