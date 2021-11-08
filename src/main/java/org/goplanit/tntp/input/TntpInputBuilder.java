@@ -56,7 +56,7 @@ public class TntpInputBuilder extends InputBuilderListener {
   /**
    * Creates the physical network object from the data in the input file
    *
-   * @param network the network object to be populated from the input data
+   * @param macroscopicNetwork the network object to be populated from the input data
    * @throws PlanItException thrown if there is an error reading the input file
    */
   protected void populateMacroscopicNetwork( final MacroscopicNetwork macroscopicNetwork) throws PlanItException {
@@ -76,7 +76,7 @@ public class TntpInputBuilder extends InputBuilderListener {
    *
    * @param demands the Demands object to be populated from the input data
    * @param zoning Zoning object previously defined
-   * @param parameter2 Network to use
+   * @param network Network to use
    * @throws PlanItException thrown if there is an error reading the input file
    */
   protected void populateDemands( final Demands demands, final Zoning zoning, final MacroscopicNetwork network) throws PlanItException {

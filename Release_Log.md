@@ -2,6 +2,12 @@
 
 PLANitTNTP releases.  PLANit reader for TNTP input files.  First released as part of Release 0.0.4
 
+## 0.3.0
+
+* parser is not compliant with reader/writer/converter paradigm. This has been fixed #4
+* updated artifact id to conform with how this generally is setup, i.e. <application>-<subrepo> #5
+* updated packages to conform to new domain org.goplanit.* #6
+
 ## 0.2.0
 
 **enhancements**
