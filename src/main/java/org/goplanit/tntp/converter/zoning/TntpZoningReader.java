@@ -143,7 +143,7 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
       final Node node = getBySourceId(Node.class, zone.getExternalId());
       // TODO - calculate connectoid length
       final double connectoidLength = 1.0;
-      Connectoid connectoid = zoning.odConnectoids.getFactory().registerNew(node, zone, connectoidLength);
+      Connectoid connectoid = zoning.getOdConnectoids().getFactory().registerNew(node, zone, connectoidLength);
       /* XML id */
       connectoid.setXmlId(Long.toString(connectoid.getId()));
       /* external id */
