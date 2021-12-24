@@ -11,7 +11,7 @@ import org.goplanit.converter.BaseReaderImpl;
 import org.goplanit.converter.network.NetworkReader;
 import org.goplanit.cost.physical.BPRLinkTravelTimeCost;
 import org.goplanit.network.MacroscopicNetwork;
-import org.goplanit.network.TransportLayerNetwork;
+import org.goplanit.network.LayeredNetwork;
 import org.goplanit.network.layer.macroscopic.AccessGroupPropertiesFactory;
 import org.goplanit.tntp.TntpHeaderConstants;
 import org.goplanit.tntp.enums.LengthUnits;
@@ -40,7 +40,7 @@ import org.locationtech.jts.geom.Point;
  * @author gman, markr
  *
  */
-public class TntpNetworkReader extends BaseReaderImpl<TransportLayerNetwork<?,?>> implements NetworkReader {
+public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> implements NetworkReader {
   
   /** logger to use */
   private static final Logger LOGGER = Logger.getLogger(TntpNetworkReader.class.getCanonicalName());
@@ -357,7 +357,7 @@ public class TntpNetworkReader extends BaseReaderImpl<TransportLayerNetwork<?,?>
    * {@inheritDoc}
    */  
   @Override
-  public TransportLayerNetwork<?, ?> read() throws PlanItException {
+  public LayeredNetwork<?, ?> read() throws PlanItException {
     LOGGER.fine(LoggingUtils.getClassNameWithBrackets(this)+"populating Physical Network");
 
     final MacroscopicNetwork network = getSettings().getNetworkToPopulate();
