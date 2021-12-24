@@ -267,7 +267,7 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
   
     /** LINK **/
     final double length = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.LENGTH)]) * lengthUnits.getMultiplier();
-    final Link link = networkLayer.getLinks().getFactory().registerNew(upstreamNode, downstreamNode, length);
+    final Link link = networkLayer.getLinks().getFactory().registerNew(upstreamNode, downstreamNode, length, true /* register on node */);
     /* XML id */
     link.setXmlId(Long.toString(link.getId()));
     /* link external id */
