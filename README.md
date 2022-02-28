@@ -238,9 +238,30 @@ PLANit TNTP has the following PLANit specific dependencies (See pom.xml):
 * planit-core
 * planit-utils
 
-Dependencies will be automatically downloaded from the PLANit website, (www.repository.goplanit.org)[http://repository.goplanit.org], or alternatively can be checked-out locally for local development. The shared PLANit Maven configuration can be found in planit-parent-pom which is defined as the parent pom of each PLANit repository.
+Since the repo depends on the parent-pom to find its (shared) repositories, we must let Maven find the parent-pom first, either:
 
-> When developing on multiple PLANit projects locally, including the parent-pom; make sure you install the PLANitParentPom pom.xml before conducting a Maven build (in for example Eclipse), otherwise it resorts to the online repository rather then the local one.
+* localy clone the parent pom repo and run mvn install on it before conducting a Maven build, or
+* add the parent pom repository to your maven (user) settings.xml by adding it to a profile like the following
+
+```xml
+  <profiles>
+    <profile>
+      <activation>
+        <property>
+          <name>!skip</name>
+        </property>
+      </activation>
+    
+      <repositories>
+        <repository>
+          <id>planit-repository.goplanit.org</id>
+          <name>PLANit Repository</name>
+          <url>http://repository.goplanit.org</url>
+        </repository>     
+      </repositories>
+    </profile>
+  </profiles>
+```
 
 ### Maven deploy
 
