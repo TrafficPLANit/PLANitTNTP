@@ -8,6 +8,7 @@ import org.goplanit.tntp.enums.CapacityPeriod;
 import org.goplanit.tntp.enums.LengthUnits;
 import org.goplanit.tntp.enums.NetworkFileColumnType;
 import org.goplanit.tntp.enums.SpeedUnits;
+import org.goplanit.tntp.enums.TimeUnits;
 import org.goplanit.tntp.input.TntpInputBuilder;
 import org.goplanit.utils.exceptions.PlanItException;
 import org.goplanit.zoning.Zoning;
@@ -31,14 +32,15 @@ public class TntpInputBuilder4Testing extends TntpInputBuilder{
    * @param networkFileColumns to use
    * @param speedUnits to use
    * @param lengthUnits to use
+   * @param freeFlowTimeUnits to use
    * @param capacityPeriod to use
    * @param defaultMaximumSpeed to use
    * @throws PlanItException thrown if error
    */
   public TntpInputBuilder4Testing(String networkFileLocation, String demandFileLocation,
       String nodeCoordinateFileLocation, Map<NetworkFileColumnType, Integer> networkFileColumns, SpeedUnits speedUnits,
-      LengthUnits lengthUnits, CapacityPeriod capacityPeriod, double defaultMaximumSpeed) throws PlanItException {
-    super(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, networkFileColumns, speedUnits, lengthUnits,
+      LengthUnits lengthUnits, TimeUnits freeFlowTimeUnits, CapacityPeriod capacityPeriod, double defaultMaximumSpeed) throws PlanItException {
+    super(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, networkFileColumns, speedUnits, lengthUnits, freeFlowTimeUnits,
         capacityPeriod, defaultMaximumSpeed);
   }
 

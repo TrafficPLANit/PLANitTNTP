@@ -23,6 +23,7 @@ import org.goplanit.tntp.enums.CapacityPeriod;
 import org.goplanit.tntp.enums.LengthUnits;
 import org.goplanit.tntp.enums.NetworkFileColumnType;
 import org.goplanit.tntp.enums.SpeedUnits;
+import org.goplanit.tntp.enums.TimeUnits;
 import org.goplanit.tntp.output.formatter.CSVOutputFormatter;
 import org.goplanit.tntp.project.TntpProject;
 import org.goplanit.utils.args.ArgumentParser;
@@ -219,9 +220,10 @@ public class TntpMain {
     final SpeedUnits speedUnits = SpeedUnits.MILES_H;
     final LengthUnits lengthUnits = LengthUnits.MILES; // Both Chicago-Sketch and Philadelphia use miles
     final CapacityPeriod capacityPeriod = CapacityPeriod.HOUR; // Chicago-Sketch only - for Philadelphia use days
+    final TimeUnits freeFlowTravelTimeUnits = TimeUnits.MINUTES;
 
     final TntpProject project = new TntpProject(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation,
-        networkFileColumns, speedUnits, lengthUnits, capacityPeriod, defaultMaximumSpeed);
+        networkFileColumns, speedUnits, lengthUnits, freeFlowTravelTimeUnits, capacityPeriod, defaultMaximumSpeed);
 
     // RAW INPUT START --------------------------------
     final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) project.createAndRegisterInfrastructureNetwork(MacroscopicNetwork.class.getCanonicalName());

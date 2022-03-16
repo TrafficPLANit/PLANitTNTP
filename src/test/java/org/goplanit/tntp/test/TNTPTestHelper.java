@@ -23,6 +23,7 @@ import org.goplanit.tntp.enums.CapacityPeriod;
 import org.goplanit.tntp.enums.LengthUnits;
 import org.goplanit.tntp.enums.NetworkFileColumnType;
 import org.goplanit.tntp.enums.SpeedUnits;
+import org.goplanit.tntp.enums.TimeUnits;
 import org.goplanit.tntp.project.TntpProject;
 import org.goplanit.utils.exceptions.PlanItException;
 import org.goplanit.utils.misc.Pair;
@@ -112,6 +113,8 @@ public class TNTPTestHelper {
     final SpeedUnits speedUnits = SpeedUnits.MILES_H;
     final LengthUnits lengthUnits = LengthUnits.MILES; // Both Chicago-Sketch and Philadelphia use miles
     final CapacityPeriod capacityPeriod = CapacityPeriod.HOUR; // Chicago-Sketch only - for Philadelphia use days
+    
+    final TimeUnits timeUnits = TimeUnits.MINUTES;
 
     final TntpInputBuilder4Testing tntp = new TntpInputBuilder4Testing(
         networkFileLocation, 
@@ -120,6 +123,7 @@ public class TNTPTestHelper {
         networkFileColumns, 
         speedUnits, 
         lengthUnits, 
+        timeUnits,
         capacityPeriod, 
         defaultMaximumSpeed);
     

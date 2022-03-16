@@ -23,6 +23,7 @@ import org.goplanit.tntp.enums.CapacityPeriod;
 import org.goplanit.tntp.enums.LengthUnits;
 import org.goplanit.tntp.enums.NetworkFileColumnType;
 import org.goplanit.tntp.enums.SpeedUnits;
+import org.goplanit.tntp.enums.TimeUnits;
 import org.goplanit.utils.exceptions.PlanItException;
 import org.goplanit.utils.misc.LoggingUtils;
 import org.goplanit.utils.misc.Pair;
@@ -151,6 +152,7 @@ public class TntpInputBuilder extends InputBuilderListener {
    * @param networkFileColumns Map specifying which columns in the network file contain which values
    * @param speedUnits speed units being used
    * @param lengthUnits length units being used
+   * @param freeFlowTimeUnits units used for free flow travel time (other assumed to be in hours)
    * @param capacityPeriod time period for link capacity
    * @param defaultMaximumSpeed default maximum speed along a link
    * @throws PlanItException thrown if there is an error during running
@@ -158,9 +160,10 @@ public class TntpInputBuilder extends InputBuilderListener {
   public TntpInputBuilder(final String networkFileLocation, final String demandFileLocation,
       final Map<NetworkFileColumnType, Integer> networkFileColumns, final SpeedUnits speedUnits,
       final LengthUnits lengthUnits,
+      final TimeUnits freeFlowTimeUnits,
       final CapacityPeriod capacityPeriod, final double defaultMaximumSpeed)
       throws PlanItException {
-    this(networkFileLocation, demandFileLocation, null, networkFileColumns, speedUnits, lengthUnits,
+    this(networkFileLocation, demandFileLocation, null, networkFileColumns, speedUnits, lengthUnits, freeFlowTimeUnits,
         capacityPeriod, defaultMaximumSpeed);
   }
 
@@ -172,15 +175,17 @@ public class TntpInputBuilder extends InputBuilderListener {
    * @param networkFileColumns Map specifying which columns in the network file contain which values
    * @param speedUnits speed units being used
    * @param lengthUnits length units being used
+   * @param freeFlowTimeUnits units being used
    * @param defaultMaximumSpeed default maximum speed along a link
    * @throws PlanItException thrown if there is an error during running
    */
   public TntpInputBuilder(final String networkFileLocation, final String demandFileLocation,
       final Map<NetworkFileColumnType, Integer> networkFileColumns, final SpeedUnits speedUnits,
       final LengthUnits lengthUnits,
+      final TimeUnits freeFlowTimeUnits,
       final double defaultMaximumSpeed)
       throws PlanItException {
-    this(networkFileLocation, demandFileLocation, null, networkFileColumns, speedUnits, lengthUnits, null,
+    this(networkFileLocation, demandFileLocation, null, networkFileColumns, speedUnits, lengthUnits, freeFlowTimeUnits, null,
         defaultMaximumSpeed);
   }
 
@@ -194,16 +199,21 @@ public class TntpInputBuilder extends InputBuilderListener {
    * @param networkFileColumns Map specifying which columns in the network file contain which values
    * @param speedUnits speed units being used
    * @param lengthUnits length units being used
+   * @param freeFlowTimeUnits units being used
    * @param defaultMaximumSpeed default maximum speed along a link
    * @throws PlanItException thrown if there is an error during running
    */
-  public TntpInputBuilder(final String networkFileLocation, final String demandFileLocation,
-      final String nodeCoordinateFileLocation, final String standardResultsFileLocation,
+  public TntpInputBuilder(final String networkFileLocation, 
+      final String demandFileLocation,
+      final String nodeCoordinateFileLocation, 
+      final String standardResultsFileLocation,
       final Map<NetworkFileColumnType, Integer> networkFileColumns,
       final SpeedUnits speedUnits,
-      final LengthUnits lengthUnits, final double defaultMaximumSpeed) throws PlanItException {
+      final LengthUnits lengthUnits, 
+      final TimeUnits freeFlowTimeUnits,
+      final double defaultMaximumSpeed) throws PlanItException {
     this(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, networkFileColumns, speedUnits,
-        lengthUnits, null, defaultMaximumSpeed);
+        lengthUnits, freeFlowTimeUnits, null, defaultMaximumSpeed);
   }
 
   /**
@@ -215,13 +225,14 @@ public class TntpInputBuilder extends InputBuilderListener {
    * @param networkFileColumns Map specifying which columns in the network file contain which values
    * @param speedUnits speed units being used
    * @param lengthUnits length units being used
+   * @param freeFlowTimeUnits units being used
    * @param capacityPeriod time period for link capacity
    * @param defaultMaximumSpeed default maximum speed along links
    * @throws PlanItException thrown if there is an error during running
    */
   public TntpInputBuilder(final String networkFileLocation, final String demandsFileLocation,
       final String nodeCoordinateFileLocation, final Map<NetworkFileColumnType, Integer> networkFileColumns,
-      final SpeedUnits speedUnits, final LengthUnits lengthUnits, final CapacityPeriod capacityPeriod,
+      final SpeedUnits speedUnits, final LengthUnits lengthUnits, final TimeUnits freeFlowTimeUnits, final CapacityPeriod capacityPeriod,
       final double defaultMaximumSpeed) throws PlanItException {
 
     super();
@@ -235,6 +246,7 @@ public class TntpInputBuilder extends InputBuilderListener {
     networkSettings.setLengthUnits(lengthUnits);
     networkSettings.setNetworkFileColumns(networkFileColumns);
     networkSettings.setSpeedUnits(speedUnits);
+    networkSettings.setFreeFlowTravelTimeUnits(freeFlowTimeUnits);
     networkSettings.setDefaultMaximumSpeed(defaultMaximumSpeed);
         
     this.demandsFileLocation = demandsFileLocation;

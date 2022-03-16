@@ -7,6 +7,7 @@ import org.goplanit.tntp.enums.CapacityPeriod;
 import org.goplanit.tntp.enums.LengthUnits;
 import org.goplanit.tntp.enums.NetworkFileColumnType;
 import org.goplanit.tntp.enums.SpeedUnits;
+import org.goplanit.tntp.enums.TimeUnits;
 import org.goplanit.tntp.input.TntpInputBuilder;
 import org.goplanit.utils.exceptions.PlanItException;
 
@@ -27,14 +28,15 @@ public class TntpProject extends CustomPlanItProject {
   * @param networkFileColumns Map specifying which columns in the network input file represent which quantities
   * @param speedUnits units of speed
   * @param lengthUnits units of link length
+  * @param freeFlowTravelTimeUnits to use
   * @param capacityPeriod time period for link capacity
   * @param defaultMaximumSpeed the default maximum speed along link segments
   * @throws PlanItException thrown if there is an error
   */
   public TntpProject(final String networkFileLocation, final String demandFileLocation, final String nodeCoordinateFileLocation,
-      final Map<NetworkFileColumnType, Integer> networkFileColumns, final SpeedUnits speedUnits, final LengthUnits lengthUnits,
+      final Map<NetworkFileColumnType, Integer> networkFileColumns, final SpeedUnits speedUnits, final LengthUnits lengthUnits, final TimeUnits freeFlowTravelTimeUnits,
       final CapacityPeriod capacityPeriod, final double defaultMaximumSpeed) throws PlanItException {
-    super(new TntpInputBuilder(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, networkFileColumns, speedUnits, lengthUnits,capacityPeriod, defaultMaximumSpeed));
+    super(new TntpInputBuilder(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, networkFileColumns, speedUnits, lengthUnits, freeFlowTravelTimeUnits, capacityPeriod, defaultMaximumSpeed));
   }
 
   /**
@@ -45,14 +47,15 @@ public class TntpProject extends CustomPlanItProject {
    * @param networkFileColumns Map specifying which columns in the network input file represent which quantities
    * @param speedUnits units of speed
    * @param lengthUnits units of link length
+   * @param freeFlowTravelTimeUnits to use
    * @param capacityPeriod time period for link capacity
    * @param defaultMaximumSpeed the default maximum speed along link segments
    * @throws PlanItException thrown if there is an error
    */
   public TntpProject(final String networkFileLocation, final String demandFileLocation,
-      final Map<NetworkFileColumnType, Integer> networkFileColumns, final SpeedUnits speedUnits, final LengthUnits lengthUnits,
+      final Map<NetworkFileColumnType, Integer> networkFileColumns, final SpeedUnits speedUnits, final LengthUnits lengthUnits, final TimeUnits freeFlowTravelTimeUnits,
       final CapacityPeriod capacityPeriod, final double defaultMaximumSpeed) throws PlanItException {
-    super(new TntpInputBuilder(networkFileLocation, demandFileLocation, null, networkFileColumns, speedUnits, lengthUnits, capacityPeriod, defaultMaximumSpeed));
+    super(new TntpInputBuilder(networkFileLocation, demandFileLocation, null, networkFileColumns, speedUnits, lengthUnits, freeFlowTravelTimeUnits, capacityPeriod, defaultMaximumSpeed));
   }
 
   /**

@@ -67,13 +67,67 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    * Map containing the BPR parameters for each link segment, if these are specified in the
    * network file (null if default values are being used)
    */
-  private Map<LinkSegment, Pair<Double, Double>> bprParametersForLinkSegmentAndMode;  
+  private Map<LinkSegment, Pair<Double, Double>> bprParametersForLinkSegmentAndMode;    
+  
+  /** Create an estimate for the number of lanes given a certain capacity using {@link #DEFAULT_LANE_CAPACITY_PCUH} and rounding upward 
+   * 
+   * @param capacityPcuH to use
+   * @return number of lanes estimate
+   */
+  private static int getNumLaneEstimate(double capacityPcuH) {
+    if(capacityPcuH > DEFAULT_LANE_CAPACITY_PCUH) {
+      return (int) Math.ceil(capacityPcuH/(double)DEFAULT_LANE_CAPACITY_PCUH);
+    }
+    return 1;
+  }
+  
+  /** Create mode access properties based on provided information
+   * 
+   * @param link to extract length from
+   * @param mode to use
+   * @param maxSpeedKmH to use in case length is not present
+   * @param freeFlowTravelTime known free flow travel time of link
+   * @return
+   */
+  private AccessGroupProperties createAccessGroupProperties(Link link, Mode mode, double maxSpeedKmH, double freeFlowTravelTime) {
+    
+    /* mode properties */
+    double freeflowSpeedKmH = maxSpeedKmH;
+    if(Precision.positive(link.getLengthKm()) && Precision.positive(freeFlowTravelTime)){
+      freeflowSpeedKmH = (link.getLengthKm() / freeFlowTravelTime);
+    }       
+    
+    //TODO: Make this configurable -> now we round to the nearest whole number regarding the free flow speed in order to minimise 
+    //      the number of link segment types needed (due to inaccuracy in tntp files, we often get very close free flow speeds but still slightly different
+    //      causing a large number of types to be created.
+    freeflowSpeedKmH = Math.round(freeflowSpeedKmH);
+    
+    final AccessGroupProperties modeAccessProperties = AccessGroupPropertiesFactory.create(freeflowSpeedKmH, freeflowSpeedKmH, mode);
+    modeAccessProperties.setMaximumSpeedKmH(freeflowSpeedKmH);
+    return modeAccessProperties;
+  }
 
-  
-  public static final int ONE_WAY_AB = 1;
-  public static final int ONE_WAY_BA = 2;
-  public static final int TWO_WAY = 3;  
-  
+  /** create a new link segment type 
+   * 
+   * @param networkLayer to register on
+   * @param capacityPerLane to use
+   * @param modeAccessProperties to use
+   * @param externalId externalId to set
+   * @return created link segment type
+   */
+  private MacroscopicLinkSegmentType createAndRegisterLinkSegmentType(final MacroscopicNetworkLayer networkLayer, double capacityPerLane,
+      final AccessGroupProperties modeAccessProperties, String externalId) {
+    MacroscopicLinkSegmentType linkSegmentType;
+    linkSegmentType = networkLayer.getLinkSegmentTypes().getFactory().registerNew(externalId, capacityPerLane, MacroscopicConstants.DEFAULT_MAX_DENSITY_PCU_KM_LANE);
+    linkSegmentType.setAccessGroupProperties(modeAccessProperties);
+    
+    /* XML id */
+    linkSegmentType.setXmlId(Long.toString(linkSegmentType.getId()));
+    /* external id */
+    linkSegmentType.setExternalId(externalId);
+    return linkSegmentType;
+  }
+
   /**
    * initialise the source id trackers, so we can lay indices on the source id as well for quick lookups
    */
@@ -136,41 +190,24 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     
     Map<NetworkFileColumnType, Integer> supportedColumns = getSettings().getNetworkFileColumns();
     SpeedUnits speedUnits = getSettings().getSpeedUnits();
-    double defaultMaximumSpeed = getSettings().getDefaultMaximumSpeed();
+    Mode mode = networkLayer.getFirstSupportedMode();
     
-    /* max speed */
-    double maxSpeed = defaultMaximumSpeed *  speedUnits.getMultiplier();
-    final double speed = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.MAXIMUM_SPEED)]);
-    if (speed > Precision.EPSILON_6 && speed < Double.POSITIVE_INFINITY) {
-      maxSpeed = speed * speedUnits.getMultiplier();
+    /* max speed km/h */
+    double defaultMaximumSpeed = getSettings().getDefaultMaximumSpeed();
+    double maxSpeedKmH = defaultMaximumSpeed *  speedUnits.getMultiplier();
+    final double speedLimit = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.MAXIMUM_SPEED)]);
+    if (speedLimit > Precision.EPSILON_6 && speedLimit < Double.POSITIVE_INFINITY) {
+      maxSpeedKmH = speedLimit * speedUnits.getMultiplier();
     }
     
     /* free flow travel time */
-    final double freeFlowTravelTime = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.FREE_FLOW_TRAVEL_TIME)]);    
+    final double freeFlowTravelTimeH = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.FREE_FLOW_TRAVEL_TIME)]) * settings.getFreeFlowTravelTimeUnits().getMultiplier();    
     
     /* capacity */
-    final double capacityPerLane = Integer.parseInt(cols[supportedColumns.get(NetworkFileColumnType.CAPACITY_PER_LANE)]) * getSettings().getCapacityPeriod().getMultiplier();
+    double capacityPerLane = Integer.parseInt(cols[supportedColumns.get(NetworkFileColumnType.CAPACITY_PER_LANE)]) * getSettings().getCapacityPeriod().getMultiplier();
     
     /* link segment type */
-    final int linkSegmentTypeSourceId = Integer.parseInt(cols[supportedColumns.get(NetworkFileColumnType.LINK_TYPE)]);    
-    
-    /* mode properties */
-    double freeflowSpeed = defaultMaximumSpeed * speedUnits.getMultiplier();
-    switch (linkSegmentTypeSourceId) {
-      case 1:
-        freeflowSpeed = (link.getLengthKm() / freeFlowTravelTime) * speedUnits.getMultiplier();
-        break;
-      case 2:
-        freeflowSpeed = (link.getLengthKm() / freeFlowTravelTime) * speedUnits.getMultiplier();
-        break;
-      case 3:
-        // already correct fall through
-        break;
-      default:
-        throw new PlanItException("incorrect external id type encountered");
-    }   
-    final AccessGroupProperties modeAccessProperties = AccessGroupPropertiesFactory.create(freeflowSpeed, freeflowSpeed, networkLayer.getFirstSupportedMode());
-  
+    final int linkSegmentTypeSourceId = Integer.parseInt(cols[supportedColumns.get(NetworkFileColumnType.LINK_TYPE)]);         
     final MacroscopicLinkSegment linkSegment = networkLayer.getLinkSegments().getFactory().registerNew(link, true, true);
     /* XML id */
     linkSegment.setXmlId(Long.toString(linkSegment.getId()));
@@ -179,22 +216,72 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     if (linkSegment.getExternalId() != null) {
       registerBySourceId(MacroscopicLinkSegment.class, linkSegment);      
     }    
-  
+    
+    /* NEW */
+    
+    int numLanes = -1;
+    final AccessGroupProperties modeAccessProperties = createAccessGroupProperties(link, mode, maxSpeedKmH, freeFlowTravelTimeH);    
+    
     /** Link segment type **/
     String linkSegmentTypeSourceIdString = String.valueOf(linkSegmentTypeSourceId);
     MacroscopicLinkSegmentType linkSegmentType = getBySourceId(MacroscopicLinkSegmentType.class, linkSegmentTypeSourceIdString);
     if (linkSegmentType == null) {
-      linkSegmentType = networkLayer.getLinkSegmentTypes().getFactory().registerNew(linkSegmentTypeSourceIdString, capacityPerLane, MacroscopicConstants.DEFAULT_MAX_DENSITY_PCU_KM_LANE);
-      linkSegmentType.setAccessGroupProperties(modeAccessProperties);
       
-      /* XML id */
-      linkSegmentType.setXmlId(Long.toString(linkSegmentType.getId()));
-      /* external id */
-      linkSegmentType.setExternalId(linkSegmentTypeSourceIdString);
-      registerBySourceId(MacroscopicLinkSegmentType.class, linkSegmentType);
-    }
+      /* create per lane capacity estimate */
+      numLanes = getNumLaneEstimate(capacityPerLane);
+      capacityPerLane = capacityPerLane/numLanes;
+            
+      linkSegmentType = createAndRegisterLinkSegmentType(networkLayer, capacityPerLane, modeAccessProperties, linkSegmentTypeSourceIdString);
+      registerBySourceId(MacroscopicLinkSegmentType.class, linkSegmentType);     
+            
+    }else {
+      /* determine if link type is compatible with link segment type as we require capacity per lane to be the same across all usages of a particular type. IF not we must create a new type or use an existing comaptible type */
+      double numLaneEstimateMod = capacityPerLane % linkSegmentType.getExplicitCapacityPerLane();  
+      if(Precision.nonZero(numLaneEstimateMod) || !linkSegmentType.getAccessProperties(mode).isEqualExceptForModes(modeAccessProperties)) {
+        /* cannot be matched to existing (referenced) TNTP link segment type */
+        numLanes = getNumLaneEstimate(capacityPerLane);  
+        double expectedCapacityPerLane = capacityPerLane / numLanes;
+
+        /* find first match with equal capacity and mode properties */
+        MacroscopicLinkSegmentType match = networkLayer.getLinkSegmentTypes().toCollection().stream().filter(
+            ls -> Precision.equal(ls.getExplicitCapacityPerLane(), expectedCapacityPerLane)).filter(
+                ls -> ls.getAccessProperties(mode).isEqualExceptForModes(modeAccessProperties)).findFirst().orElse(null);       
+        if(match != null) {
+          linkSegmentType = match;
+          LOGGER.warning(String.format("TNTP Link %s (nodes %s,%s) with capacity %.2f assigned to alternative type (%s) [%.2f capacity per lane, %.2f speed limit (km/h)] because TNTP type properties vary across links, this is not allowed in PLANit",
+              link.getExternalId(), link.getVertexA().getExternalId(), link.getVertexB().getExternalId(), capacityPerLane, match.getXmlId(), match.getExplicitCapacityPerLane(), match.getMaximumSpeedKmH(mode)));
+        }else {
+          /* no match exists, create new type */
+          linkSegmentType = createAndRegisterLinkSegmentType(networkLayer, expectedCapacityPerLane, modeAccessProperties, linkSegmentTypeSourceIdString);
+          LOGGER.warning(String.format("TNTP Link %s (nodes %s,%s) with capacity %.2f remains unmatched, created new type %s [%.2f capacity per lane, %.2f speed limit (km/h)]",
+              link.getExternalId(), link.getVertexA().getExternalId(), link.getVertexB().getExternalId(), capacityPerLane, linkSegmentType.getXmlId(), linkSegmentType.getExplicitCapacityPerLane(), linkSegmentType.getMaximumSpeedKmH(mode)));          
+        }        
+      }else {
+        /* capacity per lane can be matched, determine number of lanes */
+        numLanes = (int) Math.round(capacityPerLane/linkSegmentType.getExplicitCapacityPerLane());
+      }
+    }    
+    
+    linkSegment.setNumberOfLanes(numLanes);
     linkSegment.setLinkSegmentType(linkSegmentType);    
-    linkSegment.getLinkSegmentType().getAccessProperties(networkLayer.getFirstSupportedMode()).setMaximumSpeedKmH(maxSpeed);
+  
+    /* OLD */
+    
+//    /** Link segment type **/
+//    String linkSegmentTypeSourceIdString = String.valueOf(linkSegmentTypeSourceId);
+//    MacroscopicLinkSegmentType linkSegmentType = getBySourceId(MacroscopicLinkSegmentType.class, linkSegmentTypeSourceIdString);
+//    if (linkSegmentType == null) {
+//      linkSegmentType = networkLayer.getLinkSegmentTypes().getFactory().registerNew(linkSegmentTypeSourceIdString, capacityPerLane, MacroscopicConstants.DEFAULT_MAX_DENSITY_PCU_KM_LANE);
+//      linkSegmentType.setAccessGroupProperties(modeAccessProperties);
+//      
+//      /* XML id */
+//      linkSegmentType.setXmlId(Long.toString(linkSegmentType.getId()));
+//      /* external id */
+//      linkSegmentType.setExternalId(linkSegmentTypeSourceIdString);
+//      registerBySourceId(MacroscopicLinkSegmentType.class, linkSegmentType);
+//    }
+//    linkSegment.setLinkSegmentType(linkSegmentType);    
+//    linkSegment.getLinkSegmentType().getAccessProperties(networkLayer.getFirstSupportedMode()).setMaximumSpeedKmH(maxSpeed);
     
   
     return linkSegment;
@@ -315,14 +402,21 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    * @throws PlanItException thrown if error
    */
   protected TntpNetworkReader(TntpNetworkReaderSettings networkSettings, final IdGroupingToken idToken) throws PlanItException {
-    this.settings = networkSettings;
-    this.networkToPopulate = new MacroscopicNetwork(idToken);    
+    this(networkSettings, new MacroscopicNetwork(idToken));    
   }
 
   protected TntpNetworkReader(TntpNetworkReaderSettings settings, LayeredNetwork<?, ?> network) {
     this.settings = settings;
     this.networkToPopulate = (MacroscopicNetwork) network;
   }
+
+  public static final int ONE_WAY_AB = 1;
+
+  public static final int ONE_WAY_BA = 2;
+
+  public static final int TWO_WAY = 3;
+
+  public static final int DEFAULT_LANE_CAPACITY_PCUH = 2000;
 
   /**
    * {@inheritDoc}

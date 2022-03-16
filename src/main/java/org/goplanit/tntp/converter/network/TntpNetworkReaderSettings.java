@@ -7,6 +7,7 @@ import org.goplanit.tntp.enums.CapacityPeriod;
 import org.goplanit.tntp.enums.LengthUnits;
 import org.goplanit.tntp.enums.NetworkFileColumnType;
 import org.goplanit.tntp.enums.SpeedUnits;
+import org.goplanit.tntp.enums.TimeUnits;
 
 /**
  * Settings for Tntp network reader
@@ -39,12 +40,17 @@ public class TntpNetworkReaderSettings implements ConverterReaderSettings {
   /**
    * Units of speed used in network input file
    */
-  private SpeedUnits speedUnits;
+  private SpeedUnits speedUnits = SpeedUnits.KM_H;
 
   /**
    * Units of length used in network input file
    */
-  private LengthUnits lengthUnits;
+  private LengthUnits lengthUnits = LengthUnits.KM;
+  
+  /**
+   * Units of free flow travel time used in network input file
+   */
+  private TimeUnits freeFlowTravelTimeUnits = TimeUnits.HOURS;  
 
   /**
    * Time period for link capacity, default HOUR
@@ -128,6 +134,14 @@ public class TntpNetworkReaderSettings implements ConverterReaderSettings {
 
   public void setCoordinateReferenceSystem(String coordinateReferenceSystem) {
     this.coordinateReferenceSystem = coordinateReferenceSystem;
+  }
+
+  public TimeUnits getFreeFlowTravelTimeUnits() {
+    return freeFlowTravelTimeUnits;
+  }
+
+  public void setFreeFlowTravelTimeUnits(TimeUnits freeFlowTravelTimeUnits) {
+    this.freeFlowTravelTimeUnits = freeFlowTravelTimeUnits;
   }  
 
 }
