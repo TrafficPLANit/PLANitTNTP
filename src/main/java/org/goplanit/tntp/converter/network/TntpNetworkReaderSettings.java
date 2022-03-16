@@ -24,7 +24,12 @@ public class TntpNetworkReaderSettings implements ConverterReaderSettings {
   /**
    * node coordinate data file
    */
-  private String nodeCoordinateFile;    
+  private String nodeCoordinateFile;   
+  
+  /** 
+   * coordinate reference system of the source node file
+   */
+  private String coordinateReferenceSystem;
     
   /**
    * Map specifying which columns in the network file contain which values
@@ -115,6 +120,14 @@ public class TntpNetworkReaderSettings implements ConverterReaderSettings {
 
   public void setNodeCoordinateFile(String nodeCoordinateFile) {
     this.nodeCoordinateFile = nodeCoordinateFile;
+  }
+
+  public String getCoordinateReferenceSystem() {
+    return coordinateReferenceSystem;
+  }
+
+  public void setCoordinateReferenceSystem(String coordinateReferenceSystem) {
+    this.coordinateReferenceSystem = coordinateReferenceSystem;
   }  
 
 }

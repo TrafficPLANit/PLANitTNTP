@@ -18,6 +18,7 @@ import org.goplanit.tntp.enums.LengthUnits;
 import org.goplanit.tntp.enums.NetworkFileColumnType;
 import org.goplanit.tntp.enums.SpeedUnits;
 import org.goplanit.utils.exceptions.PlanItException;
+import org.goplanit.utils.geo.PlanitCrsUtils;
 import org.goplanit.utils.geo.PlanitJtsUtils;
 import org.goplanit.utils.id.IdGroupingToken;
 import org.goplanit.utils.macroscopic.MacroscopicConstants;
@@ -341,7 +342,14 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     if(!networkToPopulate.getTransportLayers().isEmpty()) {
       throw new PlanItException("Error cannot populate non-empty network");
     }
-
+    
+    if(getSettings().getCoordinateReferenceSystem()!=null) {
+      var sourceCrs = PlanitCrsUtils.createCoordinateReferenceSystem(settings.getCoordinateReferenceSystem());
+      networkToPopulate.setCoordinateReferenceSystem(sourceCrs);
+    }
+    LOGGER.info(String.format("Source CRS set to %s : %s", settings.getCoordinateReferenceSystem(), networkToPopulate.getCoordinateReferenceSystem().getName()));    
+    
+    
     initialiseSourceIdTrackers();
     
     File networkFile = null;
@@ -356,8 +364,7 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     
     /* TNTP only has one mode, define it here */
     Mode mode = networkToPopulate.getModes().getFactory().registerNew(PredefinedModeType.CAR);
-    /* external id */
-    mode.setExternalId("1"); //TODO wrong because no external id is available, but tests use it --> refactor
+    mode.setXmlId("1"); 
     registerBySourceId(Mode.class, mode);    
     
     /* TNTP only compatible with parsing a single network layer, so create it */
