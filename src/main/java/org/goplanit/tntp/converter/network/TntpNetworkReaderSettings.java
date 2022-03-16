@@ -3,7 +3,6 @@ package org.goplanit.tntp.converter.network;
 import java.util.Map;
 
 import org.goplanit.converter.ConverterReaderSettings;
-import org.goplanit.network.MacroscopicNetwork;
 import org.goplanit.tntp.enums.CapacityPeriod;
 import org.goplanit.tntp.enums.LengthUnits;
 import org.goplanit.tntp.enums.NetworkFileColumnType;
@@ -17,9 +16,16 @@ import org.goplanit.tntp.enums.SpeedUnits;
  */
 public class TntpNetworkReaderSettings implements ConverterReaderSettings {
   
-  /** the network to populate */
-  private MacroscopicNetwork networkToPopulate;
+  /**
+   * network data file
+   */
+  private String networkFile;
   
+  /**
+   * node coordinate data file
+   */
+  private String nodeCoordinateFile;    
+    
   /**
    * Map specifying which columns in the network file contain which values
    */
@@ -95,12 +101,20 @@ public class TntpNetworkReaderSettings implements ConverterReaderSettings {
     this.defaultMaximumSpeed = defaultMaximumSpeed;
   }
 
-  public MacroscopicNetwork getNetworkToPopulate() {
-    return networkToPopulate;
+  public String getNetworkFile() {
+    return networkFile;
   }
 
-  public void setNetworkToPopulate(final MacroscopicNetwork networkToPopulate) {
-    this.networkToPopulate = networkToPopulate;
+  public void setNetworkFile(String networkFile) {
+    this.networkFile = networkFile;
+  }
+
+  public String getNodeCoordinateFile() {
+    return nodeCoordinateFile;
+  }
+
+  public void setNodeCoordinateFile(String nodeCoordinateFile) {
+    this.nodeCoordinateFile = nodeCoordinateFile;
   }  
 
 }

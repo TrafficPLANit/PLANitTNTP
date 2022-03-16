@@ -19,6 +19,7 @@ import org.goplanit.tntp.enums.NetworkFileColumnType;
 import org.goplanit.tntp.enums.SpeedUnits;
 import org.goplanit.utils.exceptions.PlanItException;
 import org.goplanit.utils.geo.PlanitJtsUtils;
+import org.goplanit.utils.id.IdGroupingToken;
 import org.goplanit.utils.macroscopic.MacroscopicConstants;
 import org.goplanit.utils.math.Precision;
 import org.goplanit.utils.misc.LoggingUtils;
@@ -45,16 +46,9 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
   /** logger to use */
   private static final Logger LOGGER = Logger.getLogger(TntpNetworkReader.class.getCanonicalName());
   
-  /**
-   * network data file
-   */
-  private final File networkFile;
-  
-  /**
-   * node coordinate data file
-   */
-  private final File nodeCoordinateFile;  
-  
+  /** the network to populate */
+  private MacroscopicNetwork networkToPopulate;  
+      
   /** settings to use */
   private final TntpNetworkReaderSettings settings;
     
@@ -209,9 +203,10 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    * Update the node coordinates from the node coordinate file
    *
    * @param network the physical network object to be populated from the input data
+   * @param nodeCoordinateFile file used
    * @throws PlanItException thrown if there is an error reading the input file
    */
-  private void updateNodeCoordinatesFromFile(final MacroscopicNetworkLayer network) throws PlanItException {
+  private void updateNodeCoordinatesFromFile(final MacroscopicNetworkLayer network, File nodeCoordinateFile) throws PlanItException {
     try (Scanner scanner = new Scanner(nodeCoordinateFile)) {
       while (scanner.hasNextLine()) {
         final String line = scanner.nextLine().trim();
@@ -309,17 +304,6 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     final Pair<Double, Double> alphaBeta = Pair.of(alpha, beta);
     bprParametersForLinkSegmentAndMode.put(linkSegment, alphaBeta);
   }  
-
-  /**
-   * Constructor
-   * 
-   * @param networkFileLocation to use
-   * @param nodeCoordinateFileLocation to use 
-   * @throws PlanItException thrown if error
-   */
-  public TntpNetworkReader(String networkFileLocation, String nodeCoordinateFileLocation) throws PlanItException {    
-    this(networkFileLocation, nodeCoordinateFileLocation, null);
-  }
   
   /**
    * Constructor
@@ -329,20 +313,14 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    * @param networkSettings to use, when null new instance is created
    * @throws PlanItException thrown if error
    */
-  public TntpNetworkReader(String networkFileLocation, String nodeCoordinateFileLocation, TntpNetworkReaderSettings networkSettings) throws PlanItException {
-    if(networkSettings==null) {
-      this.settings = new TntpNetworkReaderSettings();
-    }else {
-      this.settings = networkSettings;
-    }
-    
-    try {
-      networkFile = new File(networkFileLocation).getCanonicalFile();
-      nodeCoordinateFile = (nodeCoordinateFileLocation == null) ? null : new File(nodeCoordinateFileLocation).getCanonicalFile();            
-    } catch (final Exception e) {
-      LOGGER.severe(e.getMessage());
-      throw new PlanItException("Error in construction of TNTP",e);
-    }
+  protected TntpNetworkReader(TntpNetworkReaderSettings networkSettings, final IdGroupingToken idToken) throws PlanItException {
+    this.settings = networkSettings;
+    this.networkToPopulate = new MacroscopicNetwork(idToken);    
+  }
+
+  protected TntpNetworkReader(TntpNetworkReaderSettings settings, LayeredNetwork<?, ?> network) {
+    this.settings = settings;
+    this.networkToPopulate = (MacroscopicNetwork) network;
   }
 
   /**
@@ -359,18 +337,31 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
   @Override
   public LayeredNetwork<?, ?> read() throws PlanItException {
     LOGGER.fine(LoggingUtils.getClassNameWithBrackets(this)+"populating Physical Network");
+    
+    if(!networkToPopulate.getTransportLayers().isEmpty()) {
+      throw new PlanItException("Error cannot populate non-empty network");
+    }
 
-    final MacroscopicNetwork network = getSettings().getNetworkToPopulate();
     initialiseSourceIdTrackers();
     
+    File networkFile = null;
+    File nodeCoordinateFile = null;
+    try {
+      networkFile = new File(settings.getNetworkFile()).getCanonicalFile();
+      nodeCoordinateFile = (settings.getNodeCoordinateFile() == null) ? null : new File(settings.getNodeCoordinateFile()).getCanonicalFile();            
+    } catch (final Exception e) {
+      LOGGER.severe(e.getMessage());
+      throw new PlanItException("Error in constructing files from network and node file location settings of TNTP",e);
+    }    
+    
     /* TNTP only has one mode, define it here */
-    Mode mode = network.getModes().getFactory().registerNew(PredefinedModeType.CAR);
+    Mode mode = networkToPopulate.getModes().getFactory().registerNew(PredefinedModeType.CAR);
     /* external id */
     mode.setExternalId("1"); //TODO wrong because no external id is available, but tests use it --> refactor
     registerBySourceId(Mode.class, mode);    
     
     /* TNTP only compatible with parsing a single network layer, so create it */
-    final MacroscopicNetworkLayer networkLayer = network.getTransportLayers().getFactory().registerNew();
+    final MacroscopicNetworkLayer networkLayer = networkToPopulate.getTransportLayers().getFactory().registerNew();
     networkLayer.registerSupportedMode(mode);
    
     try (Scanner scanner = new Scanner(networkFile)) {
@@ -409,10 +400,10 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     }
 
     if (nodeCoordinateFile != null) {
-      updateNodeCoordinatesFromFile(networkLayer);
+      updateNodeCoordinatesFromFile(networkLayer, nodeCoordinateFile);
     }
     
-    return network;
+    return networkToPopulate;
   }
 
   /**

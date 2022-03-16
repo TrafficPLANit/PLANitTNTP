@@ -16,6 +16,7 @@ import org.goplanit.input.InputBuilderListener;
 import org.goplanit.network.MacroscopicNetwork;
 import org.goplanit.tntp.converter.demands.TntpDemandsReader;
 import org.goplanit.tntp.converter.network.TntpNetworkReader;
+import org.goplanit.tntp.converter.network.TntpNetworkReaderFactory;
 import org.goplanit.tntp.converter.network.TntpNetworkReaderSettings;
 import org.goplanit.tntp.converter.zoning.TntpZoningReader;
 import org.goplanit.tntp.enums.CapacityPeriod;
@@ -40,11 +41,7 @@ public class TntpInputBuilder extends InputBuilderListener {
 
   /** the logger */
   private static final Logger LOGGER = Logger.getLogger(TntpInputBuilder.class.getCanonicalName());
-  
-  private final String networkFileLocation;
-  
-  private final String nodeCoordinateFileLocation;
-  
+    
   private final TntpNetworkReaderSettings networkSettings;
   
   private final String demandsFileLocation;
@@ -61,8 +58,7 @@ public class TntpInputBuilder extends InputBuilderListener {
    */
   protected void populateMacroscopicNetwork( final MacroscopicNetwork macroscopicNetwork) throws PlanItException {
        
-    TntpNetworkReader networkReader = new TntpNetworkReader(networkFileLocation, nodeCoordinateFileLocation, networkSettings);    
-    networkReader.getSettings().setNetworkToPopulate(macroscopicNetwork);
+    TntpNetworkReader networkReader = TntpNetworkReaderFactory.create(networkSettings, macroscopicNetwork);    
 
     /* parse */
     networkReader.read();
@@ -109,7 +105,7 @@ public class TntpInputBuilder extends InputBuilderListener {
     }
     final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) parameter1;
     
-    TntpZoningReader zoningReader = new TntpZoningReader(networkFileLocation);    
+    TntpZoningReader zoningReader = new TntpZoningReader(networkSettings.getNetworkFile());    
     /* prep */
     zoningReader.getSettings().setZoningToPopulate(zoning);
     zoningReader.getSettings().setReferenceNetwork(macroscopicNetwork);
@@ -232,8 +228,8 @@ public class TntpInputBuilder extends InputBuilderListener {
 
     /* network reader */
     this.networkSettings = new TntpNetworkReaderSettings();
-    this.networkFileLocation = networkFileLocation;
-    this.nodeCoordinateFileLocation = nodeCoordinateFileLocation;
+    networkSettings.setNetworkFile(networkFileLocation);
+    networkSettings.setNodeCoordinateFile(nodeCoordinateFileLocation);
     
     networkSettings.setCapacityPeriod((capacityPeriod == null) ? CapacityPeriod.HOUR : capacityPeriod);
     networkSettings.setLengthUnits(lengthUnits);
