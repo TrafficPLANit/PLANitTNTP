@@ -19,6 +19,7 @@ import org.goplanit.tntp.converter.network.TntpNetworkReader;
 import org.goplanit.tntp.converter.network.TntpNetworkReaderFactory;
 import org.goplanit.tntp.converter.network.TntpNetworkReaderSettings;
 import org.goplanit.tntp.converter.zoning.TntpZoningReader;
+import org.goplanit.tntp.converter.zoning.TntpZoningReaderFactory;
 import org.goplanit.tntp.enums.CapacityPeriod;
 import org.goplanit.tntp.enums.LengthUnits;
 import org.goplanit.tntp.enums.NetworkFileColumnType;
@@ -106,10 +107,7 @@ public class TntpInputBuilder extends InputBuilderListener {
     }
     final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) parameter1;
     
-    TntpZoningReader zoningReader = new TntpZoningReader(networkSettings.getNetworkFile());    
-    /* prep */
-    zoningReader.getSettings().setZoningToPopulate(zoning);
-    zoningReader.getSettings().setReferenceNetwork(macroscopicNetwork);
+    TntpZoningReader zoningReader = TntpZoningReaderFactory.create(networkSettings.getNetworkFile(), macroscopicNetwork, zoning);    
         
     /* parse */
     zoningReader.read();

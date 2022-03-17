@@ -36,10 +36,10 @@ import org.goplanit.zoning.Zoning;
  * @author gman6028
  *
  */
-public class TNTPTestHelper {
+public class TntpTestHelper {
 
   /** the logger */
-  private static final Logger LOGGER = Logger.getLogger(TNTPTestHelper.class.getCanonicalName());
+  private static final Logger LOGGER = Logger.getLogger(TntpTestHelper.class.getCanonicalName());
 
 
   public static final int DEFAULT_MAX_ITERATIONS = 1;

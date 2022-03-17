@@ -30,7 +30,7 @@ import org.junit.Test;
  * @author gman6028
  *
  */
-public class TNTPTest {
+public class TntpTest {
 
   /** the logger */
   private static Logger LOGGER = null;
@@ -39,7 +39,7 @@ public class TNTPTest {
   @BeforeClass
   public static void setUp() throws Exception {
     if (LOGGER == null) {
-      LOGGER = Logging.createLogger(TNTPTest.class);
+      LOGGER = Logging.createLogger(TntpTest.class);
     }
   }
 
@@ -65,17 +65,17 @@ public class TNTPTest {
     final String standardResultsFileLocation = "src\\test\\resources\\ChicagoSketch\\ChicagoSketch_flow.tntp";
     final Unit outputTimeUnit = null;
     final int maxIterations = 100;
-    final double epsilon = TNTPTestHelper.DEFAULT_CONVERGENCE_EPSILON;
+    final double epsilon = TntpTestHelper.DEFAULT_CONVERGENCE_EPSILON;
     final double defaultMaximumSpeed = 25.0;
     IdGenerator.reset();
 
     try {
       final Pair<MemoryOutputFormatter, TntpInputBuilder4Testing> testOutput =
-          TNTPTestHelper.execute(networkFileLocation, demandFileLocation, maxIterations, epsilon, outputTimeUnit, defaultMaximumSpeed);
+          TntpTestHelper.execute(networkFileLocation, demandFileLocation, maxIterations, epsilon, outputTimeUnit, defaultMaximumSpeed);
       final MemoryOutputFormatter memoryOutputFormatter = testOutput.first();
       final TntpInputBuilder4Testing tntp = testOutput.second();
 
-      final Map<String, Map<String, double[]>> resultsMap = TNTPTestHelper.parseStandardResultsFile(standardResultsFileLocation);
+      final Map<String, Map<String, double[]>> resultsMap = TntpTestHelper.parseStandardResultsFile(standardResultsFileLocation);
       final TimePeriod timePeriod = tntp.getDemands().timePeriods.findFirst(tp -> tp.getExternalId().equals("1"));
       final int iterationIndex = memoryOutputFormatter.getLastIteration();
       final Mode mode = tntp.getMacroscopicNetwork().getModes().getFirst();

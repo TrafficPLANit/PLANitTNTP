@@ -39,7 +39,8 @@ public class TntpNetworkReaderFactory {
   /** Create a TNTPNetworkReader which will create its own macroscopic network and non-locale specific 
    *  defaults for any right hand driving country
    * 
-   * @param inputDirectory to use (directory only, find first compatible file)
+   * @param networkInputFile to use
+   * @param nodeInputFile to use
    * @return created TNTP network reader
    */
   public static TntpNetworkReader create(final String networkInputFile, final String nodeInputFile) {

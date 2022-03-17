@@ -2,7 +2,6 @@ package org.goplanit.tntp.converter.zoning;
 
 import org.goplanit.converter.ConverterReaderSettings;
 import org.goplanit.network.MacroscopicNetwork;
-import org.goplanit.zoning.Zoning;
 
 /**
  * Settings for the Tntp zoning reader
@@ -14,39 +13,42 @@ public class TntpZoningReaderSettings implements ConverterReaderSettings {
   
   /** the network this zoning relates to */
   protected MacroscopicNetwork referenceNetwork;  
+    
+  /**
+   * network data file to extract zones from
+   */
+  private String networkFileLocation;
   
-  /** the zoning to populate */
-  protected Zoning zoningToPopulate;
-      
-  public Zoning getZoningToPopulate() {
-    return zoningToPopulate;
-  }
-
-  public void setZoningToPopulate(Zoning zoningToPopulate) {
-    this.zoningToPopulate = zoningToPopulate;
-  }
-
-  /** Reference network for the zoning
-   * 
-   * @return reference network
+  /**
+   * Default constructor
    */
-  public MacroscopicNetwork getReferenceNetwork() {
-    return referenceNetwork;
-  }
-
-  /** Reference network for the zoning
-   * 
-   * @param referenceNetwork to use
-   */
-  public void setReferenceNetwork(MacroscopicNetwork referenceNetwork) {
-    this.referenceNetwork = referenceNetwork;
+  public TntpZoningReaderSettings() {
+    setNetworkFileLocation(null);
   }  
+      
+  /** Constructor
+   * 
+   * @param networkFileLocation to use
+   */
+  public TntpZoningReaderSettings(String networkFileLocation) {
+    this();
+    this.setNetworkFileLocation(networkFileLocation);
+  }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void reset() {  
+  public void reset() { 
+    networkFileLocation = null;
+  }
+
+  public String getNetworkFileLocation() {
+    return networkFileLocation;
+  }
+
+  public void setNetworkFileLocation(String networkFileLocation) {
+    this.networkFileLocation = networkFileLocation;
   }
   
   // GETTERS/SETTERS    
