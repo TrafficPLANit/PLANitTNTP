@@ -13,11 +13,16 @@ import org.goplanit.utils.misc.LoggingUtils;
 import org.goplanit.utils.network.layer.macroscopic.MacroscopicLinkSegment;
 import org.goplanit.utils.network.layer.physical.Node;
 import org.goplanit.utils.zoning.Connectoid;
+import org.goplanit.utils.zoning.OdZone;
 import org.goplanit.utils.zoning.Zone;
 import org.goplanit.zoning.Zoning;
 
 /**
- * Zoning reader component for TNTP data format
+ * Zoning reader component for TNTP data format. Note that zones are implicitly defined with a single connector in this format, meaning
+ * that the first X entries of the links in the network file represent the connector links to X zones (in metadata). to still accomodate
+ * this in PLANit, we treat the connector links as physical links (as often they are given a physical capacity in TNTP), and in front of it
+ * create a connectoid with a zero length connectoid segment. This also requires one to use a fixed cost connectoid setup since the connectoid
+ * has no length in TNTP.
  * 
  * @author gman, markr
  *
@@ -152,7 +157,7 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
     LOGGER.fine(LoggingUtils.getClassNameWithBrackets(this)+"populating zoning");
     for (long zoneSourceId = 1; zoneSourceId <= noZones; zoneSourceId++) {
       /* ZONE */
-      final Zone zone = zoningToPopulate.odZones.getFactory().registerNew();
+      final OdZone zone = zoningToPopulate.getOdZones().getFactory().registerNew();
       /* XML id */
       zone.setXmlId(Long.toString(zone.getId()));      
       /* external id */
@@ -160,10 +165,16 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
       registerBySourceId(Zone.class, zone);
       
       /* CONNECTOID */
-      final Node node = getBySourceId(Node.class, zone.getExternalId());
-      // TODO - calculate connectoid length
-      final double connectoidLength = 1.0;
+      final Node node = getBySourceId(Node.class, zone.getExternalId());      
+      
+      /*
+       *  connectoid length set to zero as connectors are parsed as physical links in network due to limit flexibility in TNTP format itself,
+       *  Zone/centroid is placed on top of connectoid which in turn is placed on top of the node in the network
+       */
+      final double connectoidLength = 0.0;
       Connectoid connectoid = zoningToPopulate.getOdConnectoids().getFactory().registerNew(node, zone, connectoidLength);
+      zone.getCentroid().setPosition(node.getPosition());
+      
       /* XML id */
       connectoid.setXmlId(Long.toString(connectoid.getId()));
       /* external id */

@@ -44,11 +44,22 @@ public class TntpNetworkReaderFactory {
    * @return created TNTP network reader
    */
   public static TntpNetworkReader create(final String networkInputFile, final String nodeInputFile) {
-    TntpNetworkReader networkReader = create();
+    return create(networkInputFile, nodeInputFile, IdGroupingToken.collectGlobalToken());
+  } 
+  
+  /** Create a TNTPNetworkReader which will create its own macroscopic network and non-locale specific 
+   *  defaults for any right hand driving country
+   * 
+   * @param networkInputFile to use
+   * @param nodeInputFile to use
+   * @return created TNTP network reader
+   */
+  public static TntpNetworkReader create(final String networkInputFile, final String nodeInputFile, final IdGroupingToken idToken) {
+    TntpNetworkReader networkReader = create(idToken);
     networkReader.getSettings().setNetworkFile(networkInputFile);
     networkReader.getSettings().setNodeCoordinateFile(nodeInputFile);
     return networkReader;
-  }  
+  }   
   
   /** Create a TNTPNetworkReader which will create its own macroscopic network and non-locale specific defaults for any right hand driving country
    * 

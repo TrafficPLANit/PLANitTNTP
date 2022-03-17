@@ -56,7 +56,7 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
     initialiseSourceIdMap(Mode.class, Mode::getXmlId, network.getModes());
     
     initialiseSourceIdMap(Zone.class, Zone::getExternalId);
-    getSourceIdContainer(Zone.class).addAll(zoning.odZones);
+    getSourceIdContainer(Zone.class).addAll(zoning.getOdZones());
   } 
   
   /**
@@ -138,7 +138,7 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
       boolean readingMetadata = true;
       Zone originZone = null;
       Map<String, Double> demandToDestination = null;
-      final OdDemandMatrix odDemandMatrix = new OdDemandMatrix(zoning.odZones);
+      final OdDemandMatrix odDemandMatrix = new OdDemandMatrix(zoning.getOdZones());
       while (scanner.hasNextLine()) {
         final String line = scanner.nextLine().trim();
         final char firstChar = (line.isEmpty()) ? 'x' : line.charAt(0);
@@ -149,8 +149,8 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
         if (readingMetadata) {
           if (line.startsWith(TntpHeaderConstants.NUMBER_OF_ZONES_INDICATOR)) {
             final String subLine = line.substring(TntpHeaderConstants.NUMBER_OF_ZONES_INDICATOR.length()).trim();
-            if (zoning.odZones.size() != Integer.parseInt(subLine)) {
-              throw new PlanItException("Network file contained %d but demand file indicates %s zones", zoning.odZones.size(), subLine);
+            if (zoning.getOdZones().size() != Integer.parseInt(subLine)) {
+              throw new PlanItException("Network file contained %d but demand file indicates %s zones", zoning.getOdZones().size(), subLine);
             }
           }
         } else if (!atEndOfMetadata) {
