@@ -15,11 +15,14 @@ import org.goplanit.demands.Demands;
 import org.goplanit.input.InputBuilderListener;
 import org.goplanit.network.MacroscopicNetwork;
 import org.goplanit.tntp.converter.demands.TntpDemandsReader;
+import org.goplanit.tntp.converter.demands.TntpDemandsReaderFactory;
+import org.goplanit.tntp.converter.demands.TntpDemandsReaderSettings;
 import org.goplanit.tntp.converter.network.TntpNetworkReader;
 import org.goplanit.tntp.converter.network.TntpNetworkReaderFactory;
 import org.goplanit.tntp.converter.network.TntpNetworkReaderSettings;
 import org.goplanit.tntp.converter.zoning.TntpZoningReader;
 import org.goplanit.tntp.converter.zoning.TntpZoningReaderFactory;
+import org.goplanit.tntp.converter.zoning.TntpZoningReaderSettings;
 import org.goplanit.tntp.enums.CapacityPeriod;
 import org.goplanit.tntp.enums.LengthUnits;
 import org.goplanit.tntp.enums.NetworkFileColumnType;
@@ -45,8 +48,10 @@ public class TntpInputBuilder extends InputBuilderListener {
   private static final Logger LOGGER = Logger.getLogger(TntpInputBuilder.class.getCanonicalName());
     
   private final TntpNetworkReaderSettings networkSettings;
+    
+  private final TntpDemandsReaderSettings demandsReaderSettings;
   
-  private final String demandsFileLocation;
+  private final TntpZoningReaderSettings zoningReaderSettings;
   
   /** track parsed BPR parameters from network parsing and make available to cost initialisation */
   private Map<LinkSegment, Pair<Double, Double>> bprParametersPerLinkSegment;
@@ -79,12 +84,8 @@ public class TntpInputBuilder extends InputBuilderListener {
    */
   protected void populateDemands( final Demands demands, final Zoning zoning, final MacroscopicNetwork network) throws PlanItException {
     
-    TntpDemandsReader demandsReader = new TntpDemandsReader(demandsFileLocation);
-    /* prep */
-    demandsReader.getSettings().setDemandsToPopulate(demands);
-    demandsReader.getSettings().setReferenceNetwork(network);
-    demandsReader.getSettings().setReferenceZoning(zoning);
-        
+    TntpDemandsReader demandsReader = TntpDemandsReaderFactory.create(demandsReaderSettings, network, zoning, demands);
+            
     /* parse */
     demandsReader.read();
     demandsReader.reset();
@@ -107,7 +108,7 @@ public class TntpInputBuilder extends InputBuilderListener {
     }
     final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) parameter1;
     
-    TntpZoningReader zoningReader = TntpZoningReaderFactory.create(networkSettings.getNetworkFile(), macroscopicNetwork, zoning);    
+    TntpZoningReader zoningReader = TntpZoningReaderFactory.create(zoningReaderSettings, macroscopicNetwork, zoning);    
         
     /* parse */
     zoningReader.read();
@@ -211,7 +212,7 @@ public class TntpInputBuilder extends InputBuilderListener {
       final TimeUnits freeFlowTimeUnits,
       final double defaultMaximumSpeed) throws PlanItException {
     this(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, networkFileColumns, speedUnits,
-        lengthUnits, freeFlowTimeUnits, null, defaultMaximumSpeed);
+        lengthUnits, freeFlowTimeUnits, null, defaultMaximumSpeed);    
   }
 
   /**
@@ -246,8 +247,10 @@ public class TntpInputBuilder extends InputBuilderListener {
     networkSettings.setSpeedUnits(speedUnits);
     networkSettings.setFreeFlowTravelTimeUnits(freeFlowTimeUnits);
     networkSettings.setDefaultMaximumSpeed(defaultMaximumSpeed);
-        
-    this.demandsFileLocation = demandsFileLocation;
+    
+    this.demandsReaderSettings = new TntpDemandsReaderSettings(demandsFileLocation);
+    
+    this.zoningReaderSettings = new TntpZoningReaderSettings(networkFileLocation);
   }
 
   /**
@@ -275,5 +278,17 @@ public class TntpInputBuilder extends InputBuilderListener {
       LOGGER.fine("Event component " + event.getClass().getCanonicalName() + " ignored by TNTP InputBuilder");
     }
   }
+
+  public TntpDemandsReaderSettings getDemandsReaderSettings() {
+    return demandsReaderSettings;
+  }
+  
+  public TntpNetworkReaderSettings getNetworkReaderSettings() {
+    return networkSettings;
+  }
+  
+  public TntpZoningReaderSettings getZoningReaderSettings() {
+    return zoningReaderSettings;
+  }    
 
 }

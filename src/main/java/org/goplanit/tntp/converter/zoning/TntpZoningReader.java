@@ -65,10 +65,10 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
       return false;
     }
     if(referenceNetwork==null || referenceNetwork.getTransportLayers().isEmpty()) {
-      LOGGER.severe("TNTP network is not provided or empty, unable to create zoning");
+      LOGGER.severe("PLANit network is not provided or empty, unable to create zoning");
       return false;
     }    
-    if(referenceNetwork==null || referenceNetwork.getTransportLayers().isEmpty()) {
+    if(zoningToPopulate==null) {
       LOGGER.severe("PLANit zoning instance is not available to populate with TNTP zoning information, unable to create zoning");
       return false;
     }     

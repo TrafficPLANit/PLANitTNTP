@@ -127,6 +127,11 @@ public class TntpTestHelper {
         capacityPeriod, 
         defaultMaximumSpeed);
     
+    var demandsReaderSettings = tntp.getDemandsReaderSettings();
+    /* whole day demand */
+    demandsReaderSettings.setStartTimeSinceMidNight(0, TimeUnits.HOURS);
+    demandsReaderSettings.setTimePeriodDuration(24, TimeUnits.HOURS);
+    
     final TntpProject project = new TntpProject(tntp);
 
     // RAW INPUT START --------------------------------
