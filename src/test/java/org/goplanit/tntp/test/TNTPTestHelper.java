@@ -128,9 +128,9 @@ public class TntpTestHelper {
         defaultMaximumSpeed);
     
     var demandsReaderSettings = tntp.getDemandsReaderSettings();
-    /* whole day demand */
-    demandsReaderSettings.setStartTimeSinceMidNight(0, TimeUnits.HOURS);
-    demandsReaderSettings.setTimePeriodDuration(24, TimeUnits.HOURS);
+    /* 1h peak demand as per */
+    demandsReaderSettings.setStartTimeSinceMidNight(8, TimeUnits.HOURS);
+    demandsReaderSettings.setTimePeriodDuration(1, TimeUnits.HOURS);
     
     final TntpProject project = new TntpProject(tntp);
 

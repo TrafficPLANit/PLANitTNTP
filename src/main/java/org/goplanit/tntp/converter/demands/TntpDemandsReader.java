@@ -51,7 +51,10 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
    * @return true when ok, false otherwise
    */
   private boolean validateSettings() {
-    if(!settings.validateSettings())
+    if(!settings.validateSettings()){
+      LOGGER.severe("PLANit demand reader settings not valid, unable to create demands");
+      return false;
+    }
     if(referenceNetwork==null || referenceNetwork.getTransportLayers().isEmpty()) {
       LOGGER.severe("PLANit reference network is not provided or empty, unable to create demands");
       return false;
@@ -76,7 +79,15 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
     // TNTP only has one time period, define it here
     long timePeriodDurationSeconds = Math.round(settings.getTimePeriodDuration() * settings.getTimePeriodDurationUnit().getMultiplier() * 3600);
     long startAtMidNightSeconds = Math.round(settings.getStartTimeSinceMidNight() * settings.getStartTimeSinceMidNightUnit().getMultiplier() * 3600);
-    return demandsToPopulate.timePeriods.createAndRegisterNewTimePeriod("TNTP-period", startAtMidNightSeconds, timePeriodDurationSeconds);
+    var timePeriod = demandsToPopulate.timePeriods.createAndRegisterNewTimePeriod("TNTP-period", startAtMidNightSeconds, timePeriodDurationSeconds);
+    
+    /* XML id */
+    timePeriod.setXmlId(timePeriod.getDescription());
+    /* external id */
+    timePeriod.setExternalId("1"); //TODO wrong because no external id is available, but tests use it --> refactor    
+    registerBySourceId(TimePeriod.class, timePeriod);
+    
+    return timePeriod;
   }
 
   /** Create TNTP default (single) user class
@@ -90,7 +101,9 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
       throw new PlanItException("TNTP demands only support single mode, found more than one on reference network");
     }
     var mode = referenceNetwork.getModes().getFirst();
-    return demandsToPopulate.userClasses.createAndRegister("TNTP - user class", mode, travellerType);
+    var userClass = demandsToPopulate.userClasses.createAndRegister("TNTP - user class", mode, travellerType);
+    userClass .setXmlId(String.valueOf(userClass .getId()));
+    return userClass; 
   }
 
   /** Create TNTP default (single) traveller type
@@ -99,7 +112,9 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
    * @throws PlanItException thrown if error
    */    
   private TravellerType creatAndRegisterDefaultTravellerType() {
-    return demandsToPopulate.travelerTypes.createAndRegisterNew("TNTP-traveller type");
+    var travellerType =  demandsToPopulate.travelerTypes.createAndRegisterNew("TNTP-traveller type");
+    travellerType.setXmlId(String.valueOf(travellerType.getId()));
+    return travellerType;
   }
 
   /**
@@ -129,22 +144,23 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
    *
    * @param demandToDestination Map of demands (value) from the current origin to specified
    *          destination zones (key)
-   * @param zoning the current zoning object
    * @param originZone the origin zone for all the demand values
    * @param odDemandMatrix the ODDemandMatrix object to be updated
+   * @param mode to use
+   * @param timePeriod to use
    * @return trips for this origin in PcuH
    */
-  private double updateOdDemandMatrix(final Map<String, Double> demandToDestination, final Zoning zoning,
-      final Zone originZone, final OdDemandMatrix odDemandMatrix) {
+  private double updateOdDemandMatrix(final Map<String, Double> demandToDestination, final Zone originZone, final OdDemandMatrix odDemandMatrix, Mode mode, final TimePeriod timePeriod ) {
     
-    double originProductionPcuH = 0;
+    double originProductionVehH = 0;
     for (final String destinationZoneSourceId : demandToDestination.keySet()) {
       final Zone destinationZone = getBySourceId(Zone.class, destinationZoneSourceId);
-      Double destinationDemandPcuH = demandToDestination.get(destinationZoneSourceId);
-      odDemandMatrix.setValue(originZone, destinationZone, demandToDestination.get(destinationZoneSourceId));
-      originProductionPcuH += destinationDemandPcuH>0 ? destinationDemandPcuH : 0; 
+      Double destinationDemandVeh = demandToDestination.get(destinationZoneSourceId);
+      double destinationDemandVehH = destinationDemandVeh>0 ? (destinationDemandVeh*mode.getPcu())/timePeriod.getDurationHours() : 0; 
+      odDemandMatrix.setValue(originZone, destinationZone, destinationDemandVehH);
+      originProductionVehH += destinationDemandVehH; 
     }
-    return originProductionPcuH;
+    return originProductionVehH;
   }  
 
   /** Constructor 
@@ -195,13 +211,7 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
     LOGGER.info("TNTP traveller type: "+ userClass.toString());
     
     var mode = referenceNetwork.getTransportLayers().getFirst().getFirstSupportedMode();
-    
-    /* XML id */
-    timePeriod.setXmlId(timePeriod.getDescription());
-    /* external id */
-    timePeriod.setExternalId("1"); //TODO wrong because no external id is available, but tests use it --> refactor    
-    registerBySourceId(TimePeriod.class, timePeriod);    
-    
+        
     double totalTripsPcuH = 0;
     try (Scanner scanner = new Scanner(new File(settings.getDemandFileLocation()).getCanonicalFile())) {
       boolean readingMetadata = true;
@@ -226,7 +236,7 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
           if ((!line.isEmpty()) && (firstChar != '~')) {
             if (line.startsWith("Origin")) {
               if (demandToDestination != null) {
-                totalTripsPcuH += updateOdDemandMatrix(demandToDestination, referenceZoning, originZone, odDemandMatrix) * mode.getPcu();
+                totalTripsPcuH += updateOdDemandMatrix(demandToDestination, originZone, odDemandMatrix, mode, timePeriod);
               }
               final String[] cols = line.split("\\s+");
               originZone = getBySourceId(Zone.class, cols[1]);
@@ -242,13 +252,13 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
         }
       }
       scanner.close();
-      totalTripsPcuH += updateOdDemandMatrix(demandToDestination, referenceZoning, originZone, odDemandMatrix) * mode.getPcu();
+      totalTripsPcuH += updateOdDemandMatrix(demandToDestination, originZone, odDemandMatrix, mode, timePeriod);
       demandsToPopulate.registerOdDemandPcuHour(timePeriod, mode, odDemandMatrix);
     } catch (final Exception e) {
       LOGGER.severe(e.getMessage());
       throw new PlanItException("Error when populating demands in TNTP",e);
     }
-    LOGGER.info(String.format("TNTP total OD Demand (Pcu/h): %.2f",totalTripsPcuH));
+    LOGGER.info(String.format("TNTP total OD Demand: %.2f (Pcu/h), %.2f (veh/h), %.2f (veh)",totalTripsPcuH, totalTripsPcuH/mode.getPcu(), (totalTripsPcuH*timePeriod.getDurationHours())/mode.getPcu()));
     
     return demandsToPopulate;
   }
