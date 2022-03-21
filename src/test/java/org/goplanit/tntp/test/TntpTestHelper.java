@@ -56,10 +56,8 @@ public class TntpTestHelper {
           resultsMap.put(upstreamNodeExternalId, new HashMap<String, double[]>());
         }
         final String downstreamNodeExternalId = cols[1];
-        if (!cols[2].trim().equals("0")) {
-          final double[] flowCost = {Double.parseDouble(cols[2]), Double.parseDouble(cols[3])};
-          resultsMap.get(upstreamNodeExternalId).put(downstreamNodeExternalId, flowCost);
-        }
+        final double[] flowCost = {Double.parseDouble(cols[2]), Double.parseDouble(cols[3])};
+        resultsMap.get(upstreamNodeExternalId).put(downstreamNodeExternalId, flowCost);
       }
     } catch (final Exception e) {
       LOGGER.severe(e.getMessage());
