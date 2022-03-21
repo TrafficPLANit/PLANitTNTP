@@ -19,6 +19,7 @@ import org.goplanit.tntp.enums.NetworkFileColumnType;
 import org.goplanit.tntp.enums.SpeedUnits;
 import org.goplanit.utils.exceptions.PlanItException;
 import org.goplanit.utils.geo.PlanitCrsUtils;
+import org.goplanit.utils.geo.PlanitJtsCrsUtils;
 import org.goplanit.utils.geo.PlanitJtsUtils;
 import org.goplanit.utils.id.IdGroupingToken;
 import org.goplanit.utils.macroscopic.MacroscopicConstants;
@@ -159,7 +160,7 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     if (getBySourceId(Node.class, nodeSourceId) == null) {      
       node = network.getNodes().getFactory().registerNew();
       /* XML id */
-      node.setXmlId(Long.toString(node.getId()));    
+      node.setXmlId(nodeSourceId);    
       /* external id */
       node.setExternalId(nodeSourceId);
       registerBySourceId(Node.class, node);      
@@ -197,7 +198,7 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     final int linkSegmentTypeSourceId = Integer.parseInt(cols[supportedColumns.get(NetworkFileColumnType.LINK_TYPE)]);         
     final MacroscopicLinkSegment linkSegment = networkLayer.getLinkSegments().getFactory().registerNew(link, directionAb, true);
     /* XML id */
-    linkSegment.setXmlId(Long.toString(linkSegment.getId()));
+    linkSegment.setXmlId(link.getExternalId() + "-" + (directionAb ? "AB" : "BA"));
     /* external id */    
     linkSegment.setExternalId(String.valueOf(tntpLinkSegmentRowId));
     if (linkSegment.getExternalId() != null) {
@@ -217,9 +218,8 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
       /* free flow travel time */
       final double freeFlowTravelTimeH = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.FREE_FLOW_TRAVEL_TIME)]) * settings.getFreeFlowTravelTimeUnits().getMultiplier();    
       
-      /* capacity */
-      double capacityPerLane = Integer.parseInt(cols[supportedColumns.get(NetworkFileColumnType.CAPACITY_PER_LANE)]) * getSettings().getCapacityPeriod().getMultiplier();
-       
+      /* capacity (converted to per lane later) */
+      double capacityPerLane = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.CAPACITY_PER_LANE)]) * getSettings().getCapacityPeriod().getMultiplier();       
           
       int numLanes = -1;
       final AccessGroupProperties modeAccessProperties = createAccessGroupProperties(link, mode, maxSpeedKmH, freeFlowTravelTimeH);    
@@ -278,24 +278,28 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    * @param nodeCoordinateFile file used
    * @throws PlanItException thrown if there is an error reading the input file
    */
-  private void updateNodeCoordinatesFromFile(final MacroscopicNetworkLayer network, File nodeCoordinateFile) throws PlanItException {
+  private void parseNodeCoordinatesFromFile(final MacroscopicNetworkLayer network, File nodeCoordinateFile) throws PlanItException {
     try (Scanner scanner = new Scanner(nodeCoordinateFile)) {
       while (scanner.hasNextLine()) {
-        final String line = scanner.nextLine().trim();
-        line.replaceAll(";", "");
+        String line = scanner.nextLine().trim();
+        line = line.replaceAll(";", "");
         final char firstChar = line.charAt(0);
         if (Character.isDigit(firstChar)) {
           final String[] cols = line.split("\\s+");
           final String nodeSourceId = cols[0];
   
           final Node node = getBySourceId(Node.class, nodeSourceId);
+          if(node == null) {
+            LOGGER.severe(String.format("Referenced node %s in TNTP node file not available in PLANit memory model",nodeSourceId));
+            continue;
+          }
           Point nodePosition = PlanitJtsUtils.createPoint(Double.parseDouble(cols[1]), Double.parseDouble(cols[2]));          
           node.setPosition(nodePosition);
         }
       }
     } catch (final Exception e) {
       LOGGER.severe(e.getMessage());
-      throw new PlanItException("Error when updating node coordinates from file in TNTP",e);
+      throw new PlanItException("Error when parsing node coordinates from file in TNTP",e);
     }
   }
 
@@ -330,7 +334,7 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     LengthUnits lengthUnits = getSettings().getLengthUnits();
    
     final Node upstreamNode = collectOrCreatePlanitNode(networkLayer, cols, NetworkFileColumnType.UPSTREAM_NODE_ID);
-    final Node downstreamNode = collectOrCreatePlanitNode(networkLayer, cols, NetworkFileColumnType.DOWNSTREAM_NODE_ID);      
+    final Node downstreamNode = collectOrCreatePlanitNode(networkLayer, cols, NetworkFileColumnType.DOWNSTREAM_NODE_ID);    
     final double length = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.LENGTH)]) * lengthUnits.getMultiplier();
     
     /** LINK **/
@@ -350,7 +354,9 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     if(link==null) {
       link = networkLayer.getLinks().getFactory().registerNew(upstreamNode, downstreamNode, length, true /* register on node */);
       /* XML id */
-      link.setXmlId(Long.toString(link.getId()));
+      link.setXmlId(link.getId());
+      /* External id */
+      link.setExternalId(link.getXmlId());
     }
     
     /** LINK SEGMENT + TYPE **/    
@@ -437,6 +443,9 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     if(getSettings().getCoordinateReferenceSystem()!=null) {
       var sourceCrs = PlanitCrsUtils.createCoordinateReferenceSystem(settings.getCoordinateReferenceSystem());
       networkToPopulate.setCoordinateReferenceSystem(sourceCrs);
+    }else {
+      LOGGER.info(String.format("Source CRS not set, assuming cartesiam coordinates"));
+      networkToPopulate.setCoordinateReferenceSystem(PlanitJtsCrsUtils.CARTESIANCRS);
     }
     LOGGER.info(String.format("Source CRS set to %s : %s", settings.getCoordinateReferenceSystem(), networkToPopulate.getCoordinateReferenceSystem().getName()));    
     
@@ -498,7 +507,7 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     }
 
     if (nodeCoordinateFile != null) {
-      updateNodeCoordinatesFromFile(networkLayer, nodeCoordinateFile);
+      parseNodeCoordinatesFromFile(networkLayer, nodeCoordinateFile);
     }
     
     return networkToPopulate;

@@ -28,7 +28,7 @@ import org.goplanit.zoning.Zoning;
 /**
  * Helper class for TNTP unit tests
  *
- * @author gman6028
+ * @author gman6028, markr
  *
  */
 public class TntpTestHelper {
@@ -36,14 +36,8 @@ public class TntpTestHelper {
   /** the logger */
   private static final Logger LOGGER = Logger.getLogger(TntpTestHelper.class.getCanonicalName());
 
-
-  public static final int DEFAULT_MAX_ITERATIONS = 1;
-  public static final double DEFAULT_CONVERGENCE_EPSILON = 0.01;
-  public static final double DEFAULT_MAXIMUM_SPEED = 25.0; // this is the default for Chicago Sketch
-                                                           // Type 3 links
-
   /**
-   * Collect the standard results given for testing
+   * Store the standard results given for testing
    *
    * @param standardResultsFileLocation location of file containing standard results
    * @return Map of containing flow and cost values for each upstream and downstream node
@@ -62,8 +56,10 @@ public class TntpTestHelper {
           resultsMap.put(upstreamNodeExternalId, new HashMap<String, double[]>());
         }
         final String downstreamNodeExternalId = cols[1];
-        final double[] flowCost = {Double.parseDouble(cols[2]), Double.parseDouble(cols[3])};
-        resultsMap.get(upstreamNodeExternalId).put(downstreamNodeExternalId, flowCost);
+        if (!cols[2].trim().equals("0")) {
+          final double[] flowCost = {Double.parseDouble(cols[2]), Double.parseDouble(cols[3])};
+          resultsMap.get(upstreamNodeExternalId).put(downstreamNodeExternalId, flowCost);
+        }
       }
     } catch (final Exception e) {
       LOGGER.severe(e.getMessage());
@@ -73,17 +69,20 @@ public class TntpTestHelper {
   }
 
   /**
-   * Top-level method which runs PLANit for TNTP format input using a traditional static assignment
+   * Top-level method which runs PLANit for TNTP format input
    *
-   * @param inputBuilder to use which is assumed to be fully configured
-   * @param maxIterations to apply
-   * @param gapEpsilong to apply
-   * @return project that the assignment was run on and the memory output formatter registered on the assignment
+   * @param networkFileLocation the input network file (required)
+   * @param demandFileLocation the input trips file (required)
+   * @param maxIterations the maximum number of iterations
+   * @param epsilon the epsilon used for convergence
+   * @param outputCostTimeUnit the output time units
+   * @param defaultMaximumSpeed the default maximum speed along links
+   * @return a Pair containing the MemoryOutputFormatter and the Tntp object
    * @throws PlanItException thrown if there is an error
    */
-  public static Pair<TntpProject, MemoryOutputFormatter> execute(final TntpInputBuilder inputBuilder, int maxIterations, double gapEpsilon) throws PlanItException {
-    
-    final TntpProject project = new TntpProject(inputBuilder);
+  public static Pair<TntpProject, MemoryOutputFormatter> execute(final TntpInputBuilder tntp, final int maxIterations, final double epsilon) throws PlanItException {
+   
+    final TntpProject project = new TntpProject(tntp);
 
     // RAW INPUT START --------------------------------
     final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) project.createAndRegisterInfrastructureNetwork(MacroscopicNetwork.class.getCanonicalName());
@@ -101,7 +100,7 @@ public class TntpTestHelper {
     ta.createAndRegisterPhysicalCost(BPRLinkTravelTimeCost.class.getCanonicalName());
     ta.createAndRegisterVirtualCost(FixedConnectoidTravelTimeCost.class.getCanonicalName());
     ta.createAndRegisterSmoothing(MSASmoothing.class.getCanonicalName());
-          
+    
     // DATA OUTPUT CONFIGURATION
     ta.activateOutput(OutputType.LINK);
     final OutputConfiguration outputConfiguration = ta.getOutputConfiguration();
@@ -128,7 +127,7 @@ public class TntpTestHelper {
     linkOutputTypeConfiguration.removeProperty(OutputPropertyType.MAXIMUM_SPEED);
     
     linkOutputTypeConfiguration.addProperty(OutputPropertyType.DOWNSTREAM_NODE_EXTERNAL_ID);
-    linkOutputTypeConfiguration.addProperty(OutputPropertyType.UPSTREAM_NODE_EXTERNAL_ID);   
+    linkOutputTypeConfiguration.addProperty(OutputPropertyType.UPSTREAM_NODE_EXTERNAL_ID);
     
     // MemoryOutputFormatter - Links
     final MemoryOutputFormatter memoryOutputFormatter = (MemoryOutputFormatter)
@@ -139,9 +138,9 @@ public class TntpTestHelper {
 
     // "USER" configuration
     ta.getGapFunction().getStopCriterion().setMaxIterations(maxIterations);
-    ta.getGapFunction().getStopCriterion().setEpsilon(gapEpsilon);
+    ta.getGapFunction().getStopCriterion().setEpsilon(epsilon);
 
     project.executeAllTrafficAssignments();
-    return Pair.of(project,memoryOutputFormatter);
+    return Pair.of(project, memoryOutputFormatter);
   }
 }

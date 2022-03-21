@@ -7,36 +7,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.goplanit.assignment.TrafficAssignment;
-import org.goplanit.assignment.traditionalstatic.TraditionalStaticAssignmentConfigurator;
-import org.goplanit.cost.physical.BPRLinkTravelTimeCost;
-import org.goplanit.cost.virtual.FixedConnectoidTravelTimeCost;
-import org.goplanit.demands.Demands;
 import org.goplanit.logging.Logging;
 import org.goplanit.network.MacroscopicNetwork;
-import org.goplanit.output.configuration.LinkOutputTypeConfiguration;
-import org.goplanit.output.configuration.OutputConfiguration;
 import org.goplanit.output.enums.OutputType;
-import org.goplanit.output.formatter.MemoryOutputFormatter;
 import org.goplanit.output.formatter.MemoryOutputIterator;
-import org.goplanit.output.formatter.OutputFormatter;
 import org.goplanit.output.property.OutputPropertyType;
-import org.goplanit.project.PlanItProjectInput;
-import org.goplanit.sdinteraction.smoothing.MSASmoothing;
 import org.goplanit.tntp.enums.CapacityPeriod;
 import org.goplanit.tntp.enums.LengthUnits;
 import org.goplanit.tntp.enums.NetworkFileColumnType;
 import org.goplanit.tntp.enums.SpeedUnits;
 import org.goplanit.tntp.enums.TimeUnits;
 import org.goplanit.tntp.input.TntpInputBuilder;
-import org.goplanit.tntp.project.TntpProject;
 import org.goplanit.utils.id.IdGenerator;
 import org.goplanit.utils.math.Precision;
-import org.goplanit.utils.misc.Pair;
 import org.goplanit.utils.mode.Mode;
+import org.goplanit.utils.network.layer.MacroscopicNetworkLayer;
 import org.goplanit.utils.time.TimePeriod;
-import org.goplanit.utils.unit.Unit;
-import org.goplanit.zoning.Zoning;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -77,19 +63,19 @@ public class TntpTest {
    */
   @Test
   public void ChicagoSketchTest() {
-    final String networkFileLocation = "src\\test\\resources\\ChicagoSketch\\ChicagoSketch_net.tntp";
-    final String nodeFileLocation = "src\\test\\resources\\ChicagoSketch\\ChicagoSketch_node.tntp";
-    final String demandFileLocation = "src\\test\\resources\\ChicagoSketch\\ChicagoSketch_trips.tntp";
-    final String standardResultsFileLocation = "src\\test\\resources\\ChicagoSketch\\ChicagoSketch_flow.tntp";
-    final int maxIterations = 25;
-    final double epsilon = Precision.EPSILON_6;
-    final double defaultMaximumSpeedMpH = 25.0;
+    final String NETWORK_FILE = "src\\test\\resources\\ChicagoSketch\\ChicagoSketch_net.tntp";
+    final String NODE_FILE = "src\\test\\resources\\ChicagoSketch\\ChicagoSketch_node.tntp";
+    final String DEMANDS_FILE = "src\\test\\resources\\ChicagoSketch\\ChicagoSketch_trips.tntp";
+    final String STANDARD_RESULTS_FILE = "src\\test\\resources\\ChicagoSketch\\ChicagoSketch_flow.tntp";
+    final int MAX_ITERATIONS = 25;
+    final double EPSILON = Precision.EPSILON_6;
+    final double DEFAULT_MAX_SPEED_MPH = 25.0;
     IdGenerator.reset();
 
     try {
       
       /* PREP */
-      final TntpInputBuilder tntp = new TntpInputBuilder(networkFileLocation, nodeFileLocation, demandFileLocation);
+      final TntpInputBuilder tntp = new TntpInputBuilder(NETWORK_FILE, NODE_FILE, DEMANDS_FILE);
             
       // TODO - The following arrangement of columns is correct for Chicago Sketch and Philadelphia.
       // For some other cities the arrangement is different.
@@ -110,7 +96,7 @@ public class TntpTest {
       tntp.getNetworkReaderSettings().setLengthUnits(LengthUnits.MILES);
       tntp.getNetworkReaderSettings().setFreeFlowTravelTimeUnits(TimeUnits.MINUTES);
       tntp.getNetworkReaderSettings().setCapacityPeriod(CapacityPeriod.HOUR);
-      tntp.getNetworkReaderSettings().setDefaultMaximumSpeed(defaultMaximumSpeedMpH);
+      tntp.getNetworkReaderSettings().setDefaultMaximumSpeed(DEFAULT_MAX_SPEED_MPH);
             
       var demandsReaderSettings = tntp.getDemandsReaderSettings();
       /* 1h peak demand as per */
@@ -118,7 +104,7 @@ public class TntpTest {
       demandsReaderSettings.setTimePeriodDuration(1, TimeUnits.HOURS);                
             
       /* EXECUTE */
-      var resultPair = TntpTestHelper.execute(tntp, maxIterations, epsilon);
+      var resultPair = TntpTestHelper.execute(tntp, MAX_ITERATIONS, EPSILON);
       
       /* RESULTS */
       var project = resultPair.first(); // not yet used
@@ -126,7 +112,7 @@ public class TntpTest {
       var demands = project.demands.getFirst();
       var network = (MacroscopicNetwork)project.physicalNetworks.getFirst();
       
-      final Map<String, Map<String, double[]>> resultsMap = TntpTestHelper.parseStandardResultsFile(standardResultsFileLocation);
+      final Map<String, Map<String, double[]>> resultsMap = TntpTestHelper.parseStandardResultsFile(STANDARD_RESULTS_FILE);
       final TimePeriod timePeriod = demands.timePeriods.findFirst(tp -> tp.getExternalId().equals("1"));
       final int iterationIndex = memoryOutputFormatter.getLastIteration();
       final Mode mode = network.getModes().getFirst();
@@ -174,6 +160,70 @@ public class TntpTest {
    */
   @Test
   public void siouxFallsTest() {  
-    
+    final String NETWORK_FILE = "src\\test\\resources\\SiouxFalls\\SiouxFalls_net.tntp";
+    final String NODE_FILE = "src\\test\\resources\\SiouxFalls\\SiouxFalls_node.tntp";
+    final String DEMANDS_FILE = "src\\test\\resources\\SiouxFalls\\SiouxFalls_trips.tntp";
+    @SuppressWarnings("unused")
+    final String STANDARD_RESULTS_FILE = "src\\test\\resources\\SiouxFalls\\SiouxFalls_flow.tntp";
+    final int MAX_ITERATIONS = 25;
+    final double EPSILON = Precision.EPSILON_6;
+    final double DEFAULT_MAX_SPEED_MPH = 25.0;
+    IdGenerator.reset();
+
+    try {
+      
+      /* PREP */
+      final TntpInputBuilder tntp = new TntpInputBuilder(NETWORK_FILE, NODE_FILE, DEMANDS_FILE);
+            
+      // TODO - The following arrangement of columns is correct for Chicago Sketch and Philadelphia.
+      // For some other cities the arrangement is different.
+      final Map<NetworkFileColumnType, Integer> networkFileColumns = new HashMap<NetworkFileColumnType, Integer>();
+      networkFileColumns.put(NetworkFileColumnType.UPSTREAM_NODE_ID, 0);
+      networkFileColumns.put(NetworkFileColumnType.DOWNSTREAM_NODE_ID, 1);
+      networkFileColumns.put(NetworkFileColumnType.CAPACITY_PER_LANE, 2);
+      networkFileColumns.put(NetworkFileColumnType.LENGTH, 3);
+      networkFileColumns.put(NetworkFileColumnType.FREE_FLOW_TRAVEL_TIME, 4);
+      networkFileColumns.put(NetworkFileColumnType.B, 5);
+      networkFileColumns.put(NetworkFileColumnType.POWER, 6);
+      networkFileColumns.put(NetworkFileColumnType.MAXIMUM_SPEED, 7);
+      networkFileColumns.put(NetworkFileColumnType.TOLL, 8);
+      networkFileColumns.put(NetworkFileColumnType.LINK_TYPE, 9);
+      tntp.getNetworkReaderSettings().setNetworkFileColumns(networkFileColumns);
+      
+      tntp.getNetworkReaderSettings().setSpeedUnits( SpeedUnits.MILES_H);
+      tntp.getNetworkReaderSettings().setLengthUnits(LengthUnits.MILES);
+      tntp.getNetworkReaderSettings().setFreeFlowTravelTimeUnits(TimeUnits.MINUTES);
+      tntp.getNetworkReaderSettings().setCapacityPeriod(CapacityPeriod.DAY_12H);
+      tntp.getNetworkReaderSettings().setDefaultMaximumSpeed(DEFAULT_MAX_SPEED_MPH);
+            
+      var demandsReaderSettings = tntp.getDemandsReaderSettings();
+      /* 1h peak demand as per */
+      demandsReaderSettings.setStartTimeSinceMidNight(8, TimeUnits.HOURS);
+      demandsReaderSettings.setTimePeriodDuration(1, TimeUnits.HOURS);                
+            
+      /* EXECUTE */
+      var resultPair = TntpTestHelper.execute(tntp, MAX_ITERATIONS, EPSILON);
+      
+      /* RESULTS */
+      var project = resultPair.first(); // not yet used
+      //var memoryOutputFormatter = resultPair.second();
+      //var demands = project.demands.getFirst();
+      var network = (MacroscopicNetwork)project.physicalNetworks.getFirst();
+      var zoning = project.zonings.getFirst();
+      
+      
+      var networkLayer = (MacroscopicNetworkLayer) network.getLayerByMode(network.getModes().getFirst());
+      assertEquals(networkLayer.getNodes().size(),24);
+      assertEquals(networkLayer.getLinks().size(),38);
+      assertEquals(networkLayer.getLinkSegments().size(),76);
+      
+      assertEquals(zoning.getOdZones().size(),24);
+      
+
+    } catch (final Exception e) {
+      e.printStackTrace();
+      LOGGER.severe(e.getMessage());
+      fail(e.getMessage());
+    }    
   }
 }
