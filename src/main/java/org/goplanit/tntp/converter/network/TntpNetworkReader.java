@@ -399,15 +399,19 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
   /**
    * Constructor
    * 
-   * @param networkFileLocation to use
-   * @param nodeCoordinateFileLocation to use 
-   * @param networkSettings to use, when null new instance is created
-   * @throws PlanItException thrown if error
+   * @param networkSettings to use
+   * @param idToken to use for to be created network
    */
-  protected TntpNetworkReader(TntpNetworkReaderSettings networkSettings, final IdGroupingToken idToken) throws PlanItException {
+  protected TntpNetworkReader(TntpNetworkReaderSettings networkSettings, final IdGroupingToken idToken){
     this(networkSettings, new MacroscopicNetwork(idToken));    
   }
 
+  /**
+   * Constructor
+   * 
+   * @param settings to use
+   * @param network to use 
+   */  
   protected TntpNetworkReader(TntpNetworkReaderSettings settings, LayeredNetwork<?, ?> network) {
     this.settings = settings;
     this.networkToPopulate = (MacroscopicNetwork) network;

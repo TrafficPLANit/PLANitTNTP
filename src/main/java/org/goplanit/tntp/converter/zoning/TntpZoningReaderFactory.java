@@ -15,6 +15,7 @@ public class TntpZoningReaderFactory {
   /** Factory method, will create zoning based on idToken provided and use it to populate when reading in TNTP zoning
    * 
    * @param network to extract references from (if any)
+   * @param idtoken to use
    * @return created TNTP zoning reader
    */
   public static TntpZoningReader create(final MacroscopicNetwork network, final IdGroupingToken idtoken){

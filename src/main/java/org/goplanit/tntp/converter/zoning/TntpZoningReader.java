@@ -45,9 +45,9 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
   private Zoning zoningToPopulate;  
     
   /** Constructor
-   * @param zoningSettings
-   * @param referenceNetwork
-   * @param zoningToPopulate2
+   * @param zoningSettings to use
+   * @param referenceNetwork to use
+   * @param zoningToPopulate to use
    */
   protected TntpZoningReader(TntpZoningReaderSettings zoningSettings, MacroscopicNetwork referenceNetwork, Zoning zoningToPopulate) {
     this.settings = zoningSettings;

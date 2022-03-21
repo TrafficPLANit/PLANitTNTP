@@ -52,6 +52,7 @@ public class TntpNetworkReaderFactory {
    * 
    * @param networkInputFile to use
    * @param nodeInputFile to use
+   * @param idToken to use to network reader
    * @return created TNTP network reader
    */
   public static TntpNetworkReader create(final String networkInputFile, final String nodeInputFile, final IdGroupingToken idToken) {
