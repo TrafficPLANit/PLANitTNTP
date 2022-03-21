@@ -19,15 +19,10 @@ import org.goplanit.output.formatter.MemoryOutputFormatter;
 import org.goplanit.output.formatter.OutputFormatter;
 import org.goplanit.output.property.OutputPropertyType;
 import org.goplanit.sdinteraction.smoothing.MSASmoothing;
-import org.goplanit.tntp.enums.CapacityPeriod;
-import org.goplanit.tntp.enums.LengthUnits;
-import org.goplanit.tntp.enums.NetworkFileColumnType;
-import org.goplanit.tntp.enums.SpeedUnits;
-import org.goplanit.tntp.enums.TimeUnits;
+import org.goplanit.tntp.input.TntpInputBuilder;
 import org.goplanit.tntp.project.TntpProject;
 import org.goplanit.utils.exceptions.PlanItException;
 import org.goplanit.utils.misc.Pair;
-import org.goplanit.utils.unit.Unit;
 import org.goplanit.zoning.Zoning;
 
 /**
@@ -48,7 +43,7 @@ public class TntpTestHelper {
                                                            // Type 3 links
 
   /**
-   * Store the standard results given for testing
+   * Collect the standard results given for testing
    *
    * @param standardResultsFileLocation location of file containing standard results
    * @return Map of containing flow and cost values for each upstream and downstream node
@@ -67,10 +62,8 @@ public class TntpTestHelper {
           resultsMap.put(upstreamNodeExternalId, new HashMap<String, double[]>());
         }
         final String downstreamNodeExternalId = cols[1];
-        if (!cols[2].trim().equals("0")) {
-          final double[] flowCost = {Double.parseDouble(cols[2]), Double.parseDouble(cols[3])};
-          resultsMap.get(upstreamNodeExternalId).put(downstreamNodeExternalId, flowCost);
-        }
+        final double[] flowCost = {Double.parseDouble(cols[2]), Double.parseDouble(cols[3])};
+        resultsMap.get(upstreamNodeExternalId).put(downstreamNodeExternalId, flowCost);
       }
     } catch (final Exception e) {
       LOGGER.severe(e.getMessage());
@@ -80,65 +73,22 @@ public class TntpTestHelper {
   }
 
   /**
-   * Top-level method which runs PLANit for TNTP format input
+   * Top-level method which runs PLANit for TNTP format input using a traditional static assignment
    *
-   * @param networkFileLocation the input network file (required)
-   * @param demandFileLocation the input trips file (required)
-   * @param maxIterations the maximum number of iterations
-   * @param epsilon the epsilon used for convergence
-   * @param outputCostTimeUnit the output time units
-   * @param defaultMaximumSpeed the default maximum speed along links
-   * @return a Pair containing the MemoryOutputFormatter and the Tntp object
+   * @param inputBuilder to use which is assumed to be fully configured
+   * @param maxIterations to apply
+   * @param gapEpsilong to apply
+   * @return project that the assignment was run on and the memory output formatter registered on the assignment
    * @throws PlanItException thrown if there is an error
    */
-  public static Pair<MemoryOutputFormatter, TntpInputBuilder4Testing> execute(final String networkFileLocation,
-      final String demandFileLocation,
-      final int maxIterations,
-      final double epsilon, final Unit outputCostTimeUnit, final double defaultMaximumSpeed) throws PlanItException {
-
-    // TODO - The following arrangement of columns is correct for Chicago Sketch and Philadelphia.
-    // For some other cities the arrangement is different.
-    final Map<NetworkFileColumnType, Integer> networkFileColumns = new HashMap<NetworkFileColumnType, Integer>();
-    networkFileColumns.put(NetworkFileColumnType.UPSTREAM_NODE_ID, 0);
-    networkFileColumns.put(NetworkFileColumnType.DOWNSTREAM_NODE_ID, 1);
-    networkFileColumns.put(NetworkFileColumnType.CAPACITY_PER_LANE, 2);
-    networkFileColumns.put(NetworkFileColumnType.LENGTH, 3);
-    networkFileColumns.put(NetworkFileColumnType.FREE_FLOW_TRAVEL_TIME, 4);
-    networkFileColumns.put(NetworkFileColumnType.B, 5);
-    networkFileColumns.put(NetworkFileColumnType.POWER, 6);
-    networkFileColumns.put(NetworkFileColumnType.MAXIMUM_SPEED, 7);
-    networkFileColumns.put(NetworkFileColumnType.TOLL, 8);
-    networkFileColumns.put(NetworkFileColumnType.LINK_TYPE, 9);
-
-    final SpeedUnits speedUnits = SpeedUnits.MILES_H;
-    final LengthUnits lengthUnits = LengthUnits.MILES; // Both Chicago-Sketch and Philadelphia use miles
-    final CapacityPeriod capacityPeriod = CapacityPeriod.HOUR; // Chicago-Sketch only - for Philadelphia use days
+  public static Pair<TntpProject, MemoryOutputFormatter> execute(final TntpInputBuilder inputBuilder, int maxIterations, double gapEpsilon) throws PlanItException {
     
-    final TimeUnits timeUnits = TimeUnits.MINUTES;
-
-    final TntpInputBuilder4Testing tntp = new TntpInputBuilder4Testing(
-        networkFileLocation, 
-        demandFileLocation, 
-        null,
-        networkFileColumns, 
-        speedUnits, 
-        lengthUnits, 
-        timeUnits,
-        capacityPeriod, 
-        defaultMaximumSpeed);
-    
-    var demandsReaderSettings = tntp.getDemandsReaderSettings();
-    /* 1h peak demand as per */
-    demandsReaderSettings.setStartTimeSinceMidNight(8, TimeUnits.HOURS);
-    demandsReaderSettings.setTimePeriodDuration(1, TimeUnits.HOURS);
-    
-    final TntpProject project = new TntpProject(tntp);
+    final TntpProject project = new TntpProject(inputBuilder);
 
     // RAW INPUT START --------------------------------
     final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) project.createAndRegisterInfrastructureNetwork(MacroscopicNetwork.class.getCanonicalName());
     final Zoning zoning = project.createAndRegisterZoning(macroscopicNetwork);
     final Demands demands = project.createAndRegisterDemands(zoning, macroscopicNetwork);
-    tntp.setCreatedInputs(macroscopicNetwork, zoning, demands);
 
     // RAW INPUT END -----------------------------------
 
@@ -151,12 +101,7 @@ public class TntpTestHelper {
     ta.createAndRegisterPhysicalCost(BPRLinkTravelTimeCost.class.getCanonicalName());
     ta.createAndRegisterVirtualCost(FixedConnectoidTravelTimeCost.class.getCanonicalName());
     ta.createAndRegisterSmoothing(MSASmoothing.class.getCanonicalName());
-    
-    boolean adjustCostOutputTimeUnit = false;
-    if (outputCostTimeUnit != null) {
-      adjustCostOutputTimeUnit = true;
-    }        
-
+          
     // DATA OUTPUT CONFIGURATION
     ta.activateOutput(OutputType.LINK);
     final OutputConfiguration outputConfiguration = ta.getOutputConfiguration();
@@ -183,11 +128,7 @@ public class TntpTestHelper {
     linkOutputTypeConfiguration.removeProperty(OutputPropertyType.MAXIMUM_SPEED);
     
     linkOutputTypeConfiguration.addProperty(OutputPropertyType.DOWNSTREAM_NODE_EXTERNAL_ID);
-    linkOutputTypeConfiguration.addProperty(OutputPropertyType.UPSTREAM_NODE_EXTERNAL_ID);
-    
-    if(adjustCostOutputTimeUnit == true) {
-      linkOutputTypeConfiguration.overrideOutputPropertyUnits(OutputPropertyType.LINK_SEGMENT_COST, outputCostTimeUnit);
-    }     
+    linkOutputTypeConfiguration.addProperty(OutputPropertyType.UPSTREAM_NODE_EXTERNAL_ID);   
     
     // MemoryOutputFormatter - Links
     final MemoryOutputFormatter memoryOutputFormatter = (MemoryOutputFormatter)
@@ -198,9 +139,9 @@ public class TntpTestHelper {
 
     // "USER" configuration
     ta.getGapFunction().getStopCriterion().setMaxIterations(maxIterations);
-    ta.getGapFunction().getStopCriterion().setEpsilon(epsilon);
+    ta.getGapFunction().getStopCriterion().setEpsilon(gapEpsilon);
 
     project.executeAllTrafficAssignments();
-    return Pair.of(memoryOutputFormatter, tntp);
+    return Pair.of(project,memoryOutputFormatter);
   }
 }
