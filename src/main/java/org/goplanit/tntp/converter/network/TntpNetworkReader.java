@@ -218,8 +218,9 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
       /* free flow travel time */
       final double freeFlowTravelTimeH = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.FREE_FLOW_TRAVEL_TIME)]) * settings.getFreeFlowTravelTimeUnits().getMultiplier();    
       
-      /* capacity (converted to per lane later) */
-      double capacityPerLane = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.CAPACITY_PER_LANE)]) * getSettings().getCapacityPeriod().getMultiplier();       
+      /* capacity pcu/h/lane */      
+      double capacityPerHourMultiplier = getSettings().getCapacityPeriodUnits().getMultiplier()/getSettings().getCapacityPeriodDuration();      
+      double capacityPerLane = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.CAPACITY_PER_LANE)]) * capacityPerHourMultiplier;       
           
       int numLanes = -1;
       final AccessGroupProperties modeAccessProperties = createAccessGroupProperties(link, mode, maxSpeedKmH, freeFlowTravelTimeH);    

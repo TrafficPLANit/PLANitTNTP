@@ -23,11 +23,6 @@ import org.goplanit.tntp.converter.network.TntpNetworkReaderSettings;
 import org.goplanit.tntp.converter.zoning.TntpZoningReader;
 import org.goplanit.tntp.converter.zoning.TntpZoningReaderFactory;
 import org.goplanit.tntp.converter.zoning.TntpZoningReaderSettings;
-import org.goplanit.tntp.enums.CapacityPeriod;
-import org.goplanit.tntp.enums.LengthUnits;
-import org.goplanit.tntp.enums.NetworkFileColumnType;
-import org.goplanit.tntp.enums.SpeedUnits;
-import org.goplanit.tntp.enums.TimeUnits;
 import org.goplanit.utils.exceptions.PlanItException;
 import org.goplanit.utils.misc.LoggingUtils;
 import org.goplanit.utils.misc.Pair;
@@ -165,108 +160,6 @@ public class TntpInputBuilder extends InputBuilderListener {
     this.demandsReaderSettings = new TntpDemandsReaderSettings();
     this.demandsReaderSettings.setDemandFileLocation(demandFileLocation);
   }  
-
-  // REMOVE these, builder should either be simple or full control, not all possible options
-//  /**
-//   * Constructor
-//   *
-//   * @param networkFileLocation network file location
-//   * @param demandFileLocation demand file location
-//   * @param networkFileColumns Map specifying which columns in the network file contain which values
-//   * @param speedUnits speed units being used
-//   * @param lengthUnits length units being used
-//   * @param freeFlowTimeUnits units used for free flow travel time (other assumed to be in hours)
-//   * @param capacityPeriod time period for link capacity
-//   * @param defaultMaximumSpeed default maximum speed along a link
-//   * @throws PlanItException thrown if there is an error during running
-//   */
-//  public TntpInputBuilder(final String networkFileLocation, final String demandFileLocation,
-//      final Map<NetworkFileColumnType, Integer> networkFileColumns, final SpeedUnits speedUnits,
-//      final LengthUnits lengthUnits,
-//      final TimeUnits freeFlowTimeUnits,
-//      final CapacityPeriod capacityPeriod, final double defaultMaximumSpeed)
-//      throws PlanItException {
-//    this(networkFileLocation, demandFileLocation, null, networkFileColumns, speedUnits, lengthUnits, freeFlowTimeUnits,
-//        capacityPeriod, defaultMaximumSpeed);
-//  }
-//
-//  /**
-//   * Constructor
-//   *
-//   * @param networkFileLocation network file location
-//   * @param demandFileLocation demand file location
-//   * @param networkFileColumns Map specifying which columns in the network file contain which values
-//   * @param speedUnits speed units being used
-//   * @param lengthUnits length units being used
-//   * @param freeFlowTimeUnits units being used
-//   * @param defaultMaximumSpeed default maximum speed along a link
-//   * @throws PlanItException thrown if there is an error during running
-//   */
-//  public TntpInputBuilder(final String networkFileLocation, final String demandFileLocation,
-//      final Map<NetworkFileColumnType, Integer> networkFileColumns, final SpeedUnits speedUnits,
-//      final LengthUnits lengthUnits,
-//      final TimeUnits freeFlowTimeUnits,
-//      final double defaultMaximumSpeed)
-//      throws PlanItException {
-//    this(networkFileLocation, demandFileLocation, null, networkFileColumns, speedUnits, lengthUnits, freeFlowTimeUnits, null,
-//        defaultMaximumSpeed);
-//  }
-//
-//  /**
-//   * Constructor
-//   *
-//   * @param networkFileLocation network file location
-//   * @param demandFileLocation demand file location
-//   * @param nodeCoordinateFileLocation node coordinate file location
-//   * @param standardResultsFileLocation the location of the standard results file
-//   * @param networkFileColumns Map specifying which columns in the network file contain which values
-//   * @param speedUnits speed units being used
-//   * @param lengthUnits length units being used
-//   * @param freeFlowTimeUnits units being used
-//   * @param defaultMaximumSpeed default maximum speed along a link
-//   * @throws PlanItException thrown if there is an error during running
-//   */
-//  public TntpInputBuilder(final String networkFileLocation, 
-//      final String demandFileLocation,
-//      final String nodeCoordinateFileLocation, 
-//      final String standardResultsFileLocation,
-//      final Map<NetworkFileColumnType, Integer> networkFileColumns,
-//      final SpeedUnits speedUnits,
-//      final LengthUnits lengthUnits, 
-//      final TimeUnits freeFlowTimeUnits,
-//      final double defaultMaximumSpeed) throws PlanItException {
-//    this(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, networkFileColumns, speedUnits,
-//        lengthUnits, freeFlowTimeUnits, null, defaultMaximumSpeed);    
-//  }
-
-  /**
-   * Constructor
-   *
-   * @param networkFileLocation network file location
-   * @param nodeCoordinateFileLocation node coordinate file location
-   * @param demandsFileLocation demand file location
-   * @param networkFileColumns Map specifying which columns in the network file contain which values
-   * @param speedUnits speed units being used
-   * @param lengthUnits length units being used
-   * @param freeFlowTimeUnits units being used
-   * @param capacityPeriod time period for link capacity
-   * @param defaultMaximumSpeed default maximum speed along links
-   * @throws PlanItException thrown if there is an error during running
-   */
-  public TntpInputBuilder(final String networkFileLocation, final String nodeCoordinateFileLocation, final String demandsFileLocation,
-       final Map<NetworkFileColumnType, Integer> networkFileColumns,
-      final SpeedUnits speedUnits, final LengthUnits lengthUnits, final TimeUnits freeFlowTimeUnits, final CapacityPeriod capacityPeriod,
-      final double defaultMaximumSpeed) throws PlanItException {
-
-    this(networkFileLocation, nodeCoordinateFileLocation, demandsFileLocation);
-    
-    networkSettings.setCapacityPeriod((capacityPeriod == null) ? CapacityPeriod.HOUR : capacityPeriod);
-    networkSettings.setLengthUnits(lengthUnits);
-    networkSettings.setNetworkFileColumns(networkFileColumns);
-    networkSettings.setSpeedUnits(speedUnits);
-    networkSettings.setFreeFlowTravelTimeUnits(freeFlowTimeUnits);
-    networkSettings.setDefaultMaximumSpeed(defaultMaximumSpeed);    
-  }
 
   /**
    * Whenever a project component is created this method will be invoked
