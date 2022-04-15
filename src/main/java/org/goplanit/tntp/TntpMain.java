@@ -19,7 +19,6 @@ import org.goplanit.output.enums.OutputType;
 import org.goplanit.output.enums.PathOutputIdentificationType;
 import org.goplanit.output.property.OutputPropertyType;
 import org.goplanit.sdinteraction.smoothing.MSASmoothing;
-import org.goplanit.tntp.enums.CapacityPeriod;
 import org.goplanit.tntp.enums.LengthUnits;
 import org.goplanit.tntp.enums.NetworkFileColumnType;
 import org.goplanit.tntp.enums.SpeedUnits;
@@ -217,14 +216,20 @@ public class TntpMain {
     networkFileColumns.put(NetworkFileColumnType.TOLL, 8);
     networkFileColumns.put(NetworkFileColumnType.LINK_TYPE, 9);
 
-    final SpeedUnits speedUnits = SpeedUnits.MILES_H;
     final LengthUnits lengthUnits = LengthUnits.MILES; // Both Chicago-Sketch and Philadelphia use miles
-    final CapacityPeriod capacityPeriod = CapacityPeriod.HOUR; // Chicago-Sketch only - for Philadelphia use days
-    final TimeUnits freeFlowTravelTimeUnits = TimeUnits.MINUTES;
 
-    final TntpProject project = new TntpProject(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation,
-        networkFileColumns, speedUnits, lengthUnits, freeFlowTravelTimeUnits, capacityPeriod, defaultMaximumSpeed);
-
+    final TntpProject project = new TntpProject(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation);
+    project.getNetworkReaderSettings().setNetworkFileColumns(networkFileColumns);
+    project.getNetworkReaderSettings().setSpeedUnits(SpeedUnits.MILES_H);
+    project.getNetworkReaderSettings().setCapacityPeriod(1, TimeUnits.HOURS);   // Chicago-Sketch only - for Philadelphia use days
+    project.getNetworkReaderSettings().setDefaultMaximumSpeed(defaultMaximumSpeed);
+    project.getNetworkReaderSettings().setFreeFlowTravelTimeUnits(TimeUnits.MINUTES);
+    project.getNetworkReaderSettings().setLengthUnits(lengthUnits); 
+    
+    project.getZoningReaderSettings().setNetworkFileLocation(networkFileLocation);
+    project.getDemandsReaderSettings().setTimePeriodDuration(1, TimeUnits.HOURS);
+    project.getDemandsReaderSettings().setStartTimeSinceMidNight(8, TimeUnits.HOURS);
+    
     // RAW INPUT START --------------------------------
     final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) project.createAndRegisterInfrastructureNetwork(MacroscopicNetwork.class.getCanonicalName());
     final Zoning zoning = project.createAndRegisterZoning(macroscopicNetwork);

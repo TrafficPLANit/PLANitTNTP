@@ -12,7 +12,6 @@ import org.goplanit.network.MacroscopicNetwork;
 import org.goplanit.output.enums.OutputType;
 import org.goplanit.output.formatter.MemoryOutputIterator;
 import org.goplanit.output.property.OutputPropertyType;
-import org.goplanit.tntp.enums.CapacityPeriod;
 import org.goplanit.tntp.enums.LengthUnits;
 import org.goplanit.tntp.enums.NetworkFileColumnType;
 import org.goplanit.tntp.enums.SpeedUnits;
@@ -95,7 +94,7 @@ public class TntpTest {
       tntp.getNetworkReaderSettings().setSpeedUnits( SpeedUnits.MILES_H);
       tntp.getNetworkReaderSettings().setLengthUnits(LengthUnits.MILES);
       tntp.getNetworkReaderSettings().setFreeFlowTravelTimeUnits(TimeUnits.MINUTES);
-      tntp.getNetworkReaderSettings().setCapacityPeriod(CapacityPeriod.HOUR);
+      tntp.getNetworkReaderSettings().setCapacityPeriod(1, TimeUnits.HOURS);
       tntp.getNetworkReaderSettings().setDefaultMaximumSpeed(DEFAULT_MAX_SPEED_MPH);
             
       var demandsReaderSettings = tntp.getDemandsReaderSettings();
@@ -193,13 +192,13 @@ public class TntpTest {
       tntp.getNetworkReaderSettings().setSpeedUnits( SpeedUnits.MILES_H);
       tntp.getNetworkReaderSettings().setLengthUnits(LengthUnits.MILES);
       tntp.getNetworkReaderSettings().setFreeFlowTravelTimeUnits(TimeUnits.MINUTES);
-      tntp.getNetworkReaderSettings().setCapacityPeriod(CapacityPeriod.DAY_12H);
+      tntp.getNetworkReaderSettings().setCapacityPeriod(8, TimeUnits.HOURS);
       tntp.getNetworkReaderSettings().setDefaultMaximumSpeed(DEFAULT_MAX_SPEED_MPH);
             
       var demandsReaderSettings = tntp.getDemandsReaderSettings();
       /* 1h peak demand as per */
       demandsReaderSettings.setStartTimeSinceMidNight(8, TimeUnits.HOURS);
-      demandsReaderSettings.setTimePeriodDuration(1, TimeUnits.HOURS);                
+      demandsReaderSettings.setTimePeriodDuration(12*0.1 /* 10% of day*/, TimeUnits.HOURS);                
             
       /* EXECUTE */
       var resultPair = TntpTestHelper.execute(tntp, MAX_ITERATIONS, EPSILON);

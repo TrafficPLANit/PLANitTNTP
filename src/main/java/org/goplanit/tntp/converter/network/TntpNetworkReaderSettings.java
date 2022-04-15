@@ -3,11 +3,11 @@ package org.goplanit.tntp.converter.network;
 import java.util.Map;
 
 import org.goplanit.converter.ConverterReaderSettings;
-import org.goplanit.tntp.enums.CapacityPeriod;
 import org.goplanit.tntp.enums.LengthUnits;
 import org.goplanit.tntp.enums.NetworkFileColumnType;
 import org.goplanit.tntp.enums.SpeedUnits;
 import org.goplanit.tntp.enums.TimeUnits;
+import org.goplanit.utils.misc.Pair;
 
 /**
  * Settings for Tntp network reader
@@ -51,16 +51,19 @@ public class TntpNetworkReaderSettings implements ConverterReaderSettings {
    * Units of free flow travel time used in network input file
    */
   private TimeUnits freeFlowTravelTimeUnits = TimeUnits.HOURS;  
-
+      
   /**
-   * Time period for link capacity, default HOUR
+   * Time period and unit for link capacity
    */
-  private CapacityPeriod capacityPeriod = CapacityPeriod.HOUR;  
+  private Pair<Double, TimeUnits> capacityPeriod = DEFAULT_TIME_PERIOD_DURATION;  
   
   /**
    * Default maximum speed across links
    */
   private double defaultMaximumSpeed;  
+  
+  /** default time period duration is set to 1 hour */
+  public static Pair<Double, TimeUnits> DEFAULT_TIME_PERIOD_DURATION = Pair.of(1.0, TimeUnits.HOURS);
 
   /**
    * {@inheritDoc}
@@ -96,12 +99,16 @@ public class TntpNetworkReaderSettings implements ConverterReaderSettings {
     this.lengthUnits = lengthUnits;
   }
 
-  public CapacityPeriod getCapacityPeriod() {
-    return capacityPeriod;
+  public TimeUnits getCapacityPeriodUnits() {
+    return capacityPeriod.second();
   }
+  
+  public double getCapacityPeriodDuration() {
+    return capacityPeriod.first();
+  }  
 
-  public void setCapacityPeriod(final CapacityPeriod capacityPeriod) {
-    this.capacityPeriod = capacityPeriod;
+  public void setCapacityPeriod(final double duration, final TimeUnits units) {
+    this.capacityPeriod = Pair.of(duration, units);
   }
 
   public double getDefaultMaximumSpeed() {
