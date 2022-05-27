@@ -3,6 +3,7 @@ package org.goplanit.tntp.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -40,6 +41,10 @@ public class TntpTest {
   /** the logger */
   private static Logger LOGGER = null;
 
+  private static final Path projectPath = Path.of("src","test","resources");
+  private static final Path chicagoPath = Path.of(projectPath.toString(),"ChicagoSketch");
+  private static final Path siouxFallsPath = Path.of(projectPath.toString(),"SiouxFalls");
+
 
   @BeforeClass
   public static void setUp() throws Exception {
@@ -62,10 +67,10 @@ public class TntpTest {
    */
   @Test
   public void ChicagoSketchTest() {
-    final String NETWORK_FILE = "src\\test\\resources\\ChicagoSketch\\ChicagoSketch_net.tntp";
-    final String NODE_FILE = "src\\test\\resources\\ChicagoSketch\\ChicagoSketch_node.tntp";
-    final String DEMANDS_FILE = "src\\test\\resources\\ChicagoSketch\\ChicagoSketch_trips.tntp";
-    final String STANDARD_RESULTS_FILE = "src\\test\\resources\\ChicagoSketch\\ChicagoSketch_flow.tntp";
+    final String NETWORK_FILE = Path.of(chicagoPath.toString(),"ChicagoSketch_net.tntp").toString();
+    final String NODE_FILE = Path.of(chicagoPath.toString(),"ChicagoSketch_node.tntp").toString();
+    final String DEMANDS_FILE = Path.of(chicagoPath.toString(),"ChicagoSketch_trips.tntp").toString();
+    final String STANDARD_RESULTS_FILE = Path.of(chicagoPath.toString(),"ChicagoSketch_flow.tntp").toString();
     final int MAX_ITERATIONS = 25;
     final double EPSILON = Precision.EPSILON_6;
     final double DEFAULT_MAX_SPEED_MPH = 25.0;
@@ -159,11 +164,12 @@ public class TntpTest {
    */
   @Test
   public void siouxFallsTest() {  
-    final String NETWORK_FILE = "src\\test\\resources\\SiouxFalls\\SiouxFalls_net.tntp";
-    final String NODE_FILE = "src\\test\\resources\\SiouxFalls\\SiouxFalls_node.tntp";
-    final String DEMANDS_FILE = "src\\test\\resources\\SiouxFalls\\SiouxFalls_trips.tntp";
+    final String NETWORK_FILE = Path.of(siouxFallsPath.toString(),"SiouxFalls_net.tntp").toString();
+    final String NODE_FILE = Path.of(siouxFallsPath.toString(),"SiouxFalls_node.tntp").toString();
+    final String DEMANDS_FILE = Path.of(siouxFallsPath.toString(),"SiouxFalls_trips.tntp").toString();
     @SuppressWarnings("unused")
-    final String STANDARD_RESULTS_FILE = "src\\test\\resources\\SiouxFalls\\SiouxFalls_flow.tntp";
+    final String STANDARD_RESULTS_FILE = Path.of(siouxFallsPath.toString(),"SiouxFalls_flow.tntp").toString();
+
     final int MAX_ITERATIONS = 25;
     final double EPSILON = Precision.EPSILON_6;
     final double DEFAULT_MAX_SPEED_MPH = 25.0;
