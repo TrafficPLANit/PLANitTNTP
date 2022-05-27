@@ -1,4 +1,6 @@
 # PLANitTNTP
+![Master Branch](https://github.com/TrafficPLANit/PLANitTNTP/actions/workflows/maven_master.yml/badge.svg?branch=master)
+![Develop Branch](https://github.com/TrafficPLANit/PLANitTNTP/actions/workflows/maven_develop.yml/badge.svg?branch=develop)
 
 PLANit Interface for TNTP format files
 
@@ -108,19 +110,19 @@ The command line arguments specify the parameters used during the assignment run
   
 The arguments are given in a space-separated list.  There are ten possible arguments, six of which are required.  The full list of possible arguments is:
 
-|Name|Meaning|
-|---| ---|
-|network|Location of _net.tntp file (required)| 
-|demands|Location of _trips.tntp file (required)| 
-|nodecoordinates|Location of _node.tntp (optional)|
-|linkoutput|Location where generated output CSV links file is to be placed (optional)|
-|odoutput|Location where generated output CSV origin-destination skim matrix file is to be placed (optional)|
-|odpathoutput|Location where generated output CSV OD path file is to be placed(optional)|
-|logfile|Location where generated log file is to be placed (optional, no log file created if this argument omitted)| 
-|maxiterations|Maximum number of iterations to be used in the assignment (optional, defaults to 1 if not present)|
-|defaultmaximumspeed|Default maximum speed on links where 0 is given in the file (optional, defaults to 25 m/h if not present)
-|epsilon|Epsilon used in convergence criterion (optional, defaults to 0.01 if not present)|
-|outputtimeunit|Time unit to be used when writing link cost times to output file  - one from hour, minute, second (or h ,m ,s), not case-sensitive (optional, defaults to hours)
+| Name                | Meaning                                                                                                                                                          |
+|---------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| network             | Location of _net.tntp file (required)                                                                                                                            | 
+| demands             | Location of _trips.tntp file (required)                                                                                                                          | 
+| nodecoordinates     | Location of _node.tntp (optional)                                                                                                                                |
+| linkoutput          | Location where generated output CSV links file is to be placed (optional)                                                                                        |
+| odoutput            | Location where generated output CSV origin-destination skim matrix file is to be placed (optional)                                                               |
+| odpathoutput        | Location where generated output CSV OD path file is to be placed(optional)                                                                                       |
+| logfile             | Location where generated log file is to be placed (optional, no log file created if this argument omitted)                                                       | 
+| maxiterations       | Maximum number of iterations to be used in the assignment (optional, defaults to 1 if not present)                                                               |
+| defaultmaximumspeed | Default maximum speed on links where 0 is given in the file (optional, defaults to 25 m/h if not present)                                                        |
+| epsilon             | Epsilon used in convergence criterion (optional, defaults to 0.01 if not present)                                                                                |
+| outputtimeunit      | Time unit to be used when writing link cost times to output file  - one from hour, minute, second (or h ,m ,s), not case-sensitive (optional, defaults to hours) |
 
 If a required file is missing from the argument list an error message is displayed.  The arguments can be given in any order provided they are separated by spaces.
 
@@ -237,31 +239,6 @@ PLANit TNTP has the following PLANit specific dependencies (See pom.xml):
 * planit-parentpom
 * planit-core
 * planit-utils
-
-Since the repo depends on the parent-pom to find its (shared) repositories, we must let Maven find the parent-pom first, either:
-
-* localy clone the parent pom repo and run mvn install on it before conducting a Maven build, or
-* add the parent pom repository to your maven (user) settings.xml by adding it to a profile like the following
-
-```xml
-  <profiles>
-    <profile>
-      <activation>
-        <property>
-          <name>!skip</name>
-        </property>
-      </activation>
-    
-      <repositories>
-        <repository>
-          <id>planit-repository.goplanit.org</id>
-          <name>PLANit Repository</name>
-          <url>http://repository.goplanit.org</url>
-        </repository>     
-      </repositories>
-    </profile>
-  </profiles>
-```
 
 ### Maven deploy
 

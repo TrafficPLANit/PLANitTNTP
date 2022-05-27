@@ -60,7 +60,7 @@ public class TntpInputBuilder extends InputBuilderListener {
    */
   protected void populateMacroscopicNetwork( final MacroscopicNetwork macroscopicNetwork) throws PlanItException {
        
-    TntpNetworkReader networkReader = TntpNetworkReaderFactory.create(networkSettings, macroscopicNetwork);    
+    TntpNetworkReader networkReader = TntpNetworkReaderFactory.create(networkSettings, macroscopicNetwork);
 
     /* parse */
     networkReader.read();
@@ -103,7 +103,7 @@ public class TntpInputBuilder extends InputBuilderListener {
     }
     final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) parameter1;
     
-    TntpZoningReader zoningReader = TntpZoningReaderFactory.create(zoningReaderSettings, macroscopicNetwork, zoning);    
+    TntpZoningReader zoningReader = TntpZoningReaderFactory.create(zoningReaderSettings, macroscopicNetwork, zoning);
         
     /* parse */
     zoningReader.read();

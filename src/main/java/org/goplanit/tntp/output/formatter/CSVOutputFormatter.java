@@ -1,6 +1,7 @@
 package org.goplanit.tntp.output.formatter;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +41,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 
 	private static final String DEFAULT_NAME_EXTENSION = ".csv";
 	private static final String DEFAULT_NAME_ROOT = "CSVOutput";
-	private static final String DEFAULT_OUTPUT_DIRECTORY = "C:\\Users\\Public\\PlanIt\\Csv";
+	private static final String DEFAULT_OUTPUT_DIRECTORY = System.getProperty("user.home");
 
 	/**
 	 * Extension for the CSV output file
@@ -233,7 +234,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 		try {
 		    for(final OutputType outputType : outputConfiguration.getActivatedOutputTypes()) {
 	            if (!csvFileNameMap.containsKey(outputType)) {
-	                final String csvFileName = generateOutputFileName(csvOutputDirectory, csvNameRoot, csvNameExtension, null, outputType, runId);
+	                final String csvFileName = generateAbsoluteOutputFileName(csvOutputDirectory, csvNameRoot, csvNameExtension, null, outputType, runId);
 	                addCsvFileNamePerOutputType(outputType, csvFileName);
 	            }
 
