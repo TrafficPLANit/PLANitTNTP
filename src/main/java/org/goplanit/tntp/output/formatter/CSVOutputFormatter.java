@@ -1,7 +1,6 @@
 package org.goplanit.tntp.output.formatter;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +31,7 @@ import org.goplanit.utils.time.TimePeriod;
  * Output formatter for CSV output, i.e. this class is capable of persisting
  * output in the CSV data type
  *
- * @author markr
+ * @author markr,gary Mann
  */
 public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTextFileOutputFormatter {
 
