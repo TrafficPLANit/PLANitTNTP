@@ -30,6 +30,7 @@ import org.goplanit.utils.mode.Mode;
 import org.goplanit.utils.mode.PredefinedModeType;
 import org.goplanit.utils.network.layer.MacroscopicNetworkLayer;
 import org.goplanit.utils.network.layer.macroscopic.AccessGroupProperties;
+import org.goplanit.utils.network.layer.macroscopic.MacroscopicLink;
 import org.goplanit.utils.network.layer.macroscopic.MacroscopicLinkSegment;
 import org.goplanit.utils.network.layer.macroscopic.MacroscopicLinkSegmentType;
 import org.goplanit.utils.network.layer.physical.Link;
@@ -179,16 +180,12 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    * @param networkLayer the current macroscopic networkLayer
    * @param link the current link
    * @param directionAb direction to register link segment in
-   * @param maxSpeed the maximum speed for this link
-   * @param capacityPerLane the capacity per lane for this link
    * @param tntpLinkSegmentRowId the external Id of the type of this link segment (row index in file)
-   * @param length the length of this link segment
-   * @param freeFlowTravelTime the free flow travel time for this link segment
+   * @param cols with information to parse
    * @return the macroscopic link segment which has been created
-   * @throws PlanItException thrown if there is an error
    */
   private MacroscopicLinkSegment createAndRegisterLinkSegment(
-      final MacroscopicNetworkLayer networkLayer, final Link link, final long tntpLinkSegmentRowId, boolean directionAb, final String[] cols) throws PlanItException {
+      final MacroscopicNetworkLayer networkLayer, final MacroscopicLink link, final long tntpLinkSegmentRowId, boolean directionAb, final String[] cols) {
     
     Map<NetworkFileColumnType, Integer> supportedColumns = getSettings().getNetworkFileColumns();
     SpeedUnits speedUnits = getSettings().getSpeedUnits();
@@ -339,7 +336,7 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     final double length = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.LENGTH)]) * lengthUnits.getMultiplier();
     
     /** LINK **/
-    Link link = null;
+    MacroscopicLink link = null;
     var oppositeDirectionSegment = (MacroscopicLinkSegment) downstreamNode.getEdgeSegment(upstreamNode);
     boolean directionAb = true;
     if(oppositeDirectionSegment != null) {
