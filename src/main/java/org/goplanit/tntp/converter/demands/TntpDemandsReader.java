@@ -15,6 +15,7 @@ import org.goplanit.tntp.TntpHeaderConstants;
 import org.goplanit.userclass.TravellerType;
 import org.goplanit.userclass.UserClass;
 import org.goplanit.utils.exceptions.PlanItException;
+import org.goplanit.utils.exceptions.PlanItRunTimeException;
 import org.goplanit.utils.misc.LoggingUtils;
 import org.goplanit.utils.mode.Mode;
 import org.goplanit.utils.time.TimePeriod;
@@ -73,13 +74,12 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
   /** Create TNTP default (single) time period
    * 
    * @return created time period
-   * @throws PlanItException thrown if error
    */
-  private TimePeriod creatAndRegistereDefaultTimePeriod() throws PlanItException {
+  private TimePeriod creatAndRegistereDefaultTimePeriod() {
     // TNTP only has one time period, define it here
     long timePeriodDurationSeconds = Math.round(settings.getTimePeriodDuration() * settings.getTimePeriodDurationUnit().getMultiplier() * 3600);
     long startAtMidNightSeconds = Math.round(settings.getStartTimeSinceMidNight() * settings.getStartTimeSinceMidNightUnit().getMultiplier() * 3600);
-    var timePeriod = demandsToPopulate.timePeriods.createAndRegisterNewTimePeriod("TNTP-period", startAtMidNightSeconds, timePeriodDurationSeconds);
+    var timePeriod = demandsToPopulate.timePeriods.getFactory().registerNew("TNTP-period", startAtMidNightSeconds, timePeriodDurationSeconds);
     
     /* XML id */
     timePeriod.setXmlId(timePeriod.getDescription());
@@ -94,14 +94,13 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
    * 
    * @param travellerType to use for user class
    * @return created user class
-   * @throws PlanItException thrown if error
    */  
-  private UserClass creatAndRegistereDefaultUserClass(TravellerType travellerType) throws PlanItException {
+  private UserClass creatAndRegistereDefaultUserClass(TravellerType travellerType) {
     if(referenceNetwork.getModes().size()>1) {
-      throw new PlanItException("TNTP demands only support single mode, found more than one on reference network");
+      throw new PlanItRunTimeException("TNTP demands only support single mode, found more than one on reference network");
     }
     var mode = referenceNetwork.getModes().getFirst();
-    var userClass = demandsToPopulate.userClasses.createAndRegister("TNTP - user class", mode, travellerType);
+    var userClass = demandsToPopulate.userClasses.getFactory().registerNew("TNTP - user class", mode, travellerType);
     userClass .setXmlId(String.valueOf(userClass .getId()));
     return userClass; 
   }
@@ -109,10 +108,9 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
   /** Create TNTP default (single) traveller type
    * 
    * @return created traveller
-   * @throws PlanItException thrown if error
-   */    
+   */
   private TravellerType creatAndRegisterDefaultTravellerType() {
-    var travellerType =  demandsToPopulate.travelerTypes.createAndRegisterNew("TNTP-traveller type");
+    var travellerType =  demandsToPopulate.travelerTypes.getFactory().registerNew("TNTP-traveller type");
     travellerType.setXmlId(String.valueOf(travellerType.getId()));
     return travellerType;
   }
