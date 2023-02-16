@@ -21,7 +21,6 @@ public class TntpProject extends CustomPlanItProject {
    * @param networkFileLocation network input file location
    * @param demandFileLocation demand input file location
    * @param nodeCoordinateFileLocation node coordinate file location
-   * @param networkFileColumns Map specifying which columns in the network input file represent which quantities
    * @throws PlanItException thrown if there is an error
    */
    public TntpProject(final String networkFileLocation, final String demandFileLocation, final String nodeCoordinateFileLocation) throws PlanItException {

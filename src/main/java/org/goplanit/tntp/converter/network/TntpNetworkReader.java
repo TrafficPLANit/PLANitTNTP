@@ -181,6 +181,7 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    * @param link the current link
    * @param directionAb direction to register link segment in
    * @param tntpLinkSegmentRowId the external Id of the type of this link segment (row index in file)
+   * @param cols with information to parse
    * @return the macroscopic link segment which has been created
    */
   private MacroscopicLinkSegment createAndRegisterLinkSegment(
@@ -465,8 +466,7 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     
     /* TNTP only has one mode, define it here */
     Mode mode = networkToPopulate.getModes().getFactory().registerNew(PredefinedModeType.CAR);
-    mode.setXmlId(PredefinedModeType.CAR.value());
-    mode.setExternalId(mode.getXmlId());
+    mode.setXmlId("1"); 
     registerBySourceId(Mode.class, mode);    
     
     /* TNTP only compatible with parsing a single network layer, so create it */
