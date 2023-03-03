@@ -117,7 +117,7 @@ public class TntpTest {
       var network = (MacroscopicNetwork)project.physicalNetworks.getFirst();
       
       final Map<String, Map<String, double[]>> resultsMap = TntpTestHelper.parseStandardResultsFile(STANDARD_RESULTS_FILE);
-      final TimePeriod timePeriod = demands.timePeriods.findFirst(tp -> tp.getExternalId().equals("1"));
+      final TimePeriod timePeriod = demands.timePeriods.firstMatch(tp -> tp.getExternalId().equals("1"));
       final int iterationIndex = memoryOutputFormatter.getLastIteration();
       final Mode mode = network.getModes().getFirst();
       
