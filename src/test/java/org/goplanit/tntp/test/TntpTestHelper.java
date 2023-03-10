@@ -69,12 +69,9 @@ public class TntpTestHelper {
   /**
    * Top-level method which runs PLANit for TNTP format input
    *
-   * @param networkFileLocation the input network file (required)
-   * @param demandFileLocation the input trips file (required)
+   * @param tntp the builder to use
    * @param maxIterations the maximum number of iterations
    * @param epsilon the epsilon used for convergence
-   * @param outputCostTimeUnit the output time units
-   * @param defaultMaximumSpeed the default maximum speed along links
    * @return a Pair containing the MemoryOutputFormatter and the Tntp object
    * @throws PlanItException thrown if there is an error
    */
