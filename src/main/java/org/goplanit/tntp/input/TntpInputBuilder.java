@@ -10,7 +10,7 @@ import org.goplanit.component.event.PopulateNetworkEvent;
 import org.goplanit.component.event.PopulatePhysicalCostEvent;
 import org.goplanit.component.event.PopulateZoningEvent;
 import org.goplanit.cost.physical.AbstractPhysicalCost;
-import org.goplanit.cost.physical.BPRLinkTravelTimeCost;
+import org.goplanit.cost.physical.BprLinkTravelTimeCost;
 import org.goplanit.demands.Demands;
 import org.goplanit.input.InputBuilderListener;
 import org.goplanit.network.MacroscopicNetwork;
@@ -125,12 +125,12 @@ public class TntpInputBuilder extends InputBuilderListener {
       LOGGER.warning("BPR parameters not available upon populating physical costs in TNTP input builder, ignore");
       return;
     }
-    if(!(costComponent instanceof BPRLinkTravelTimeCost)) {
+    if(!(costComponent instanceof BprLinkTravelTimeCost)) {
       LOGGER.warning(String.format("Expected BPR cost to be populated by found %s, ignore", costComponent.getClass().getCanonicalName()));
       return;
     }
     
-    final BPRLinkTravelTimeCost bprLinkTravelTimeCost = (BPRLinkTravelTimeCost) costComponent;
+    final BprLinkTravelTimeCost bprLinkTravelTimeCost = (BprLinkTravelTimeCost) costComponent;
     for (final Entry<LinkSegment, Pair<Double, Double>> entry : bprParametersPerLinkSegment.entrySet()) {
       final Pair<Double, Double> alphaBeta = entry.getValue();
       final MacroscopicLinkSegment macroscopicLinkSegment = (MacroscopicLinkSegment) entry.getKey();

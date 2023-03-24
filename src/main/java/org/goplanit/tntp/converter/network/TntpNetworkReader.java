@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 import org.goplanit.converter.BaseReaderImpl;
 import org.goplanit.converter.network.NetworkReader;
-import org.goplanit.cost.physical.BPRLinkTravelTimeCost;
+import org.goplanit.cost.physical.BprLinkTravelTimeCost;
 import org.goplanit.network.MacroscopicNetwork;
 import org.goplanit.network.LayeredNetwork;
 import org.goplanit.network.layer.macroscopic.AccessGroupPropertiesFactory;
@@ -361,8 +361,8 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     final MacroscopicLinkSegment linkSegment = createAndRegisterLinkSegment(networkLayer, link, tntpLinkSegmentRowId, directionAb, cols);
   
     /** MODE PARAMETERS **/
-    double alpha = BPRLinkTravelTimeCost.DEFAULT_ALPHA;
-    double beta = BPRLinkTravelTimeCost.DEFAULT_BETA;
+    double alpha = BprLinkTravelTimeCost.DEFAULT_ALPHA;
+    double beta = BprLinkTravelTimeCost.DEFAULT_BETA;
     boolean settingAlpha = false;
     if (supportedColumns.keySet().contains(NetworkFileColumnType.B)) {
       alpha = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.B)]);

@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 
 import org.goplanit.assignment.TrafficAssignment;
 import org.goplanit.assignment.traditionalstatic.TraditionalStaticAssignmentConfigurator;
-import org.goplanit.cost.physical.BPRLinkTravelTimeCost;
+import org.goplanit.cost.physical.BprLinkTravelTimeCost;
 import org.goplanit.cost.virtual.FixedConnectoidTravelTimeCost;
 import org.goplanit.demands.Demands;
 import org.goplanit.logging.Logging;
@@ -243,7 +243,7 @@ public class TntpMain {
             TrafficAssignment.TRADITIONAL_STATIC_ASSIGNMENT, demands, zoning, macroscopicNetwork);
 
     // SUPPLY-DEMAND INTERACTIONS
-    ta.createAndRegisterPhysicalCost(BPRLinkTravelTimeCost.class.getCanonicalName());
+    ta.createAndRegisterPhysicalCost(BprLinkTravelTimeCost.class.getCanonicalName());
     ta.createAndRegisterVirtualCost(FixedConnectoidTravelTimeCost.class.getCanonicalName());
     ta.createAndRegisterSmoothing(MSASmoothing.class.getCanonicalName());
     

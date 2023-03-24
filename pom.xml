@@ -53,6 +53,25 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 			</plugin>
+
+			<plugin>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<id>javadoc-jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<!--  place generated javadocs in /docs directory of root-->
+							<destDir>docs</destDir>
+							<includeDependencySources>false</includeDependencySources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>	    
 	</build>
 
@@ -74,7 +93,7 @@
 			<artifactId>junit</artifactId>
 			<!-- only used locally for testing so not an actual dependency for using the API -->
 			<optional>true</optional>
-		</dependency>	
+		</dependency>
 				
 	</dependencies>
 
