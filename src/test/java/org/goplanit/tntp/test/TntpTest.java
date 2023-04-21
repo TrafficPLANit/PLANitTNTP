@@ -1,7 +1,7 @@
 package org.goplanit.tntp.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -23,9 +23,9 @@ import org.goplanit.utils.math.Precision;
 import org.goplanit.utils.mode.Mode;
 import org.goplanit.utils.network.layer.MacroscopicNetworkLayer;
 import org.goplanit.utils.time.TimePeriod;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit test for TNTP model.
@@ -46,15 +46,15 @@ public class TntpTest {
   private static final Path siouxFallsPath = Path.of(projectPath.toString(),"SiouxFalls");
 
 
-  @BeforeClass
+  @BeforeAll
   public static void setUp() throws Exception {
     if (LOGGER == null) {
       LOGGER = Logging.createLogger(TntpTest.class);
     }
   }
 
-  @After
-  public void tearDown() {
+  @AfterAll
+  public static void tearDown() {
     Logging.closeLogger(LOGGER);
   }
   

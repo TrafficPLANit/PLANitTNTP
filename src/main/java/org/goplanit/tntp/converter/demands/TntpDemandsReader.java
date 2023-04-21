@@ -238,7 +238,7 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
               }
               final String[] cols = line.split("\\s+");
               originZone = getBySourceId(Zone.class, cols[1]);
-              demandToDestination = new HashMap<String, Double>();
+              demandToDestination = new HashMap<>();
             } else {
               final String lineWithNoSpaces = line.replaceAll("\\s", "");
               final String[] destDemand = lineWithNoSpaces.split("[:;]");
