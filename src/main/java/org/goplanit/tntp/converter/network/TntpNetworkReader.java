@@ -134,7 +134,7 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    * initialise the source id trackers, so we can lay indices on the source id as well for quick lookups
    */
   private void initialiseSourceIdTrackers() {
-    initialiseSourceIdMap(Mode.class, Mode::getExternalId);
+    initialiseSourceIdMap(Mode.class, Mode::getXmlId); // no source id for TNTP modes, uses XML id of predefined mode instead
     initialiseSourceIdMap(Link.class, Link::getExternalId);
     initialiseSourceIdMap(MacroscopicLinkSegment.class, MacroscopicLinkSegment::getExternalId);
     initialiseSourceIdMap(MacroscopicLinkSegmentType.class, MacroscopicLinkSegmentType::getExternalId);
@@ -466,8 +466,7 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     
     /* TNTP only has one mode, define it here */
     Mode mode = networkToPopulate.getModes().getFactory().registerNew(PredefinedModeType.CAR);
-    mode.setXmlId("1"); 
-    registerBySourceId(Mode.class, mode);    
+    registerBySourceId(Mode.class, mode);
     
     /* TNTP only compatible with parsing a single network layer, so create it */
     final MacroscopicNetworkLayer networkLayer = networkToPopulate.getTransportLayers().getFactory().registerNew();
