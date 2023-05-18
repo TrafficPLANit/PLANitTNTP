@@ -436,8 +436,6 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    */  
   @Override
   public LayeredNetwork<?, ?> read() throws PlanItException {
-    LOGGER.fine(LoggingUtils.getClassNameWithBrackets(this)+"populating Physical Network");
-    
     if(!networkToPopulate.getTransportLayers().isEmpty()) {
       throw new PlanItException("Error cannot populate non-empty network");
     }
@@ -449,7 +447,11 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
       LOGGER.info(String.format("Source CRS not set, assuming cartesiam coordinates"));
       networkToPopulate.setCoordinateReferenceSystem(PlanitJtsCrsUtils.CARTESIANCRS);
     }
-    LOGGER.info(String.format("Source CRS set to %s : %s", settings.getCoordinateReferenceSystem(), networkToPopulate.getCoordinateReferenceSystem().getName()));    
+    LOGGER.info(String.format("Source CRS set to %s : %s", settings.getCoordinateReferenceSystem(), networkToPopulate.getCoordinateReferenceSystem().getName()));
+
+    getSettings().logSettings();
+
+    LOGGER.fine(LoggingUtils.getClassNameWithBrackets(this)+"populating Physical Network");
     
     
     initialiseSourceIdTrackers();

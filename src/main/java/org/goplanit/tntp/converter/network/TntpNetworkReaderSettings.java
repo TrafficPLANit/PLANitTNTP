@@ -1,6 +1,7 @@
 package org.goplanit.tntp.converter.network;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.goplanit.converter.ConverterReaderSettings;
 import org.goplanit.tntp.enums.LengthUnits;
@@ -16,6 +17,8 @@ import org.goplanit.utils.misc.Pair;
  *
  */
 public class TntpNetworkReaderSettings implements ConverterReaderSettings {
+
+  private static final Logger LOGGER = Logger.getLogger(TntpNetworkReaderSettings.class.getCanonicalName());
   
   /**
    * network data file
@@ -70,9 +73,25 @@ public class TntpNetworkReaderSettings implements ConverterReaderSettings {
    */
   @Override
   public void reset() {
-
+    //todo
   }
-  
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void logSettings() {
+    LOGGER.info(String.format("Parsing TNTP network from: %s", getNetworkFile()));
+    LOGGER.info(String.format("Parsing TNTP network nodes from: %s", getNodeCoordinateFile()));
+    LOGGER.info(String.format("Speed units set to: %s", getSpeedUnits()));
+    LOGGER.info(String.format("Length units set to: %s", getLengthUnits()));
+    LOGGER.info(String.format("Free flow travel time units set to: %s", getFreeFlowTravelTimeUnits()));
+    LOGGER.info(String.format("Capacity period units set to: %s", getCapacityPeriodUnits()));
+    LOGGER.info(String.format("Capacity period duration set to: %s", getCapacityPeriodDuration()));
+    LOGGER.info(String.format("Default max speed set to: %s", getDefaultMaximumSpeed()));
+  }
+
+
   // GETTERS/SETTERS
   
   public Map<NetworkFileColumnType, Integer> getNetworkFileColumns() {
@@ -149,6 +168,6 @@ public class TntpNetworkReaderSettings implements ConverterReaderSettings {
 
   public void setFreeFlowTravelTimeUnits(TimeUnits freeFlowTravelTimeUnits) {
     this.freeFlowTravelTimeUnits = freeFlowTravelTimeUnits;
-  }  
+  }
 
 }

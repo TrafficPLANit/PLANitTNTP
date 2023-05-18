@@ -3,6 +3,8 @@ package org.goplanit.tntp.converter.zoning;
 import org.goplanit.converter.ConverterReaderSettings;
 import org.goplanit.network.MacroscopicNetwork;
 
+import java.util.logging.Logger;
+
 /**
  * Settings for the Tntp zoning reader
  * 
@@ -10,6 +12,8 @@ import org.goplanit.network.MacroscopicNetwork;
  *
  */
 public class TntpZoningReaderSettings implements ConverterReaderSettings {
+
+  private static final Logger LOGGER = Logger.getLogger(TntpZoningReaderSettings.class.getCanonicalName());
   
   /** the network this zoning relates to */
   protected MacroscopicNetwork referenceNetwork;  
@@ -41,6 +45,14 @@ public class TntpZoningReaderSettings implements ConverterReaderSettings {
   @Override
   public void reset() { 
     networkFileLocation = null;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void logSettings() {
+    LOGGER.info(String.format("Parsing TNTP zoning from: %s", networkFileLocation));
   }
 
   public String getNetworkFileLocation() {
