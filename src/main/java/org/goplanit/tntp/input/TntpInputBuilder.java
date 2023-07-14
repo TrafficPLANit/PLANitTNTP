@@ -10,18 +10,19 @@ import org.goplanit.component.event.PopulateNetworkEvent;
 import org.goplanit.component.event.PopulatePhysicalCostEvent;
 import org.goplanit.component.event.PopulateZoningEvent;
 import org.goplanit.cost.physical.AbstractPhysicalCost;
-import org.goplanit.cost.physical.BPRLinkTravelTimeCost;
+import org.goplanit.cost.physical.BprLinkTravelTimeCost;
 import org.goplanit.demands.Demands;
 import org.goplanit.input.InputBuilderListener;
 import org.goplanit.network.MacroscopicNetwork;
 import org.goplanit.tntp.converter.demands.TntpDemandsReader;
+import org.goplanit.tntp.converter.demands.TntpDemandsReaderFactory;
+import org.goplanit.tntp.converter.demands.TntpDemandsReaderSettings;
 import org.goplanit.tntp.converter.network.TntpNetworkReader;
+import org.goplanit.tntp.converter.network.TntpNetworkReaderFactory;
 import org.goplanit.tntp.converter.network.TntpNetworkReaderSettings;
 import org.goplanit.tntp.converter.zoning.TntpZoningReader;
-import org.goplanit.tntp.enums.CapacityPeriod;
-import org.goplanit.tntp.enums.LengthUnits;
-import org.goplanit.tntp.enums.NetworkFileColumnType;
-import org.goplanit.tntp.enums.SpeedUnits;
+import org.goplanit.tntp.converter.zoning.TntpZoningReaderFactory;
+import org.goplanit.tntp.converter.zoning.TntpZoningReaderSettings;
 import org.goplanit.utils.exceptions.PlanItException;
 import org.goplanit.utils.misc.LoggingUtils;
 import org.goplanit.utils.misc.Pair;
@@ -40,14 +41,12 @@ public class TntpInputBuilder extends InputBuilderListener {
 
   /** the logger */
   private static final Logger LOGGER = Logger.getLogger(TntpInputBuilder.class.getCanonicalName());
-  
-  private final String networkFileLocation;
-  
-  private final String nodeCoordinateFileLocation;
-  
+    
   private final TntpNetworkReaderSettings networkSettings;
+    
+  private final TntpDemandsReaderSettings demandsReaderSettings;
   
-  private final String demandsFileLocation;
+  private final TntpZoningReaderSettings zoningReaderSettings;
   
   /** track parsed BPR parameters from network parsing and make available to cost initialisation */
   private Map<LinkSegment, Pair<Double, Double>> bprParametersPerLinkSegment;
@@ -61,8 +60,7 @@ public class TntpInputBuilder extends InputBuilderListener {
    */
   protected void populateMacroscopicNetwork( final MacroscopicNetwork macroscopicNetwork) throws PlanItException {
        
-    TntpNetworkReader networkReader = new TntpNetworkReader(networkFileLocation, nodeCoordinateFileLocation, networkSettings);    
-    networkReader.getSettings().setNetworkToPopulate(macroscopicNetwork);
+    TntpNetworkReader networkReader = TntpNetworkReaderFactory.create(networkSettings, macroscopicNetwork);
 
     /* parse */
     networkReader.read();
@@ -81,12 +79,8 @@ public class TntpInputBuilder extends InputBuilderListener {
    */
   protected void populateDemands( final Demands demands, final Zoning zoning, final MacroscopicNetwork network) throws PlanItException {
     
-    TntpDemandsReader demandsReader = new TntpDemandsReader(demandsFileLocation);
-    /* prep */
-    demandsReader.getSettings().setDemandsToPopulate(demands);
-    demandsReader.getSettings().setReferenceNetwork(network);
-    demandsReader.getSettings().setReferenceZoning(zoning);
-        
+    TntpDemandsReader demandsReader = TntpDemandsReaderFactory.create(demandsReaderSettings, network, zoning, demands);
+            
     /* parse */
     demandsReader.read();
     demandsReader.reset();
@@ -109,10 +103,7 @@ public class TntpInputBuilder extends InputBuilderListener {
     }
     final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) parameter1;
     
-    TntpZoningReader zoningReader = new TntpZoningReader(networkFileLocation);    
-    /* prep */
-    zoningReader.getSettings().setZoningToPopulate(zoning);
-    zoningReader.getSettings().setReferenceNetwork(macroscopicNetwork);
+    TntpZoningReader zoningReader = TntpZoningReaderFactory.create(zoningReaderSettings, macroscopicNetwork, zoning);
         
     /* parse */
     zoningReader.read();
@@ -134,115 +125,41 @@ public class TntpInputBuilder extends InputBuilderListener {
       LOGGER.warning("BPR parameters not available upon populating physical costs in TNTP input builder, ignore");
       return;
     }
-    if(!(costComponent instanceof BPRLinkTravelTimeCost)) {
+    if(!(costComponent instanceof BprLinkTravelTimeCost)) {
       LOGGER.warning(String.format("Expected BPR cost to be populated by found %s, ignore", costComponent.getClass().getCanonicalName()));
       return;
     }
     
-    final BPRLinkTravelTimeCost bprLinkTravelTimeCost = (BPRLinkTravelTimeCost) costComponent;
+    final BprLinkTravelTimeCost bprLinkTravelTimeCost = (BprLinkTravelTimeCost) costComponent;
     for (final Entry<LinkSegment, Pair<Double, Double>> entry : bprParametersPerLinkSegment.entrySet()) {
       final Pair<Double, Double> alphaBeta = entry.getValue();
       final MacroscopicLinkSegment macroscopicLinkSegment = (MacroscopicLinkSegment) entry.getKey();
       bprLinkTravelTimeCost.setParameters(macroscopicLinkSegment, mode, alphaBeta.first(), alphaBeta.second());
     }
   }
-
+  
   /**
-   * Constructor
+   * Constructor. Most barebones constructor, requires user to change underlying settings regarding configuration of network, zoning etc. before continuing.
    *
    * @param networkFileLocation network file location
-   * @param demandFileLocation demand file location
-   * @param networkFileColumns Map specifying which columns in the network file contain which values
-   * @param speedUnits speed units being used
-   * @param lengthUnits length units being used
-   * @param capacityPeriod time period for link capacity
-   * @param defaultMaximumSpeed default maximum speed along a link
+   * @param nodeCoordinateFileLocation optional provision of node coordinates (may be null)
+   * @param demandFileLocation demand file location optional provision of demand file location (may be null)
    * @throws PlanItException thrown if there is an error during running
    */
-  public TntpInputBuilder(final String networkFileLocation, final String demandFileLocation,
-      final Map<NetworkFileColumnType, Integer> networkFileColumns, final SpeedUnits speedUnits,
-      final LengthUnits lengthUnits,
-      final CapacityPeriod capacityPeriod, final double defaultMaximumSpeed)
+  public TntpInputBuilder(final String networkFileLocation, final String nodeCoordinateFileLocation, final String demandFileLocation)
       throws PlanItException {
-    this(networkFileLocation, demandFileLocation, null, networkFileColumns, speedUnits, lengthUnits,
-        capacityPeriod, defaultMaximumSpeed);
-  }
-
-  /**
-   * Constructor
-   *
-   * @param networkFileLocation network file location
-   * @param demandFileLocation demand file location
-   * @param networkFileColumns Map specifying which columns in the network file contain which values
-   * @param speedUnits speed units being used
-   * @param lengthUnits length units being used
-   * @param defaultMaximumSpeed default maximum speed along a link
-   * @throws PlanItException thrown if there is an error during running
-   */
-  public TntpInputBuilder(final String networkFileLocation, final String demandFileLocation,
-      final Map<NetworkFileColumnType, Integer> networkFileColumns, final SpeedUnits speedUnits,
-      final LengthUnits lengthUnits,
-      final double defaultMaximumSpeed)
-      throws PlanItException {
-    this(networkFileLocation, demandFileLocation, null, networkFileColumns, speedUnits, lengthUnits, null,
-        defaultMaximumSpeed);
-  }
-
-  /**
-   * Constructor
-   *
-   * @param networkFileLocation network file location
-   * @param demandFileLocation demand file location
-   * @param nodeCoordinateFileLocation node coordinate file location
-   * @param standardResultsFileLocation the location of the standard results file
-   * @param networkFileColumns Map specifying which columns in the network file contain which values
-   * @param speedUnits speed units being used
-   * @param lengthUnits length units being used
-   * @param defaultMaximumSpeed default maximum speed along a link
-   * @throws PlanItException thrown if there is an error during running
-   */
-  public TntpInputBuilder(final String networkFileLocation, final String demandFileLocation,
-      final String nodeCoordinateFileLocation, final String standardResultsFileLocation,
-      final Map<NetworkFileColumnType, Integer> networkFileColumns,
-      final SpeedUnits speedUnits,
-      final LengthUnits lengthUnits, final double defaultMaximumSpeed) throws PlanItException {
-    this(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation, networkFileColumns, speedUnits,
-        lengthUnits, null, defaultMaximumSpeed);
-  }
-
-  /**
-   * Constructor
-   *
-   * @param networkFileLocation network file location
-   * @param demandsFileLocation demand file location
-   * @param nodeCoordinateFileLocation node coordinate file location
-   * @param networkFileColumns Map specifying which columns in the network file contain which values
-   * @param speedUnits speed units being used
-   * @param lengthUnits length units being used
-   * @param capacityPeriod time period for link capacity
-   * @param defaultMaximumSpeed default maximum speed along links
-   * @throws PlanItException thrown if there is an error during running
-   */
-  public TntpInputBuilder(final String networkFileLocation, final String demandsFileLocation,
-      final String nodeCoordinateFileLocation, final Map<NetworkFileColumnType, Integer> networkFileColumns,
-      final SpeedUnits speedUnits, final LengthUnits lengthUnits, final CapacityPeriod capacityPeriod,
-      final double defaultMaximumSpeed) throws PlanItException {
-
     super();
-
-    /* network reader */
-    this.networkSettings = new TntpNetworkReaderSettings();
-    this.networkFileLocation = networkFileLocation;
-    this.nodeCoordinateFileLocation = nodeCoordinateFileLocation;
     
-    networkSettings.setCapacityPeriod((capacityPeriod == null) ? CapacityPeriod.HOUR : capacityPeriod);
-    networkSettings.setLengthUnits(lengthUnits);
-    networkSettings.setNetworkFileColumns(networkFileColumns);
-    networkSettings.setSpeedUnits(speedUnits);
-    networkSettings.setDefaultMaximumSpeed(defaultMaximumSpeed);
-        
-    this.demandsFileLocation = demandsFileLocation;
-  }
+    this.networkSettings = new TntpNetworkReaderSettings();
+    this.networkSettings.setNetworkFile(networkFileLocation);
+    this.networkSettings.setNodeCoordinateFile(nodeCoordinateFileLocation);
+    
+    this.zoningReaderSettings = new TntpZoningReaderSettings();    
+    this.zoningReaderSettings.setNetworkFileLocation(networkFileLocation);
+    
+    this.demandsReaderSettings = new TntpDemandsReaderSettings();
+    this.demandsReaderSettings.setDemandFileLocation(demandFileLocation);
+  }  
 
   /**
    * Whenever a project component is created this method will be invoked
@@ -269,5 +186,17 @@ public class TntpInputBuilder extends InputBuilderListener {
       LOGGER.fine("Event component " + event.getClass().getCanonicalName() + " ignored by TNTP InputBuilder");
     }
   }
+
+  public TntpDemandsReaderSettings getDemandsReaderSettings() {
+    return demandsReaderSettings;
+  }
+  
+  public TntpNetworkReaderSettings getNetworkReaderSettings() {
+    return networkSettings;
+  }
+  
+  public TntpZoningReaderSettings getZoningReaderSettings() {
+    return zoningReaderSettings;
+  }    
 
 }

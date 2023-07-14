@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 
 import org.goplanit.assignment.TrafficAssignment;
 import org.goplanit.assignment.traditionalstatic.TraditionalStaticAssignmentConfigurator;
-import org.goplanit.cost.physical.BPRLinkTravelTimeCost;
+import org.goplanit.cost.physical.BprLinkTravelTimeCost;
 import org.goplanit.cost.virtual.FixedConnectoidTravelTimeCost;
 import org.goplanit.demands.Demands;
 import org.goplanit.logging.Logging;
@@ -19,10 +19,10 @@ import org.goplanit.output.enums.OutputType;
 import org.goplanit.output.enums.PathOutputIdentificationType;
 import org.goplanit.output.property.OutputPropertyType;
 import org.goplanit.sdinteraction.smoothing.MSASmoothing;
-import org.goplanit.tntp.enums.CapacityPeriod;
 import org.goplanit.tntp.enums.LengthUnits;
 import org.goplanit.tntp.enums.NetworkFileColumnType;
 import org.goplanit.tntp.enums.SpeedUnits;
+import org.goplanit.tntp.enums.TimeUnits;
 import org.goplanit.tntp.output.formatter.CSVOutputFormatter;
 import org.goplanit.tntp.project.TntpProject;
 import org.goplanit.utils.args.ArgumentParser;
@@ -216,13 +216,20 @@ public class TntpMain {
     networkFileColumns.put(NetworkFileColumnType.TOLL, 8);
     networkFileColumns.put(NetworkFileColumnType.LINK_TYPE, 9);
 
-    final SpeedUnits speedUnits = SpeedUnits.MILES_H;
     final LengthUnits lengthUnits = LengthUnits.MILES; // Both Chicago-Sketch and Philadelphia use miles
-    final CapacityPeriod capacityPeriod = CapacityPeriod.HOUR; // Chicago-Sketch only - for Philadelphia use days
 
-    final TntpProject project = new TntpProject(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation,
-        networkFileColumns, speedUnits, lengthUnits, capacityPeriod, defaultMaximumSpeed);
-
+    final TntpProject project = new TntpProject(networkFileLocation, demandFileLocation, nodeCoordinateFileLocation);
+    project.getNetworkReaderSettings().setNetworkFileColumns(networkFileColumns);
+    project.getNetworkReaderSettings().setSpeedUnits(SpeedUnits.MILES_H);
+    project.getNetworkReaderSettings().setCapacityPeriod(1, TimeUnits.HOURS);   // Chicago-Sketch only - for Philadelphia use days
+    project.getNetworkReaderSettings().setDefaultMaximumSpeed(defaultMaximumSpeed);
+    project.getNetworkReaderSettings().setFreeFlowTravelTimeUnits(TimeUnits.MINUTES);
+    project.getNetworkReaderSettings().setLengthUnits(lengthUnits); 
+    
+    project.getZoningReaderSettings().setNetworkFileLocation(networkFileLocation);
+    project.getDemandsReaderSettings().setTimePeriodDuration(1, TimeUnits.HOURS);
+    project.getDemandsReaderSettings().setStartTimeSinceMidNight(8, TimeUnits.HOURS);
+    
     // RAW INPUT START --------------------------------
     final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) project.createAndRegisterInfrastructureNetwork(MacroscopicNetwork.class.getCanonicalName());
     final Zoning zoning = project.createAndRegisterZoning(macroscopicNetwork);
@@ -236,7 +243,7 @@ public class TntpMain {
             TrafficAssignment.TRADITIONAL_STATIC_ASSIGNMENT, demands, zoning, macroscopicNetwork);
 
     // SUPPLY-DEMAND INTERACTIONS
-    ta.createAndRegisterPhysicalCost(BPRLinkTravelTimeCost.class.getCanonicalName());
+    ta.createAndRegisterPhysicalCost(BprLinkTravelTimeCost.class.getCanonicalName());
     ta.createAndRegisterVirtualCost(FixedConnectoidTravelTimeCost.class.getCanonicalName());
     ta.createAndRegisterSmoothing(MSASmoothing.class.getCanonicalName());
     
