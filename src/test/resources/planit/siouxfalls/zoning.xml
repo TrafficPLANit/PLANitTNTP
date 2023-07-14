@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<macroscopiczoning xmlns:gml="http://www.opengis.net/gml" xmlns:ns3="http://www.w3.org/1999/xlink" xmlns:ns4="http://www.w3.org/2001/SMIL20/" xmlns:ns5="http://www.w3.org/2001/SMIL20/Language" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" srsname="" xsi:noNamespaceSchemaLocation="https://trafficplanit.github.io/PLANitManual/xsd/macroscopiczoninginput.xsd">
+    <id>0</id>
+    <zones>
+        <zone id="0" externalid="1">
+            <centroid>
+                <gml:Point>
+                    <gml:pos>-96.77041974 43.61282792</gml:pos>
+                </gml:Point>
+            </centroid>
+            <connectoids>
+                <connectoid noderef="1" id="0" externalid="1" type="traveller_access">
+                    <length>0.0</length>
+                </connectoid>
+            </connectoids>
+        </zone>
+        <zone id="1" externalid="2">
+            <centroid>
+                <gml:Point>
+                    <gml:pos>-96.71125063 43.60581298</gml:pos>
+                </gml:Point>
+            </centroid>
+            <connectoids>
+                <connectoid noderef="2" id="1" externalid="2" type="traveller_access">
+                    <length>0.0</length>
+                </connectoid>
+            </connectoids>
+        </zone>
+        <zone id="10" externalid="11">
+            <centroid>
+                <gml:Point>
+                    <gml:pos>-96.74684071 43.54413068</gml:pos>
+                </gml:Point>
+            </centroid>
+            <connectoids>
+                <connectoid noderef="11" id="10" externalid="11" type="traveller_access">
+                    <length>0.0</length>
+                </connectoid>
+            </connectoids>
+        </zone>
+        <zone id="11" externalid="12">
+            <centroid>
+                <gml:Point>
+                    <gml:pos>-96.78013678 43.54394065</gml:pos>
+                </gml:Point>
+            </centroid>
+            <connectoids>
+                <connectoid noderef="12" id="11" externalid="12" type="traveller_access">
+                    <length>0.0</length>
+                </connectoid>
+            </connectoids>
+        </zone>
+        <zone id="12" externalid="13">
+            <centroid>
+                <gml:Point>
+                    <gml:pos>-96.79337655 43.49070718</gml:pos>
+                </gml:Point>
+            </centroid>
+            <connectoids>
+                <connectoid noderef="13" id="12" externalid="13" type="traveller_access">
+                    <length>0.0</length>
+                </connectoid>
+            </connectoids>
+        </zone>
+        <zone id="13" externalid="14">
+            <centroid>
+                <gml:Point>
+                    <gml:pos>-96.75103549 43.52930613</gml:pos>
+                </gml:Point>
+            </centroid>
+            <connectoids>
+                <connectoid noderef="14" id="13" externalid="14" type="traveller_access">
+                    <length>0.0</length>
+                </connectoid>
+            </connectoids>
+        </zone>
+        <zone id="14" externalid="15">
+            <centroid>
+                <gml:Point>
+                    <gml:pos>-96.73150355 43.52940117</gml:pos>
+                </gml:Point>
+            </centroid>
+            <connectoids>
+                <connectoid noderef="15" id="14" externalid="15" type="traveller_access">
+                    <length>0.0</length>
+                </connectoid>
+            </connectoids>
+        </zone>
+        <zone id="15" externalid="16">
+            <centroid>
+                <gml:Point>
+                    <gml:pos>-96.71138171 43.54674361</gml:pos>
+                </gml:Point>
+            </centroid>
+            <connectoids>
+                <connectoid noderef="16" id="15" externalid="16" type="traveller_access">
+                    <length>0.0</length>
+                </connectoid>
+            </connectoids>
+        </zone>
+        <zone id="16" externalid="17">
+            <centroid>
+                <gml:Point>
+                    <gml:pos>-96.71138171 43.54128009</gml:pos>
+                </gml:Point>
+            </centroid>
+            <connectoids>
+                <connectoid noderef="17" id="16" externalid="17" type="traveller_access">
+                    <length>0.0</length>
+                </connectoid>
+            </connectoids>
+        </zone>
+        <zone id="17" externalid="18">
+            <centroid>
+                <gml:Point>
+                    <gml:pos>-96.69407825 43.54674361</gml:pos>
+                </gml:Point>
+            </centroid>
+            <connectoids>
+                <connectoid noderef="18" id="17" externalid="18" type="traveller_access">
+                    <length>0.0</length>
+                </connectoid>
+            </connectoids>
+        </zone>
+        <zone id="18" externalid="19">
+            <centroid>
+                <gml:Point>
+                    <gml:pos>-96.71131617 43.52959125</gml:pos>
+                </gml:Point>
+            </centroid>
+            <connectoids>
+                <connectoid noderef="19" id="18" externalid="19" type="traveller_access">
+                    <length>0.0</length>
+                </connectoid>
+            </connectoids>
+        </zone>
+        <zone id="19" externalid="20">
+            <centroid>
+                <gml:Point>
+                    <gml:pos>-96.71118508 43.5153335</gml:pos>
+                </gml:Point>
+            </centroid>
+            <connectoids>
+                <connectoid noderef="20" id="19" externalid="20" type="traveller_access">
+                    <length>0.0</length>
+                </connectoid>
+            </connectoids>
+        </zone>
+        <zone id="2" externalid="3">
+            <centroid>
+                <gml:Point>
+                    <gml:pos>-96.77430341 43.5729616</gml:pos>
+                </gml:Point>
+            </centroid>
+            <connectoids>
+                <connectoid noderef="3" id="2" externalid="3" type="traveller_access">
+                    <length>0.0</length>
+                </connectoid>
+            </connectoids>
+        </zone>
+        <zone id="20" externalid="21">
+            <centroid>
+                <gml:Point>
+                    <gml:pos>-96.7309792 43.51048509</gml:pos>
+                </gml:Point>
+            </centroid>
+            <connectoids>
+                <connectoid noderef="21" id="20" externalid="21" type="traveller_access">
+                    <length>0.0</length>
+                </connectoid>
+            </connectoids>
+        </zone>
+        <zone id="21" externalid="22">
+            <centroid>
+                <gml:Point>
+                    <gml:pos>-96.73124137 43.51485818</gml:pos>
+                </gml:Point>
+            </centroid>
+            <connectoids>
+                <connectoid noderef="22" id="21" externalid="22" type="traveller_access">
+                    <length>0.0</length>
+                </connectoid>
+            </connectoids>
+        </zone>
+        <zone id="22" externalid="23">
+            <centroid>
+                <gml:Point>
+                    <gml:pos>-96.75090441 43.51485818</gml:pos>
+                </gml:Point>
+            </centroid>
+            <connectoids>
+                <connectoid noderef="23" id="22" externalid="23" type="traveller_access">
+                    <length>0.0</length>
+                </connectoid>
+            </connectoids>
+        </zone>
+        <zone id="23" externalid="24">
+            <centroid>
+                <gml:Point>
+                    <gml:pos>-96.74920028 43.50316422</gml:pos>
+                </gml:Point>
+            </centroid>
+            <connectoids>
+                <connectoid noderef="24" id="23" externalid="24" type="traveller_access">
+                    <length>0.0</length>
+                </connectoid>
+            </connectoids>
+        </zone>
+        <zone id="3" externalid="4">
+            <centroid>
+                <gml:Point>
+                    <gml:pos>-96.74716843 43.56365362</gml:pos>
+                </gml:Point>
+            </centroid>
+            <connectoids>
+                <connectoid noderef="4" id="3" externalid="4" type="traveller_access">
+                    <length>0.0</length>
+                </connectoid>
+            </connectoids>
+        </zone>
+        <zone id="4" externalid="5">
+            <centroid>
+                <gml:Point>
+                    <gml:pos>-96.73156909 43.56403357</gml:pos>
+                </gml:Point>
+            </centroid>
+            <connectoids>
+                <connectoid noderef="5" id="4" externalid="5" type="traveller_access">
+                    <length>0.0</length>
+                </connectoid>
+            </connectoids>
+        </zone>
+        <zone id="5" externalid="6">
+            <centroid>
+                <gml:Point>
+                    <gml:pos>-96.71164389 43.58758553</gml:pos>
+                </gml:Point>
+            </centroid>
+            <connectoids>
+                <connectoid noderef="6" id="5" externalid="6" type="traveller_access">
+                    <length>0.0</length>
+                </connectoid>
+            </connectoids>
+        </zone>
+        <zone id="6" externalid="7">
+            <centroid>
+                <gml:Point>
+                    <gml:pos>-96.69342281 43.5638436</gml:pos>
+                </gml:Point>
+            </centroid>
+            <connectoids>
+                <connectoid noderef="7" id="6" externalid="7" type="traveller_access">
+                    <length>0.0</length>
+                </connectoid>
+            </connectoids>
+        </zone>
+        <zone id="7" externalid="8">
+            <centroid>
+                <gml:Point>
+                    <gml:pos>-96.71138171 43.56232379</gml:pos>
+                </gml:Point>
+            </centroid>
+            <connectoids>
+                <connectoid noderef="8" id="7" externalid="8" type="traveller_access">
+                    <length>0.0</length>
+                </connectoid>
+            </connectoids>
+        </zone>
+        <zone id="8" externalid="9">
+            <centroid>
+                <gml:Point>
+                    <gml:pos>-96.73124137 43.54859634</gml:pos>
+                </gml:Point>
+            </centroid>
+            <connectoids>
+                <connectoid noderef="9" id="8" externalid="9" type="traveller_access">
+                    <length>0.0</length>
+                </connectoid>
+            </connectoids>
+        </zone>
+        <zone id="9" externalid="10">
+            <centroid>
+                <gml:Point>
+                    <gml:pos>-96.73143801 43.54527088</gml:pos>
+                </gml:Point>
+            </centroid>
+            <connectoids>
+                <connectoid noderef="10" id="9" externalid="10" type="traveller_access">
+                    <length>0.0</length>
+                </connectoid>
+            </connectoids>
+        </zone>
+    </zones>
+</macroscopiczoning>

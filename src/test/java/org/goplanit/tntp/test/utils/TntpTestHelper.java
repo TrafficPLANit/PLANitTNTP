@@ -1,4 +1,4 @@
-package org.goplanit.tntp.test;
+package org.goplanit.tntp.test.utils;
 
 import java.io.File;
 import java.util.HashMap;

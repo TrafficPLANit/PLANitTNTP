@@ -1,0 +1,912 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<macroscopicnetwork xmlns:gml="http://www.opengis.net/gml" xmlns:ns3="http://www.w3.org/1999/xlink" xmlns:ns4="http://www.w3.org/2001/SMIL20/" xmlns:ns5="http://www.w3.org/2001/SMIL20/Language" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://trafficplanit.github.io/PLANitManual/xsd/macroscopicnetworkinput.xsd">
+    <id>0</id>
+    <configuration>
+        <modes>
+            <mode id="car" predefined="true">
+                <name>car</name>
+                <maxspeed>130.0</maxspeed>
+                <pcu>1.0</pcu>
+                <physicalfeatures>
+                    <vehicletype>vehicle</vehicletype>
+                    <motorisationtype>motorised</motorisationtype>
+                    <tracktype>road</tracktype>
+                </physicalfeatures>
+                <usabilityfeatures>
+                    <usedtotype>private</usedtotype>
+                </usabilityfeatures>
+            </mode>
+        </modes>
+    </configuration>
+    <infrastructurelayers srsname="">
+        <layer id="0">
+            <layerconfiguration>
+                <linksegmenttypes>
+                    <linksegmenttype id="0" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>1618.76254</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="1" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>1462.717074375</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="10" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>631.2741445</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="11" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>630.727822875</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="12" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>1739.4735525</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="13" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>1689.00019375</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="14" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>606.864714625</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="15" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>624.18883675</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="16" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>609.563535875</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="17" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>636.407019</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="18" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>640.940764875</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="19" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>615.598825625</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="2" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>619.772616</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="20" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>1820.59414375</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="21" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>1199.897570625</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="22" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>653.738757875</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="23" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>1229.993544375</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="24" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>602.993853875</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="25" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>625.325945375</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="26" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>632.4890425</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="27" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>634.462149125</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="28" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>610.6696955</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="29" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>625.0</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="3" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>1069.4077325</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="30" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>634.8135545</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="4" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>1111.42463125</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="5" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>613.60334125</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="6" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>618.499433625</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="7" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>1250.0</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="8" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>612.32345575</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                    <linksegmenttype id="9" externalid="1">
+                        <name>1</name>
+                        <maxdensitylane>180.0</maxdensitylane>
+                        <capacitylane>980.22641375</capacitylane>
+                        <access>
+                            <accessgroup moderefs="car">
+<maxspeed>97.0</maxspeed>
+<critspeed>97.0</critspeed>
+                            </accessgroup>
+                        </access>
+                    </linksegmenttype>
+                </linksegmenttypes>
+            </layerconfiguration>
+            <nodes>
+                <node id="1" externalid="1">
+                    <gml:Point>
+                        <gml:pos>-96.77041974 43.61282792</gml:pos>
+                    </gml:Point>
+                </node>
+                <node id="10" externalid="10">
+                    <gml:Point>
+                        <gml:pos>-96.73143801 43.54527088</gml:pos>
+                    </gml:Point>
+                </node>
+                <node id="11" externalid="11">
+                    <gml:Point>
+                        <gml:pos>-96.74684071 43.54413068</gml:pos>
+                    </gml:Point>
+                </node>
+                <node id="12" externalid="12">
+                    <gml:Point>
+                        <gml:pos>-96.78013678 43.54394065</gml:pos>
+                    </gml:Point>
+                </node>
+                <node id="13" externalid="13">
+                    <gml:Point>
+                        <gml:pos>-96.79337655 43.49070718</gml:pos>
+                    </gml:Point>
+                </node>
+                <node id="14" externalid="14">
+                    <gml:Point>
+                        <gml:pos>-96.75103549 43.52930613</gml:pos>
+                    </gml:Point>
+                </node>
+                <node id="15" externalid="15">
+                    <gml:Point>
+                        <gml:pos>-96.73150355 43.52940117</gml:pos>
+                    </gml:Point>
+                </node>
+                <node id="16" externalid="16">
+                    <gml:Point>
+                        <gml:pos>-96.71138171 43.54674361</gml:pos>
+                    </gml:Point>
+                </node>
+                <node id="17" externalid="17">
+                    <gml:Point>
+                        <gml:pos>-96.71138171 43.54128009</gml:pos>
+                    </gml:Point>
+                </node>
+                <node id="18" externalid="18">
+                    <gml:Point>
+                        <gml:pos>-96.69407825 43.54674361</gml:pos>
+                    </gml:Point>
+                </node>
+                <node id="19" externalid="19">
+                    <gml:Point>
+                        <gml:pos>-96.71131617 43.52959125</gml:pos>
+                    </gml:Point>
+                </node>
+                <node id="2" externalid="2">
+                    <gml:Point>
+                        <gml:pos>-96.71125063 43.60581298</gml:pos>
+                    </gml:Point>
+                </node>
+                <node id="20" externalid="20">
+                    <gml:Point>
+                        <gml:pos>-96.71118508 43.5153335</gml:pos>
+                    </gml:Point>
+                </node>
+                <node id="21" externalid="21">
+                    <gml:Point>
+                        <gml:pos>-96.7309792 43.51048509</gml:pos>
+                    </gml:Point>
+                </node>
+                <node id="22" externalid="22">
+                    <gml:Point>
+                        <gml:pos>-96.73124137 43.51485818</gml:pos>
+                    </gml:Point>
+                </node>
+                <node id="23" externalid="23">
+                    <gml:Point>
+                        <gml:pos>-96.75090441 43.51485818</gml:pos>
+                    </gml:Point>
+                </node>
+                <node id="24" externalid="24">
+                    <gml:Point>
+                        <gml:pos>-96.74920028 43.50316422</gml:pos>
+                    </gml:Point>
+                </node>
+                <node id="3" externalid="3">
+                    <gml:Point>
+                        <gml:pos>-96.77430341 43.5729616</gml:pos>
+                    </gml:Point>
+                </node>
+                <node id="4" externalid="4">
+                    <gml:Point>
+                        <gml:pos>-96.74716843 43.56365362</gml:pos>
+                    </gml:Point>
+                </node>
+                <node id="5" externalid="5">
+                    <gml:Point>
+                        <gml:pos>-96.73156909 43.56403357</gml:pos>
+                    </gml:Point>
+                </node>
+                <node id="6" externalid="6">
+                    <gml:Point>
+                        <gml:pos>-96.71164389 43.58758553</gml:pos>
+                    </gml:Point>
+                </node>
+                <node id="7" externalid="7">
+                    <gml:Point>
+                        <gml:pos>-96.69342281 43.5638436</gml:pos>
+                    </gml:Point>
+                </node>
+                <node id="8" externalid="8">
+                    <gml:Point>
+                        <gml:pos>-96.71138171 43.56232379</gml:pos>
+                    </gml:Point>
+                </node>
+                <node id="9" externalid="9">
+                    <gml:Point>
+                        <gml:pos>-96.73124137 43.54859634</gml:pos>
+                    </gml:Point>
+                </node>
+            </nodes>
+            <links>
+                <link id="0" externalid="0" nodearef="1" nodebref="2">
+                    <linksegment id="0-AB" dir="a_b" typeref="0">
+                        <numberoflanes>2</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="0-BA" dir="b_a" typeref="0">
+                        <numberoflanes>2</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">9.66</length>
+                </link>
+                <link id="1" externalid="1" nodearef="1" nodebref="3">
+                    <linksegment id="1-AB" dir="a_b" typeref="1">
+                        <numberoflanes>2</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="1-BA" dir="b_a" typeref="1">
+                        <numberoflanes>2</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">6.44</length>
+                </link>
+                <link id="10" externalid="10" nodearef="7" nodebref="8">
+                    <linksegment id="10-AB" dir="a_b" typeref="9">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="10-BA" dir="b_a" typeref="9">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">4.83</length>
+                </link>
+                <link id="11" externalid="11" nodearef="7" nodebref="18">
+                    <linksegment id="11-AB" dir="a_b" typeref="1">
+                        <numberoflanes>2</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="11-BA" dir="b_a" typeref="1">
+                        <numberoflanes>2</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">3.22</length>
+                </link>
+                <link id="12" externalid="12" nodearef="8" nodebref="9">
+                    <linksegment id="12-AB" dir="a_b" typeref="10">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="12-BA" dir="b_a" typeref="10">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">16.1</length>
+                </link>
+                <link id="13" externalid="13" nodearef="8" nodebref="16">
+                    <linksegment id="13-AB" dir="a_b" typeref="11">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="13-BA" dir="b_a" typeref="11">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">8.05</length>
+                </link>
+                <link id="14" externalid="14" nodearef="9" nodebref="10">
+                    <linksegment id="14-AB" dir="a_b" typeref="12">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="14-BA" dir="b_a" typeref="12">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">4.83</length>
+                </link>
+                <link id="15" externalid="15" nodearef="10" nodebref="11">
+                    <linksegment id="15-AB" dir="a_b" typeref="7">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="15-BA" dir="b_a" typeref="7">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">8.05</length>
+                </link>
+                <link id="16" externalid="16" nodearef="10" nodebref="15">
+                    <linksegment id="16-AB" dir="a_b" typeref="13">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="16-BA" dir="b_a" typeref="13">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">9.66</length>
+                </link>
+                <link id="17" externalid="17" nodearef="10" nodebref="16">
+                    <linksegment id="17-AB" dir="a_b" typeref="14">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="17-BA" dir="b_a" typeref="14">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">6.44</length>
+                </link>
+                <link id="18" externalid="18" nodearef="10" nodebref="17">
+                    <linksegment id="18-AB" dir="a_b" typeref="15">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="18-BA" dir="b_a" typeref="15">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">12.88</length>
+                </link>
+                <link id="19" externalid="19" nodearef="11" nodebref="12">
+                    <linksegment id="19-AB" dir="a_b" typeref="5">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="19-BA" dir="b_a" typeref="5">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">9.66</length>
+                </link>
+                <link id="2" externalid="2" nodearef="2" nodebref="6">
+                    <linksegment id="2-AB" dir="a_b" typeref="2">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="2-BA" dir="b_a" typeref="2">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">8.05</length>
+                </link>
+                <link id="20" externalid="20" nodearef="11" nodebref="14">
+                    <linksegment id="20-AB" dir="a_b" typeref="16">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="20-BA" dir="b_a" typeref="16">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">6.44</length>
+                </link>
+                <link id="21" externalid="21" nodearef="12" nodebref="13">
+                    <linksegment id="21-AB" dir="a_b" typeref="0">
+                        <numberoflanes>2</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="21-BA" dir="b_a" typeref="0">
+                        <numberoflanes>2</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">4.83</length>
+                </link>
+                <link id="22" externalid="22" nodearef="13" nodebref="24">
+                    <linksegment id="22-AB" dir="a_b" typeref="17">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="22-BA" dir="b_a" typeref="17">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">6.44</length>
+                </link>
+                <link id="23" externalid="23" nodearef="14" nodebref="15">
+                    <linksegment id="23-AB" dir="a_b" typeref="18">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="23-BA" dir="b_a" typeref="18">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">8.05</length>
+                </link>
+                <link id="24" externalid="24" nodearef="14" nodebref="23">
+                    <linksegment id="24-AB" dir="a_b" typeref="19">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="24-BA" dir="b_a" typeref="19">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">6.44</length>
+                </link>
+                <link id="25" externalid="25" nodearef="15" nodebref="19">
+                    <linksegment id="25-AB" dir="a_b" typeref="20">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="25-BA" dir="b_a" typeref="20">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">4.83</length>
+                </link>
+                <link id="26" externalid="26" nodearef="15" nodebref="22">
+                    <linksegment id="26-AB" dir="a_b" typeref="21">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="26-BA" dir="b_a" typeref="21">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">4.83</length>
+                </link>
+                <link id="27" externalid="27" nodearef="16" nodebref="17">
+                    <linksegment id="27-AB" dir="a_b" typeref="22">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="27-BA" dir="b_a" typeref="22">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">3.22</length>
+                </link>
+                <link id="28" externalid="28" nodearef="16" nodebref="18">
+                    <linksegment id="28-AB" dir="a_b" typeref="23">
+                        <numberoflanes>2</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="28-BA" dir="b_a" typeref="23">
+                        <numberoflanes>2</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">4.83</length>
+                </link>
+                <link id="29" externalid="29" nodearef="17" nodebref="19">
+                    <linksegment id="29-AB" dir="a_b" typeref="24">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="29-BA" dir="b_a" typeref="24">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">3.22</length>
+                </link>
+                <link id="3" externalid="3" nodearef="3" nodebref="4">
+                    <linksegment id="3-AB" dir="a_b" typeref="3">
+                        <numberoflanes>2</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="3-BA" dir="b_a" typeref="3">
+                        <numberoflanes>2</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">6.44</length>
+                </link>
+                <link id="30" externalid="30" nodearef="18" nodebref="20">
+                    <linksegment id="30-AB" dir="a_b" typeref="1">
+                        <numberoflanes>2</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="30-BA" dir="b_a" typeref="1">
+                        <numberoflanes>2</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">6.44</length>
+                </link>
+                <link id="31" externalid="31" nodearef="19" nodebref="20">
+                    <linksegment id="31-AB" dir="a_b" typeref="25">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="31-BA" dir="b_a" typeref="25">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">6.44</length>
+                </link>
+                <link id="32" externalid="32" nodearef="20" nodebref="21">
+                    <linksegment id="32-AB" dir="a_b" typeref="26">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="32-BA" dir="b_a" typeref="26">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">9.66</length>
+                </link>
+                <link id="33" externalid="33" nodearef="20" nodebref="22">
+                    <linksegment id="33-AB" dir="a_b" typeref="27">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="33-BA" dir="b_a" typeref="27">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">8.05</length>
+                </link>
+                <link id="34" externalid="34" nodearef="21" nodebref="22">
+                    <linksegment id="34-AB" dir="a_b" typeref="22">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="34-BA" dir="b_a" typeref="22">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">3.22</length>
+                </link>
+                <link id="35" externalid="35" nodearef="21" nodebref="24">
+                    <linksegment id="35-AB" dir="a_b" typeref="28">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="35-BA" dir="b_a" typeref="28">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">4.83</length>
+                </link>
+                <link id="36" externalid="36" nodearef="22" nodebref="23">
+                    <linksegment id="36-AB" dir="a_b" typeref="29">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="36-BA" dir="b_a" typeref="29">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">6.44</length>
+                </link>
+                <link id="37" externalid="37" nodearef="23" nodebref="24">
+                    <linksegment id="37-AB" dir="a_b" typeref="30">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="37-BA" dir="b_a" typeref="30">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">3.22</length>
+                </link>
+                <link id="4" externalid="4" nodearef="3" nodebref="12">
+                    <linksegment id="4-AB" dir="a_b" typeref="1">
+                        <numberoflanes>2</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="4-BA" dir="b_a" typeref="1">
+                        <numberoflanes>2</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">6.44</length>
+                </link>
+                <link id="5" externalid="5" nodearef="4" nodebref="5">
+                    <linksegment id="5-AB" dir="a_b" typeref="4">
+                        <numberoflanes>2</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="5-BA" dir="b_a" typeref="4">
+                        <numberoflanes>2</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">3.22</length>
+                </link>
+                <link id="6" externalid="6" nodearef="4" nodebref="11">
+                    <linksegment id="6-AB" dir="a_b" typeref="5">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="6-BA" dir="b_a" typeref="5">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">9.66</length>
+                </link>
+                <link id="7" externalid="7" nodearef="5" nodebref="6">
+                    <linksegment id="7-AB" dir="a_b" typeref="6">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="7-BA" dir="b_a" typeref="6">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">6.44</length>
+                </link>
+                <link id="8" externalid="8" nodearef="5" nodebref="9">
+                    <linksegment id="8-AB" dir="a_b" typeref="7">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="8-BA" dir="b_a" typeref="7">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">8.05</length>
+                </link>
+                <link id="9" externalid="9" nodearef="6" nodebref="8">
+                    <linksegment id="9-AB" dir="a_b" typeref="8">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <linksegment id="9-BA" dir="b_a" typeref="8">
+                        <numberoflanes>1</numberoflanes>
+                        <maxspeed>130.0</maxspeed>
+                    </linksegment>
+                    <length unit="km">3.22</length>
+                </link>
+            </links>
+        </layer>
+    </infrastructurelayers>
+</macroscopicnetwork>
