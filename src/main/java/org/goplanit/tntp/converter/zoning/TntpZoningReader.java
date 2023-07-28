@@ -79,7 +79,6 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
    * initialise the source id trackers and populate them for the network references, 
    * so we can lay indices on the source id as well for quick lookups
    * 
-   * @param network
    */
   private void initialiseParentNetworkSourceIdTrackers() {    
     initialiseSourceIdMap(Node.class, Node::getExternalId);
@@ -190,7 +189,6 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
    */  
   @Override
   public void reset() {
-    settings.reset();    
   }
 
 }

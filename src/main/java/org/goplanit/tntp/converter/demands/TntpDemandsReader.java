@@ -266,7 +266,6 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
    */  
   @Override
   public void reset() {
-    settings.reset();
   }
 
 }

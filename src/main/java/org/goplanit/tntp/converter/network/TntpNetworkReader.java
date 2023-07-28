@@ -521,7 +521,6 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    */  
   @Override
   public void reset() {
-    settings.reset();
     bprParametersForLinkSegmentAndMode = null;
   }
   
