@@ -86,8 +86,10 @@ public class TntpConversionTests {
     Logging.closeLogger(LOGGER);
   }
 
-  private static TntpNetworkReader createChicagoTntpNetworkReader(Path networkFileLocation, Path nodeFileLocation, double defaultMaxSpeedMpH, IdGroupingToken idToken) {
-    return createChicagoTntpNetworkReader(networkFileLocation.toAbsolutePath().toString(),nodeFileLocation.toAbsolutePath().toString(), defaultMaxSpeedMpH, idToken);
+  private static TntpNetworkReader createChicagoTntpNetworkReader(
+      Path networkFileLocation, Path nodeFileLocation, double defaultMaxSpeedMpH, IdGroupingToken idToken) {
+    return createChicagoTntpNetworkReader(
+        networkFileLocation.toAbsolutePath().toString(),nodeFileLocation.toAbsolutePath().toString(), defaultMaxSpeedMpH, idToken);
   }
   
   /** Create TNTP reader suitable for Chicago network
@@ -98,11 +100,12 @@ public class TntpConversionTests {
    * @param idToken 
    * @return pre-configured network reader
    */
-  private static TntpNetworkReader createChicagoTntpNetworkReader(String networkFileLocation, String nodeFileLocation, double defaultMaxSpeedMpH, IdGroupingToken idToken) {
+  private static TntpNetworkReader createChicagoTntpNetworkReader(
+      String networkFileLocation, String nodeFileLocation, double defaultMaxSpeedMpH, IdGroupingToken idToken) {
     var tntpReader = TntpNetworkReaderFactory.create(networkFileLocation, nodeFileLocation, idToken);
     
     // The following arrangement of columns is correct for Chicago Sketch (and Philadelphia), for other cities the arrangement can be different.
-    final Map<NetworkFileColumnType, Integer> networkFileColumns = new HashMap<NetworkFileColumnType, Integer>();
+    final Map<NetworkFileColumnType, Integer> networkFileColumns = new HashMap<>();
     networkFileColumns.put(NetworkFileColumnType.UPSTREAM_NODE_ID, 0);
     networkFileColumns.put(NetworkFileColumnType.DOWNSTREAM_NODE_ID, 1);
     networkFileColumns.put(NetworkFileColumnType.CAPACITY_PER_LANE, 2);
@@ -135,10 +138,11 @@ public class TntpConversionTests {
    * @return pre-configured network reader
    */  
   private static TntpNetworkReader createSiouxFallsTntpNetworkReader(Path networkFileLocation, Path nodeFileLocation, double defaultMaxSpeedMpH, IdGroupingToken idToken) {
-    var tntpReader = TntpNetworkReaderFactory.create(networkFileLocation.toAbsolutePath().toString(), nodeFileLocation.toAbsolutePath().toString(), idToken);
+    var tntpReader = TntpNetworkReaderFactory.create(
+        networkFileLocation.toAbsolutePath().toString(), nodeFileLocation.toAbsolutePath().toString(), idToken);
     
     // The following arrangement of columns is correct for SiouxFalls
-    final Map<NetworkFileColumnType, Integer> networkFileColumns = new HashMap<NetworkFileColumnType, Integer>();
+    final Map<NetworkFileColumnType, Integer> networkFileColumns = new HashMap<>();
     networkFileColumns.put(NetworkFileColumnType.UPSTREAM_NODE_ID, 0);
     networkFileColumns.put(NetworkFileColumnType.DOWNSTREAM_NODE_ID, 1);
     networkFileColumns.put(NetworkFileColumnType.CAPACITY_PER_LANE, 2);
@@ -177,7 +181,8 @@ public class TntpConversionTests {
       TntpNetworkReader tntpReader = createChicagoTntpNetworkReader(CHICAGO_NETWORK_FILE, CHICAGO_NODE_FILE, DEFAULT_MAXIMUM_SPEED, idToken );
       
       /* PLANit writer */
-      PlanitNetworkWriter planitWriter = PlanitNetworkWriterFactory.create(PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), CountryNames.UNITED_STATES_OF_AMERICA);
+      PlanitNetworkWriter planitWriter = PlanitNetworkWriterFactory.create(
+          PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), CountryNames.UNITED_STATES_OF_AMERICA);
       
       /* convert */
       NetworkConverter theConverter = NetworkConverterFactory.create(tntpReader, planitWriter);
@@ -209,10 +214,12 @@ public class TntpConversionTests {
       var planitNetwork = (MacroscopicNetwork) tntpNetworkReader.read();
       
       /* TNTP ZONING reader */
-      TntpZoningReader tntpZoningReader = TntpZoningReaderFactory.create(CHICAGO_NETWORK_FILE.toAbsolutePath().toString(), planitNetwork, idToken);
+      TntpZoningReader tntpZoningReader = TntpZoningReaderFactory.create(
+          CHICAGO_NETWORK_FILE.toAbsolutePath().toString(), planitNetwork, idToken);
       
       /* PLANit ZONING writer */
-      PlanitZoningWriter planitWriter = PlanitZoningWriterFactory.create(PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), CountryNames.UNITED_STATES_OF_AMERICA, planitNetwork.getCoordinateReferenceSystem());
+      PlanitZoningWriter planitWriter = PlanitZoningWriterFactory.create(
+          PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), CountryNames.UNITED_STATES_OF_AMERICA);
       
       /* convert */
       ZoningConverter theConverter = ZoningConverterFactory.create(tntpZoningReader, planitWriter);
@@ -240,27 +247,38 @@ public class TntpConversionTests {
       
       /* TNTP network.zoning reader */
       var idToken = IdGenerator.createIdGroupingToken("testTntp2PlanitDemandsChicago");
-      TntpNetworkReader tntpNetworkReader = createChicagoTntpNetworkReader(CHICAGO_NETWORK_FILE, CHICAGO_NODE_FILE, DEFAULT_MAXIMUM_SPEED, idToken);
-      var planitNetwork = (MacroscopicNetwork) tntpNetworkReader.read();      
+      TntpNetworkReader tntpNetworkReader = createChicagoTntpNetworkReader(
+          CHICAGO_NETWORK_FILE, CHICAGO_NODE_FILE, DEFAULT_MAXIMUM_SPEED, idToken);
       
-      TntpZoningReader tntpZoningReader = TntpZoningReaderFactory.create(CHICAGO_NETWORK_FILE.toAbsolutePath().toString(), planitNetwork, idToken);
-      var zoning = tntpZoningReader.read();
-      
+      TntpZoningReader tntpZoningReader = TntpZoningReaderFactory.create(tntpNetworkReader);
+      tntpZoningReader.getSettings().setNetworkFileLocation(CHICAGO_NETWORK_FILE.toAbsolutePath().toString());
+
       /* TNTP DEMAND reader */
-      TntpDemandsReader tntpDemandsReader = TntpDemandsReaderFactory.create(CHICAGO_DEMAND_FILE.toAbsolutePath().toString(), planitNetwork, zoning, idToken);
-      tntpDemandsReader.getSettings().setStartTimeSinceMidNight(8, TimeUnits.HOURS);
+      TntpDemandsReader tntpDemandsReader = TntpDemandsReaderFactory.create(tntpZoningReader);
+      tntpDemandsReader.getSettings().setDemandFileLocation(CHICAGO_DEMAND_FILE.toAbsolutePath().toString());
+      tntpDemandsReader.getSettings().setStartTimeSinceMidnight(8, TimeUnits.HOURS);
       tntpDemandsReader.getSettings().setTimePeriodDuration(1, TimeUnits.HOURS);     
       
       /* PLANit DEMAND writer */
-      PlanitDemandsWriter planitWriter = PlanitDemandsWriterFactory.create(PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), zoning);
+      PlanitDemandsWriter planitWriter = PlanitDemandsWriterFactory.create();
+      planitWriter.getSettings().setOutputDirectory(PLANIT_OUTPUT_DIR.toAbsolutePath().toString());
       
       /* convert */
       DemandsConverter theConverter = DemandsConverterFactory.create(tntpDemandsReader, planitWriter);
       theConverter.convert();
 
-      PlanitAssertionUtils.assertNetworkFilesSimilar(PLANIT_OUTPUT_DIR, PLANIT_REF_DIR);
-      PlanitAssertionUtils.assertZoningFilesSimilar(PLANIT_OUTPUT_DIR, PLANIT_REF_DIR);
       PlanitAssertionUtils.assertDemandsFilesSimilar(PLANIT_OUTPUT_DIR, PLANIT_REF_DIR);
+
+      PlanitNetworkWriter networkWriter =
+          PlanitNetworkWriterFactory.create(PLANIT_OUTPUT_DIR.toAbsolutePath().toString());
+      networkWriter.write(tntpDemandsReader.getReferenceNetwork());
+      PlanitAssertionUtils.assertNetworkFilesSimilar(PLANIT_OUTPUT_DIR, PLANIT_REF_DIR);
+      PlanitZoningWriter zoningWriter =
+          PlanitZoningWriterFactory.create(
+              PLANIT_OUTPUT_DIR.toAbsolutePath().toString(),
+              CountryNames.UNITED_STATES_OF_AMERICA);
+      zoningWriter.write(tntpDemandsReader.getReferenceZoning());
+      PlanitAssertionUtils.assertZoningFilesSimilar(PLANIT_OUTPUT_DIR, PLANIT_REF_DIR);
 
     } catch (final Exception e) {
       e.printStackTrace();
@@ -280,7 +298,8 @@ public class TntpConversionTests {
     try {      
       /* TNTP network reader */
       var idToken = IdGenerator.createIdGroupingToken("testTntp2PlanitDemandsSiouxFalls");
-      var tntpNetworkReader = createSiouxFallsTntpNetworkReader(SIOUXFALLS_NETWORK_FILE, SIOUXFALLS_NODE_FILE, DEFAULT_MAXIMUM_SPEED, idToken);
+      var tntpNetworkReader =
+          createSiouxFallsTntpNetworkReader(SIOUXFALLS_NETWORK_FILE, SIOUXFALLS_NODE_FILE, DEFAULT_MAXIMUM_SPEED, idToken);
       tntpNetworkReader.getSettings().setCapacityPeriod(8 /* about 8 hours */, TimeUnits.HOURS);
       var planitNetwork = (MacroscopicNetwork) tntpNetworkReader.read();
       /* PLANit network writer */
@@ -291,12 +310,13 @@ public class TntpConversionTests {
       var tntpZoningReader = TntpZoningReaderFactory.create(SIOUXFALLS_NETWORK_FILE.toAbsolutePath().toString(), planitNetwork, idToken);
       var zoning = tntpZoningReader.read();
       /* PLANit ZONING writer */
-      var planitZoningWriter = PlanitZoningWriterFactory.create(PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), CountryNames.UNITED_STATES_OF_AMERICA, planitNetwork.getCoordinateReferenceSystem());
+      var planitZoningWriter = PlanitZoningWriterFactory.create(
+          PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), CountryNames.UNITED_STATES_OF_AMERICA);
       planitZoningWriter.write(zoning);      
       
       /* TNTP DEMAND reader */
       var tntpDemandsReader = TntpDemandsReaderFactory.create(SIOUXFALLS_DEMAND_FILE.toAbsolutePath().toString(), planitNetwork, zoning, idToken);
-      tntpDemandsReader.getSettings().setStartTimeSinceMidNight(8, TimeUnits.HOURS);
+      tntpDemandsReader.getSettings().setStartTimeSinceMidnight(8, TimeUnits.HOURS);
       tntpDemandsReader.getSettings().setTimePeriodDuration(12*0.1 /* 10% of daily flow/capacity as per github readme*/, TimeUnits.HOURS);           
       /* PLANit DEMAND writer */
       var planitWriter = PlanitDemandsWriterFactory.create(PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), zoning);

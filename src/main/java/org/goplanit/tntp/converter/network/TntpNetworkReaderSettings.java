@@ -124,18 +124,25 @@ public class TntpNetworkReaderSettings implements ConverterReaderSettings {
   
   public double getCapacityPeriodDuration() {
     return capacityPeriod.first();
-  }  
+  }
 
-  public void setCapacityPeriod(final double duration, final TimeUnits units) {
-    this.capacityPeriod = Pair.of(duration, units);
+  /**
+   * Determine how the capacity is defined in terms of units, e.g., 1, TimeUnits.Hour reflects that capacity is
+   * given in PCU volume per (1) hour.
+   *
+   * @param duration duration of the time period for expressing capacity in the unit provided
+   * @param units unit to use for the time period duration
+   */
+  public void setCapacityPeriod(final Number duration, final TimeUnits units) {
+    this.capacityPeriod = Pair.of(duration.doubleValue(), units);
   }
 
   public double getDefaultMaximumSpeed() {
     return defaultMaximumSpeed;
   }
 
-  public void setDefaultMaximumSpeed(double defaultMaximumSpeed) {
-    this.defaultMaximumSpeed = defaultMaximumSpeed;
+  public void setDefaultMaximumSpeed(Number defaultMaximumSpeed) {
+    this.defaultMaximumSpeed = defaultMaximumSpeed.doubleValue();
   }
 
   public String getNetworkFile() {
@@ -166,6 +173,11 @@ public class TntpNetworkReaderSettings implements ConverterReaderSettings {
     return freeFlowTravelTimeUnits;
   }
 
+  /**
+   * Identify how to interpret the free flow travel time column units in the input file
+   *
+   * @param freeFlowTravelTimeUnits to use
+   */
   public void setFreeFlowTravelTimeUnits(TimeUnits freeFlowTravelTimeUnits) {
     this.freeFlowTravelTimeUnits = freeFlowTravelTimeUnits;
   }

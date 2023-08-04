@@ -2,6 +2,7 @@ package org.goplanit.tntp.converter.demands;
 
 import org.goplanit.demands.Demands;
 import org.goplanit.network.MacroscopicNetwork;
+import org.goplanit.tntp.converter.zoning.TntpZoningReader;
 import org.goplanit.utils.id.IdGroupingToken;
 import org.goplanit.zoning.Zoning;
 
@@ -69,7 +70,27 @@ public class TntpDemandsReaderFactory {
   public static TntpDemandsReader create(
       final TntpDemandsReaderSettings demandsSettings, final MacroscopicNetwork referenceNetwork, final Zoning referenceZoning, final Demands demandsToPopulate) {
     return new TntpDemandsReader(demandsSettings, referenceNetwork, referenceZoning, demandsToPopulate);
-  }  
+  }
+
+  /** Factory method
+   *
+   * @param referenceZoningReader to use
+   * @return created PLANit zoning reader
+   */
+  public static TntpDemandsReader create(final TntpZoningReader referenceZoningReader) {
+    return create(new TntpDemandsReaderSettings(), referenceZoningReader);
+  }
+
+    /** Factory method
+     *
+     * @param demandsSettings to use
+     * @param referenceZoningReader to use
+     * @return created PLANit zoning reader
+     */
+    public static TntpDemandsReader create(
+        final TntpDemandsReaderSettings demandsSettings, final TntpZoningReader referenceZoningReader) {
+      return new TntpDemandsReader(demandsSettings, referenceZoningReader);
+    }
   
 
 }

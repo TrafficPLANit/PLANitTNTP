@@ -104,7 +104,7 @@ public class TntpAssignmentTest {
             
       var demandsReaderSettings = tntp.getDemandsReaderSettings();
       /* 1h peak demand as per */
-      demandsReaderSettings.setStartTimeSinceMidNight(8, TimeUnits.HOURS);
+      demandsReaderSettings.setStartTimeSinceMidnight(8, TimeUnits.HOURS);
       demandsReaderSettings.setTimePeriodDuration(1, TimeUnits.HOURS);                
             
       /* EXECUTE */

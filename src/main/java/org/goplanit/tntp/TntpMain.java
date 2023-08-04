@@ -228,7 +228,7 @@ public class TntpMain {
     
     project.getZoningReaderSettings().setNetworkFileLocation(networkFileLocation);
     project.getDemandsReaderSettings().setTimePeriodDuration(1, TimeUnits.HOURS);
-    project.getDemandsReaderSettings().setStartTimeSinceMidNight(8, TimeUnits.HOURS);
+    project.getDemandsReaderSettings().setStartTimeSinceMidnight(8, TimeUnits.HOURS);
     
     // RAW INPUT START --------------------------------
     final MacroscopicNetwork macroscopicNetwork = (MacroscopicNetwork) project.createAndRegisterInfrastructureNetwork(MacroscopicNetwork.class.getCanonicalName());

@@ -5,10 +5,13 @@ import java.util.Scanner;
 import java.util.logging.Logger;
 
 import org.goplanit.converter.BaseReaderImpl;
+import org.goplanit.converter.network.NetworkReader;
 import org.goplanit.converter.zoning.ZoningReader;
 import org.goplanit.network.MacroscopicNetwork;
 import org.goplanit.tntp.TntpHeaderConstants;
 import org.goplanit.utils.exceptions.PlanItException;
+import org.goplanit.utils.exceptions.PlanItRunTimeException;
+import org.goplanit.utils.id.IdGenerator;
 import org.goplanit.utils.misc.LoggingUtils;
 import org.goplanit.utils.network.layer.macroscopic.MacroscopicLinkSegment;
 import org.goplanit.utils.network.layer.physical.Node;
@@ -36,14 +39,31 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
   private TntpZoningReaderSettings settings;
   
   /** track number of expected zones based on metadata */
-  private int noZones;
+  private int numZones;
 
   /** reference network to use while populating zoning */  
   private MacroscopicNetwork referenceNetwork;
+
+  /** reference network reader to use to create the reference network, in case no reference network is provided as a
+   * starting point */
+  private final NetworkReader referenceNetworkReader;
   
   /** the zoning to populate */
   private Zoning zoningToPopulate;  
     
+  /** Constructor
+   * @param zoningSettings to use
+   * @param referenceNetworkReader to use
+   */
+  protected TntpZoningReader(
+      TntpZoningReaderSettings zoningSettings, NetworkReader referenceNetworkReader) {
+    this.settings = zoningSettings;
+    this.referenceNetworkReader = referenceNetworkReader;
+
+    this.referenceNetwork = null;
+    this.zoningToPopulate = null;
+  }
+
   /** Constructor
    * @param zoningSettings to use
    * @param referenceNetwork to use
@@ -51,6 +71,8 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
    */
   protected TntpZoningReader(TntpZoningReaderSettings zoningSettings, MacroscopicNetwork referenceNetwork, Zoning zoningToPopulate) {
     this.settings = zoningSettings;
+    this.referenceNetworkReader = null;
+
     this.referenceNetwork = referenceNetwork;
     this.zoningToPopulate = zoningToPopulate;
   }
@@ -71,7 +93,11 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
     if(zoningToPopulate==null) {
       LOGGER.severe("PLANit zoning instance is not available to populate with TNTP zoning information, unable to create zoning");
       return false;
-    }     
+    }
+    if(zoningToPopulate.getCoordinateReferenceSystem() == null){
+      LOGGER.severe("Zoning instance to populate is expected to be initialised with a valid coordinate reference system");
+      return false;
+    }
     return true;
   }
 
@@ -103,15 +129,13 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
    */
   private void readMetadataEntry(final String line) throws Exception {
     if (line.startsWith(TntpHeaderConstants.NUMBER_OF_ZONES_INDICATOR)) {
-      noZones = TntpHeaderConstants.parseFromHeader(line, TntpHeaderConstants.NUMBER_OF_ZONES_INDICATOR);
+      numZones = TntpHeaderConstants.parseFromHeader(line, TntpHeaderConstants.NUMBER_OF_ZONES_INDICATOR);
     } 
   }  
 
   /** Read meta data in order to now how many zones are to be expected
-   * 
-   * @throws PlanItException thrown if error
    */
-  private void readMetaData() throws PlanItException {
+  private void readMetaData() {
     try (Scanner scanner = new Scanner(new File(settings.getNetworkFileLocation()).getCanonicalFile())) {
       while (scanner.hasNextLine()) {
         final String line = scanner.nextLine().trim();
@@ -122,11 +146,9 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
           readMetadataEntry(line);
         }
       }      
-    } catch (final PlanItException e) {
-      throw e;
     } catch (final Exception e) {
       LOGGER.severe(e.getMessage());
-      throw new PlanItException("Error when populating physical network in TNTP",e);
+      throw new PlanItRunTimeException("Error when populating physical network in TNTP",e);
     }
   }
 
@@ -142,7 +164,23 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
    * {@inheritDoc}
    */  
   @Override
-  public Zoning read() throws PlanItException {
+  public Zoning read() {
+
+    /* prep reference network and zoning to populate based on network reader if that is what we use */
+    if(referenceNetworkReader != null){
+      var readNetwork = referenceNetworkReader.read();
+      if( readNetwork == null || !(readNetwork instanceof MacroscopicNetwork)){
+        throw new PlanItRunTimeException("Unable to read network, or network not an instance of MacroscopicNetwork for " +
+            "use in conjunction with TnTP zoning reader");
+      }
+      referenceNetwork = (MacroscopicNetwork) readNetwork;
+      zoningToPopulate = new Zoning(referenceNetwork.getIdGroupingToken(), referenceNetwork.getNetworkGroupingTokenId());
+      /*TNTP zoning is always 1:1 to its network, so we may assume that the CRS of the zoning is 1:1 to the network as well */
+      if(zoningToPopulate.getCoordinateReferenceSystem()==null){
+        zoningToPopulate.setCoordinateReferenceSystem(referenceNetwork.getCoordinateReferenceSystem());
+      }
+    }
+
     if(!validateSettings()) {
       return null;
     }
@@ -154,7 +192,7 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
     readMetaData();
     
     LOGGER.fine(LoggingUtils.getClassNameWithBrackets(this)+"populating zoning");
-    for (long zoneSourceId = 1; zoneSourceId <= noZones; zoneSourceId++) {
+    for (long zoneSourceId = 1; zoneSourceId <= numZones; zoneSourceId++) {
       /* ZONE */
       final OdZone zone = zoningToPopulate.getOdZones().getFactory().registerNew();
       /* XML id */
@@ -182,6 +220,10 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
     }
     
     return zoningToPopulate;
+  }
+
+  public MacroscopicNetwork getReferenceNetwork(){
+    return referenceNetwork;
   }
 
   /**

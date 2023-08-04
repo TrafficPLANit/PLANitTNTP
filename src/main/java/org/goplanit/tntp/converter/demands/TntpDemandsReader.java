@@ -12,6 +12,7 @@ import org.goplanit.demands.Demands;
 import org.goplanit.network.MacroscopicNetwork;
 import org.goplanit.od.demand.OdDemandMatrix;
 import org.goplanit.tntp.TntpHeaderConstants;
+import org.goplanit.tntp.converter.zoning.TntpZoningReader;
 import org.goplanit.userclass.TravellerType;
 import org.goplanit.userclass.UserClass;
 import org.goplanit.utils.exceptions.PlanItException;
@@ -37,6 +38,9 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
    * settings to use
    */
   private TntpDemandsReaderSettings settings;
+
+  /** reference zoning reader to use to populate zoning, network etc. as an alternative to explicitly providing them */
+  final TntpZoningReader referenceZoningReader;
   
   /** the network these demands relates to */
   private MacroscopicNetwork referenceNetwork;  
@@ -170,9 +174,25 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
    */
   protected TntpDemandsReader(final TntpDemandsReaderSettings settings, final MacroscopicNetwork referenceNetwork, final Zoning referenceZoning, final Demands demandsToPopulate) {
     this.settings = settings;
+    this.referenceZoningReader = null;
+
     this.referenceNetwork = referenceNetwork;
     this.referenceZoning = referenceZoning;
     this.demandsToPopulate = demandsToPopulate;      
+  }
+
+  /** Constructor
+   *
+   * @param settings to use
+   * @param referenceZoningReader to use
+   */
+  protected TntpDemandsReader(final TntpDemandsReaderSettings settings, final TntpZoningReader referenceZoningReader) {
+    this.settings = settings;
+    this.referenceZoningReader = referenceZoningReader;
+
+    this.referenceNetwork = null;
+    this.referenceZoning = null;
+    this.demandsToPopulate = null;
   }
 
   /**
@@ -187,7 +207,16 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
    * {@inheritDoc}
    */  
   @Override
-  public Demands read() throws PlanItException {
+  public Demands read() {
+    /* prep reference network and zoning to populate based on network reader if that is what we use */
+    if(referenceZoningReader != null && referenceZoning == null){
+      this.referenceZoning = referenceZoningReader.read();
+      PlanItRunTimeException.throwIfNull(referenceZoning, "Unable to read demand, underlying zoning not available " +
+          "in conjunction with TnTP zoning reader");
+      this.referenceNetwork = referenceZoningReader.getReferenceNetwork();
+      this.demandsToPopulate = new Demands(referenceNetwork.getNetworkGroupingTokenId());
+    }
+
     if(!validateSettings()) {
       return null;
     }       
@@ -202,11 +231,11 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
 
     /* traveller type */
     var travellerType = creatAndRegisterDefaultTravellerType();
-    LOGGER.info("TNTP traveller type: "+ travellerType.toString());
+    LOGGER.info("TNTP traveller type: "+ travellerType);
     
     /* user class */
     var userClass = creatAndRegistereDefaultUserClass(travellerType);
-    LOGGER.info("TNTP traveller type: "+ userClass.toString());
+    LOGGER.info("TNTP traveller type: "+ userClass);
     
     var mode = referenceNetwork.getTransportLayers().getFirst().getFirstSupportedMode();
         
@@ -227,7 +256,8 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
           if (line.startsWith(TntpHeaderConstants.NUMBER_OF_ZONES_INDICATOR)) {
             final String subLine = line.substring(TntpHeaderConstants.NUMBER_OF_ZONES_INDICATOR.length()).trim();
             if (referenceZoning.getOdZones().size() != Integer.parseInt(subLine)) {
-              throw new PlanItException("Network file contained %d but demand file indicates %s zones", referenceZoning.getOdZones().size(), subLine);
+              throw new PlanItRunTimeException("Network file contained %d but demand file indicates %s zones",
+                  referenceZoning.getOdZones().size(), subLine);
             }
           }
         } else if (!atEndOfMetadata) {
@@ -254,11 +284,20 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
       demandsToPopulate.registerOdDemandPcuHour(timePeriod, mode, odDemandMatrix);
     } catch (final Exception e) {
       LOGGER.severe(e.getMessage());
-      throw new PlanItException("Error when populating demands in TNTP",e);
+      throw new PlanItRunTimeException("Error when populating demands in TNTP",e);
     }
-    LOGGER.info(String.format("TNTP total OD Demand: %.2f (Pcu/h), %.2f (veh/h), %.2f (veh)",totalTripsPcuH, totalTripsPcuH/mode.getPcu(), (totalTripsPcuH*timePeriod.getDurationHours())/mode.getPcu()));
+    LOGGER.info(String.format("TNTP total OD Demand: %.2f (Pcu/h), %.2f (veh/h), %.2f (veh)",
+        totalTripsPcuH, totalTripsPcuH/mode.getPcu(), (totalTripsPcuH*timePeriod.getDurationHours())/mode.getPcu()));
     
     return demandsToPopulate;
+  }
+
+  public MacroscopicNetwork getReferenceNetwork(){
+    return this.referenceNetwork;
+  }
+
+  public Zoning getReferenceZoning(){
+    return this.referenceZoning;
   }
 
   /**

@@ -114,8 +114,8 @@ public class TntpDemandsReaderSettings implements ConverterReaderSettings {
     this.demandFileLocation = demandFileLocation;
   }  
   
-  public void setTimePeriodDuration(final double duration, final TimeUnits durationUnit) {
-    this.timePeriodDuration = Pair.of(duration, durationUnit);
+  public void setTimePeriodDuration(final Number duration, final TimeUnits durationUnit) {
+    this.timePeriodDuration = Pair.of(duration.doubleValue(), durationUnit);
   }
   
   public double getTimePeriodDuration() {
@@ -126,8 +126,8 @@ public class TntpDemandsReaderSettings implements ConverterReaderSettings {
     return this.timePeriodDuration.second();
   }
 
-  public void setStartTimeSinceMidNight(final double startTime, final TimeUnits startTimeUnit) {
-    this.startTimeSinceMidNight = Pair.of(startTime, startTimeUnit);;
+  public void setStartTimeSinceMidnight(final Number startTime, final TimeUnits startTimeUnit) {
+    this.startTimeSinceMidNight = Pair.of(startTime.doubleValue(), startTimeUnit);;
   }   
   
   public double getStartTimeSinceMidNight() {

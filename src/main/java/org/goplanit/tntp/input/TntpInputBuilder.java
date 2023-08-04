@@ -115,9 +115,8 @@ public class TntpInputBuilder extends InputBuilderListener {
    *
    * @param costComponent the BPRLinkTravelTimeCost to be populated
    * @param parentNetwork top use for costs
-   * @throws PlanItException thrown if there is an error
    */
-  protected void populatePhysicalCost( final AbstractPhysicalCost costComponent, final MacroscopicNetwork parentNetwork) throws PlanItException {
+  protected void populatePhysicalCost( final AbstractPhysicalCost costComponent, final MacroscopicNetwork parentNetwork) {
     LOGGER.info(LoggingUtils.getClassNameWithBrackets(this)+"populating BPR link costs");
     
     Mode mode = parentNetwork.getModes().getFirst();

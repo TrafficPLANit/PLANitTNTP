@@ -12,7 +12,7 @@ public enum SpeedUnits {
 		this.multiplier = multiplier;
 	 }
 
-	 public double getMultiplier() {
+	public double getMultiplier() {
 	     return multiplier;
 	 }
 }

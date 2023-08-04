@@ -18,6 +18,7 @@ import org.goplanit.tntp.enums.LengthUnits;
 import org.goplanit.tntp.enums.NetworkFileColumnType;
 import org.goplanit.tntp.enums.SpeedUnits;
 import org.goplanit.utils.exceptions.PlanItException;
+import org.goplanit.utils.exceptions.PlanItRunTimeException;
 import org.goplanit.utils.geo.PlanitCrsUtils;
 import org.goplanit.utils.geo.PlanitJtsCrsUtils;
 import org.goplanit.utils.geo.PlanitJtsUtils;
@@ -274,9 +275,8 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    *
    * @param network the physical network object to be populated from the input data
    * @param nodeCoordinateFile file used
-   * @throws PlanItException thrown if there is an error reading the input file
    */
-  private void parseNodeCoordinatesFromFile(final MacroscopicNetworkLayer network, File nodeCoordinateFile) throws PlanItException {
+  private void parseNodeCoordinatesFromFile(final MacroscopicNetworkLayer network, File nodeCoordinateFile) {
     try (Scanner scanner = new Scanner(nodeCoordinateFile)) {
       while (scanner.hasNextLine()) {
         String line = scanner.nextLine().trim();
@@ -297,7 +297,7 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
       }
     } catch (final Exception e) {
       LOGGER.severe(e.getMessage());
-      throw new PlanItException("Error when parsing node coordinates from file in TNTP",e);
+      throw new PlanItRunTimeException("Error when parsing node coordinates from file in TNTP",e);
     }
   }
 
@@ -435,16 +435,16 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    * {@inheritDoc}
    */  
   @Override
-  public LayeredNetwork<?, ?> read() throws PlanItException {
+  public LayeredNetwork<?, ?> read(){
     if(!networkToPopulate.getTransportLayers().isEmpty()) {
-      throw new PlanItException("Error cannot populate non-empty network");
+      throw new PlanItRunTimeException("Error cannot populate non-empty network");
     }
     
     if(getSettings().getCoordinateReferenceSystem()!=null) {
       var sourceCrs = PlanitCrsUtils.createCoordinateReferenceSystem(settings.getCoordinateReferenceSystem());
       networkToPopulate.setCoordinateReferenceSystem(sourceCrs);
     }else {
-      LOGGER.info(String.format("Source CRS not set, assuming cartesiam coordinates"));
+      LOGGER.info(String.format("Source CRS not set, assuming cartesian coordinates"));
       networkToPopulate.setCoordinateReferenceSystem(PlanitJtsCrsUtils.CARTESIANCRS);
     }
     LOGGER.info(String.format("Source CRS set to %s : %s", settings.getCoordinateReferenceSystem(), networkToPopulate.getCoordinateReferenceSystem().getName()));
@@ -463,7 +463,7 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
       nodeCoordinateFile = (settings.getNodeCoordinateFile() == null) ? null : new File(settings.getNodeCoordinateFile()).getCanonicalFile();            
     } catch (final Exception e) {
       LOGGER.severe(e.getMessage());
-      throw new PlanItException("Error in constructing files from network and node file location settings of TNTP",e);
+      throw new PlanItRunTimeException("Error in constructing files from network and node file location settings of TNTP",e);
     }    
     
     /* TNTP only has one mode, define it here */
@@ -500,13 +500,11 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
       if (tntpLinkSegmentRowId != noLinks) {
         final String errorMessage = "Header says " + noLinks + " links but " + tntpLinkSegmentRowId+ " were actually defined.";
         LOGGER.severe(errorMessage);
-        throw new PlanItException(errorMessage);
+        throw new PlanItRunTimeException(errorMessage);
       }
-    } catch (final PlanItException e) {
-      throw e;
-    } catch (final Exception e) {
+    }catch (final Exception e) {
       LOGGER.severe(e.getMessage());
-      throw new PlanItException("Error when populating physical network in TNTP",e);
+      throw new PlanItRunTimeException("Error when populating physical network in TNTP",e);
     }
 
     if (nodeCoordinateFile != null) {
