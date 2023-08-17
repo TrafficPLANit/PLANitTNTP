@@ -95,8 +95,13 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
       return false;
     }
     if(zoningToPopulate.getCoordinateReferenceSystem() == null){
-      LOGGER.severe("Zoning instance to populate is expected to be initialised with a valid coordinate reference system");
-      return false;
+      var networkCrs = referenceNetwork.getCoordinateReferenceSystem();
+      if(networkCrs == null){
+        LOGGER.severe("Zoning instance to populate and related network are expected to be initialised with a valid coordinate reference system");
+        return false;
+      }
+      LOGGER.info(String.format("Zoning instance's expected coordinate reference system synced to network coordinate reference system: %s",networkCrs.getName()));
+      zoningToPopulate.setCoordinateReferenceSystem(networkCrs);
     }
     return true;
   }

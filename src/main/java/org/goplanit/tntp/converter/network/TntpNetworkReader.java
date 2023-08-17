@@ -249,13 +249,17 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
                   ls -> ls.getAccessProperties(mode).isEqualExceptForModes(modeAccessProperties)).findFirst().orElse(null);       
           if(match != null) {
             linkSegmentType = match;
-            LOGGER.warning(String.format("TNTP Link %s (nodes %s,%s) with capacity %.2f assigned to alternative type (%s) [%.2f capacity per lane, %.2f speed limit (km/h)] because TNTP type properties vary across links, this is not allowed in PLANit",
-                link.getExternalId(), link.getVertexA().getExternalId(), link.getVertexB().getExternalId(), capacityPerLane, match.getXmlId(), match.getExplicitCapacityPerLane(), match.getMaximumSpeedKmH(mode)));
+            LOGGER.fine(String.format("TNTP Link %s (nodes %s,%s) with capacity %.2f assigned to alternative type (%s) " +
+                            "[%.2f capacity per lane, %.2f speed limit (km/h)] because TNTP type properties vary across links, this is not allowed in PLANit",
+                link.getExternalId(), link.getVertexA().getExternalId(), link.getVertexB().getExternalId(), capacityPerLane,
+                    match.getXmlId(), match.getExplicitCapacityPerLane(), match.getMaximumSpeedKmH(mode)));
           }else {
             /* no match exists, create new type */
             linkSegmentType = createAndRegisterLinkSegmentType(networkLayer, expectedCapacityPerLane, modeAccessProperties, linkSegmentTypeSourceIdString);
-            LOGGER.warning(String.format("TNTP Link %s (nodes %s,%s) with capacity %.2f remains unmatched, created new type %s [%.2f capacity per lane, %.2f speed limit (km/h)]",
-                link.getExternalId(), link.getVertexA().getExternalId(), link.getVertexB().getExternalId(), capacityPerLane, linkSegmentType.getXmlId(), linkSegmentType.getExplicitCapacityPerLane(), linkSegmentType.getMaximumSpeedKmH(mode)));          
+            LOGGER.warning(String.format("TNTP Link %s (nodes %s,%s) with capacity %.2f remains unmatched, created new " +
+                            "type %s [%.2f capacity per lane, %.2f speed limit (km/h)]",
+                link.getExternalId(), link.getVertexA().getExternalId(), link.getVertexB().getExternalId(), capacityPerLane,
+                    linkSegmentType.getXmlId(), linkSegmentType.getExplicitCapacityPerLane(), linkSegmentType.getMaximumSpeedKmH(mode)));
           }        
         }else {
           /* capacity per lane can be matched, determine number of lanes */
@@ -478,6 +482,7 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
       boolean readingMetadata = true;
       boolean readingLinkData = false;
       long tntpLinkSegmentRowId = 0;
+
       while (scanner.hasNextLine()) {
         final String line = scanner.nextLine().trim();
         final char firstChar = (line.isEmpty()) ? 'x' : line.charAt(0);
