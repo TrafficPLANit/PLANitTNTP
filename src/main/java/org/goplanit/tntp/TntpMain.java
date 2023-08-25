@@ -43,6 +43,9 @@ public class TntpMain {
 
   public static final int DEFAULT_MAX_ITERATIONS = 1;
   public static final double DEFAULT_CONVERGENCE_EPSILON = 0.01;
+
+  //Todo: this is bad, it should be moved to reader settings and it should not be so low nor based on a specific example
+  // network
   public static final double DEFAULT_MAXIMUM_SPEED = 25.0; // this is the default for Chicago Sketch
                                                            // Type 3 links
 
