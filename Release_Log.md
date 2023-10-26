@@ -1,6 +1,30 @@
 # Release Log
 
-PLANitTNTP releases.  PLANit reader for TNTP input files.  First released as part of Release 0.0.4
+PLANitTNTP releases.  PLANit reader for TNTP input files.  First released as part of Release 0.0.3
+
+## 0.4.0
+
+**Enhancements**
+* #25 Add logging for network settings in reader
+* #24 update to junit5
+* #22 Support CI though github actions and maven build
+* #20 Add smaller test than Chicago Sketch. Add SiouxFalls
+* #18 Refactor setup of tests so it is no longer so cluttered and more modular
+* #16 Make time period configuration configurable via settings, currently hard coded
+* #14 Zoning reader should havenow has factory and settings are constructed in line with rest of architecture
+* #8 Add networkreaderfactory to created network readers in line with other repos
+
+**Bug fixes**
+
+* #23 Update mode uses to predefined modes properly
+* #21 Capacity column did not support double values when parsing
+* #19 Bug in parsing of standard test results as zero flows are skipped but they need to be included as well
+* #17 User class and traveller type not created in TNTP demands reader
+* #15 Centroid has no location on generated zones
+* #13 We should not create new link/linksegment for each directional link. Add support for bi-directional links with segments in either direction
+* #11 Travel time column has no configurable time unit and default (hour) does not suffice
+* #10 Mode access and link segment types are not correctly created. We cannot rely on type id of TNTP
+* #9 Support for source coordinate reference system missing
 
 ## 0.3.0
 
