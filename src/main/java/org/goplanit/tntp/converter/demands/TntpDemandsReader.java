@@ -15,7 +15,6 @@ import org.goplanit.tntp.TntpHeaderConstants;
 import org.goplanit.tntp.converter.zoning.TntpZoningReader;
 import org.goplanit.userclass.TravellerType;
 import org.goplanit.userclass.UserClass;
-import org.goplanit.utils.exceptions.PlanItException;
 import org.goplanit.utils.exceptions.PlanItRunTimeException;
 import org.goplanit.utils.misc.LoggingUtils;
 import org.goplanit.utils.mode.Mode;
@@ -29,7 +28,7 @@ import org.goplanit.zoning.Zoning;
  * @author gman, markr
  *
  */
-public class TntpDemandsReader extends BaseReaderImpl<Demands> implements DemandsReader{
+public class TntpDemandsReader extends BaseReaderImpl<Demands> implements DemandsReader {
   
   /** logger to use */
   private static final Logger LOGGER = Logger.getLogger(TntpDemandsReader.class.getCanonicalName());
@@ -43,10 +42,10 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
   final TntpZoningReader referenceZoningReader;
   
   /** the network these demands relates to */
-  private MacroscopicNetwork referenceNetwork;  
+  private MacroscopicNetwork referenceNetwork;
   
   /** the zoning these demands relate to*/
-  private Zoning referenceZoning;  
+  private Zoning referenceZoning;
   
   /** the demands to populate */
   private Demands demandsToPopulate;               
@@ -152,7 +151,8 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
    * @param timePeriod to use
    * @return trips for this origin in PcuH
    */
-  private double updateOdDemandMatrix(final Map<String, Double> demandToDestination, final Zone originZone, final OdDemandMatrix odDemandMatrix, Mode mode, final TimePeriod timePeriod ) {
+  private double updateOdDemandMatrix(
+          final Map<String, Double> demandToDestination, final Zone originZone, final OdDemandMatrix odDemandMatrix, Mode mode, final TimePeriod timePeriod ) {
     
     double originProductionVehH = 0;
     for (final String destinationZoneSourceId : demandToDestination.keySet()) {
