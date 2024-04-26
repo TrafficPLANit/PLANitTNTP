@@ -268,9 +268,9 @@ public class TntpMain {
       linkOutputTypeConfiguration.addProperty(OutputPropertyType.VC_RATIO);
       linkOutputTypeConfiguration.removeProperty(OutputPropertyType.LINK_SEGMENT_ID);
       linkOutputTypeConfiguration.removeProperty(OutputPropertyType.LINK_SEGMENT_EXTERNAL_ID);
-      linkOutputTypeConfiguration.removeProperty(OutputPropertyType.DOWNSTREAM_NODE_LOCATION);
+      linkOutputTypeConfiguration.removeProperty(OutputPropertyType.DOWNSTREAM_NODE_GEOMETRY);
       linkOutputTypeConfiguration.removeProperty(OutputPropertyType.DOWNSTREAM_NODE_ID);
-      linkOutputTypeConfiguration.removeProperty(OutputPropertyType.UPSTREAM_NODE_LOCATION);
+      linkOutputTypeConfiguration.removeProperty(OutputPropertyType.DOWNSTREAM_NODE_GEOMETRY);
       linkOutputTypeConfiguration.removeProperty(OutputPropertyType.UPSTREAM_NODE_ID);
       linkOutputTypeConfiguration.removeProperty(OutputPropertyType.MODE_EXTERNAL_ID);
       linkOutputTypeConfiguration.removeProperty(OutputPropertyType.MODE_ID);

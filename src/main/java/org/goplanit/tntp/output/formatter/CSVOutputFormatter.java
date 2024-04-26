@@ -21,6 +21,7 @@ import org.goplanit.output.formatter.CsvFileOutputFormatter;
 import org.goplanit.output.formatter.CsvTextFileOutputFormatter;
 import org.goplanit.output.property.OutputProperty;
 import org.goplanit.utils.exceptions.PlanItException;
+import org.goplanit.utils.exceptions.PlanItRunTimeException;
 import org.goplanit.utils.id.IdGroupingToken;
 import org.goplanit.utils.mode.Mode;
 import org.goplanit.utils.network.layer.macroscopic.MacroscopicLinkSegment;
@@ -72,11 +73,10 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	 * @param modes                   Set of modes of travel
 	 * @param timePeriod              current time period
 	 * @param iterationIndex current iteration index
-	 * @throws PlanItException thrown if there is an error
 	 */
   @Override
 	protected void writeLinkResultsForCurrentTimePeriod(final OutputConfiguration outputConfiguration,
-	            final OutputTypeConfiguration outputTypeConfiguration, final OutputTypeEnum currentOutputType, final OutputAdapter outputAdapter, final Set<Mode> modes, final TimePeriod timePeriod, final int iterationIndex) throws PlanItException {
+	            final OutputTypeConfiguration outputTypeConfiguration, final OutputTypeEnum currentOutputType, final OutputAdapter outputAdapter, final Set<Mode> modes, final TimePeriod timePeriod, final int iterationIndex) {
 
 		final MacroscopicLinkOutputTypeAdapter linkOutputTypeAdapter = 
 		    (MacroscopicLinkOutputTypeAdapter) outputAdapter.getOutputTypeAdapter(outputTypeConfiguration.getOutputType());
@@ -104,7 +104,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 			}
 		} catch (final Exception e) {
       LOGGER.severe(e.getMessage());
-      throw new PlanItException("Error when writing link results for current time period in TNTP",e);
+      throw new PlanItRunTimeException("Error when writing link results for current time period in TNTP",e);
     }
 	}
 
@@ -118,14 +118,13 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	 * @param modes                   Set of modes of travel
 	 * @param timePeriod              current time period
 	 * @param iterationIndex current iteration index
-	 * @throws PlanItException thrown if there is an error
 	 */
 	@Override
 	protected void writeOdResultsForCurrentTimePeriod(final OutputConfiguration outputConfiguration,
-            final OutputTypeConfiguration outputTypeConfiguration, final OutputTypeEnum currentOutputType, final OutputAdapter outputAdapter, final Set<Mode> modes, final TimePeriod timePeriod, final int iterationIndex) throws PlanItException {
+            final OutputTypeConfiguration outputTypeConfiguration, final OutputTypeEnum currentOutputType, final OutputAdapter outputAdapter, final Set<Mode> modes, final TimePeriod timePeriod, final int iterationIndex) {
 		final PlanItException pe = writeOdResultsForCurrentTimePeriodToCsvPrinter(outputConfiguration, outputTypeConfiguration, currentOutputType, outputAdapter, modes, timePeriod, printer.get(outputTypeConfiguration.getOutputType()));
 		if (pe != null) {
-			throw pe;
+			throw new PlanItRunTimeException(pe);
 		}
 	}
 
@@ -139,14 +138,13 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	 * @param modes                   Set of modes of travel
 	 * @param timePeriod              current time period
 	 * @param iterationIndex current iteration index
-	 * @throws PlanItException thrown if there is an error
 	 */
 	@Override
 	protected void writePathResultsForCurrentTimePeriod(final OutputConfiguration outputConfiguration,
-	            final OutputTypeConfiguration outputTypeConfiguration, final OutputTypeEnum currentOutputType, final OutputAdapter outputAdapter, final Set<Mode> modes, final TimePeriod timePeriod, final int iterationIndex) throws PlanItException {
+	            final OutputTypeConfiguration outputTypeConfiguration, final OutputTypeEnum currentOutputType, final OutputAdapter outputAdapter, final Set<Mode> modes, final TimePeriod timePeriod, final int iterationIndex){
 		final PlanItException pe = writePathResultsForCurrentTimePeriodToCsvPrinter(outputConfiguration, outputTypeConfiguration, currentOutputType, outputAdapter, modes, timePeriod, printer.get(outputTypeConfiguration.getOutputType()));
 		if (pe != null) {
-			throw pe;
+			throw new PlanItRunTimeException(pe);
 		}
 	}
 
@@ -160,11 +158,10 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	 * @param modes                   Set of modes of travel
 	 * @param timePeriod              current time period
 	 * @param iterationIndex current iteration index
-	 * @throws PlanItException thrown if there is an error
 	 */
 	@Override
      protected void writeGeneralResultsForCurrentTimePeriod(final OutputConfiguration outputConfiguration,
-	            final OutputTypeConfiguration outputTypeConfiguration, final OutputTypeEnum currentOutputType, final OutputAdapter outputAdapter, final Set<Mode> modes, final TimePeriod timePeriod, final int iterationIndex) throws PlanItException {
+	            final OutputTypeConfiguration outputTypeConfiguration, final OutputTypeEnum currentOutputType, final OutputAdapter outputAdapter, final Set<Mode> modes, final TimePeriod timePeriod, final int iterationIndex) {
 	  LOGGER.info("CSV Output for OutputType GENERAL has not been implemented yet.");
 	}
 
@@ -178,11 +175,10 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	 * @param modes                   Set of modes of travel
 	 * @param timePeriod              current time period
 	 * @param iterationIndex current iteration index
-	 * @throws PlanItException thrown if there is an error
 	 */
 	@Override
 	protected void writeSimulationResultsForCurrentTimePeriod(final OutputConfiguration outputConfiguration,
-	            final OutputTypeConfiguration outputTypeConfiguration, final OutputTypeEnum currentOutputType, final OutputAdapter outputAdapter, final Set<Mode> modes, final TimePeriod timePeriod, final int iterationIndex) throws PlanItException {
+	            final OutputTypeConfiguration outputTypeConfiguration, final OutputTypeEnum currentOutputType, final OutputAdapter outputAdapter, final Set<Mode> modes, final TimePeriod timePeriod, final int iterationIndex) {
 	  LOGGER.info("CSV Output for OutputType SIMULATION has not been implemented yet.");
 	}
 

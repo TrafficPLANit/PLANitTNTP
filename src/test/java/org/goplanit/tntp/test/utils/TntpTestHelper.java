@@ -108,10 +108,10 @@ public class TntpTestHelper {
     linkOutputTypeConfiguration.addProperty(OutputPropertyType.LINK_SEGMENT_TYPE_NAME);
     linkOutputTypeConfiguration.removeProperty(OutputPropertyType.LINK_SEGMENT_ID);
     linkOutputTypeConfiguration.removeProperty(OutputPropertyType.LINK_SEGMENT_XML_ID);
-    linkOutputTypeConfiguration.removeProperty(OutputPropertyType.DOWNSTREAM_NODE_LOCATION);
+    linkOutputTypeConfiguration.removeProperty(OutputPropertyType.DOWNSTREAM_NODE_GEOMETRY);
     linkOutputTypeConfiguration.removeProperty(OutputPropertyType.DOWNSTREAM_NODE_ID);
     linkOutputTypeConfiguration.removeProperty(OutputPropertyType.DOWNSTREAM_NODE_XML_ID);
-    linkOutputTypeConfiguration.removeProperty(OutputPropertyType.UPSTREAM_NODE_LOCATION);
+    linkOutputTypeConfiguration.removeProperty(OutputPropertyType.UPSTREAM_NODE_GEOMETRY);
     linkOutputTypeConfiguration.removeProperty(OutputPropertyType.UPSTREAM_NODE_ID);
     linkOutputTypeConfiguration.removeProperty(OutputPropertyType.UPSTREAM_NODE_XML_ID);
     linkOutputTypeConfiguration.removeProperty(OutputPropertyType.MODE_EXTERNAL_ID);
