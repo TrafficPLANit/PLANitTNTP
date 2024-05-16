@@ -129,7 +129,31 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     initialiseSourceIdMap(MacroscopicLinkSegment.class, MacroscopicLinkSegment::getExternalId);
     initialiseSourceIdMap(MacroscopicLinkSegmentType.class, MacroscopicLinkSegmentType::getExternalId);
     initialiseSourceIdMap(Node.class, Node::getExternalId);
-  }  
+  }
+
+  /**
+   * Create and register a new node if it does not already exist
+   *
+   * @param network the current physical network
+   * @param cols the columns in the network input file
+   * @param nodeSourceId node source id to use
+   * @return the node corresponding to this external ID
+   */
+  private Node collectOrCreatePlanitNode(final MacroscopicNetworkLayer network, final String[] cols, final String nodeSourceId) {
+
+    Node node = null;
+    if (getBySourceId(Node.class, nodeSourceId) == null) {
+      node = network.getNodes().getFactory().registerNew();
+      /* XML id */
+      node.setXmlId(nodeSourceId);
+      /* external id */
+      node.setExternalId(nodeSourceId);
+      registerBySourceId(Node.class, node);
+    } else {
+      node = getBySourceId(Node.class, nodeSourceId);
+    }
+    return node;
+  }
   
   /**
    * Create and register a new node if it does not already exist
@@ -138,27 +162,14 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    * @param cols the columns in the network input file
    * @param networkFileColumn the column in the network file which contains the node external Id
    * @return the node corresponding to this external ID
-   * @throws PlanItException thrown if there is an error registering the node
    */
-  private Node collectOrCreatePlanitNode(final MacroscopicNetworkLayer network, final String[] cols, final NetworkFileColumnType networkFileColumn)
-      throws PlanItException {
+  private Node collectOrCreatePlanitNode(final MacroscopicNetworkLayer network, final String[] cols, final NetworkFileColumnType networkFileColumn){
         
     final String nodeSourceId = cols[getSettings().getNetworkFileColumns().get(networkFileColumn)];
     if ( Long.parseLong(nodeSourceId) > noPhysicalNodes) {
-      throw new PlanItException("Number of nodes is specified as " + noPhysicalNodes + " but found a reference to node " + nodeSourceId);
+      throw new PlanItRunTimeException("Number of nodes is specified as " + noPhysicalNodes + " but found a reference to node " + nodeSourceId);
     }
-    Node node = null;
-    if (getBySourceId(Node.class, nodeSourceId) == null) {      
-      node = network.getNodes().getFactory().registerNew();
-      /* XML id */
-      node.setXmlId(nodeSourceId);    
-      /* external id */
-      node.setExternalId(nodeSourceId);
-      registerBySourceId(Node.class, node);      
-    } else {
-      node = getBySourceId(Node.class, nodeSourceId);
-    }
-    return node;
+    return collectOrCreatePlanitNode(network, cols, nodeSourceId);
   }
 
   /**
@@ -294,10 +305,10 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
   /**
    * Update the node coordinates from the node coordinate file
    *
-   * @param network the physical network object to be populated from the input data
+   * @param networkLayer the physical network object to be populated from the input data
    * @param nodeCoordinateFile file used
    */
-  private void parseNodeCoordinatesFromFile(final MacroscopicNetworkLayer network, File nodeCoordinateFile) {
+  private void parseNodeCoordinatesFromFile(final MacroscopicNetworkLayer networkLayer, File nodeCoordinateFile) {
     try (Scanner scanner = new Scanner(nodeCoordinateFile)) {
       while (scanner.hasNextLine()) {
         String line = scanner.nextLine().trim();
@@ -307,10 +318,10 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
           final String[] cols = line.split("\\s+");
           final String nodeSourceId = cols[0];
   
-          final Node node = getBySourceId(Node.class, nodeSourceId);
+          Node node = getBySourceId(Node.class, nodeSourceId);
           if(node == null) {
-            LOGGER.severe(String.format("Referenced node %s in TNTP node file not available in PLANit memory model",nodeSourceId));
-            continue;
+            LOGGER.warning(String.format("Node %s in TNTP node file not use by TNTP links, likely dangling",nodeSourceId));
+            node = collectOrCreatePlanitNode(networkLayer, cols, nodeSourceId);
           }
           Point nodePosition = PlanitJtsUtils.createPoint(Double.parseDouble(cols[1]), Double.parseDouble(cols[2]));          
           node.setPosition(nodePosition);
