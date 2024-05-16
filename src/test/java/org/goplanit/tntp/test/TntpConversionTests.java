@@ -25,9 +25,13 @@ import org.goplanit.tntp.enums.LengthUnits;
 import org.goplanit.tntp.enums.NetworkFileColumnType;
 import org.goplanit.tntp.enums.SpeedUnits;
 import org.goplanit.tntp.enums.TimeUnits;
+import org.goplanit.utils.geo.PlanitCrsUtils;
+import org.goplanit.utils.geo.PlanitJtsCrsUtils;
 import org.goplanit.utils.id.IdGenerator;
 import org.goplanit.utils.id.IdGroupingToken;
 import org.goplanit.utils.locale.CountryNames;
+import org.goplanit.utils.unit.Unit;
+import org.goplanit.utils.unit.UnitGroup;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -60,8 +64,14 @@ public class TntpConversionTests {
   private static final Path SIOUXFALLS_NETWORK_FILE = Path.of(RESOURCE_PATH.toString(),"SiouxFalls","SiouxFalls_net.tntp");
   private static final Path SIOUXFALLS_NODE_FILE = Path.of(RESOURCE_PATH.toString(),"SiouxFalls","SiouxFalls_node.tntp");
   private static final Path SIOUXFALLS_DEMAND_FILE = Path.of(RESOURCE_PATH.toString(),"SiouxFalls","SiouxFalls_trips.tntp");
-  
-  public static final double DEFAULT_MAXIMUM_SPEED = 25.0;
+
+  private static final Path GOLDCOAST_NETWORK_FILE = Path.of(RESOURCE_PATH.toString(),"GoldCoast","GoldCoast_network_2016_01.tntp");
+  private static final Path GOLDCOAST_NODE_FILE = Path.of(RESOURCE_PATH.toString(),"GoldCoast","GoldCoast_nodes_2016_01.tntp");
+  private static final Path GOLDCOAST_DEMAND_FILE = Path.of(RESOURCE_PATH.toString(),"GoldCoast","GoldCoast_trips_2016_01.tntp");
+
+  public static final double DEFAULT_MAXIMUM_SPEED_MPH = 25.0;
+
+  public static final double DEFAULT_MAXIMUM_SPEED_KPH = 50.0;
  
  
   @BeforeAll
@@ -137,7 +147,8 @@ public class TntpConversionTests {
    * @param idToken 
    * @return pre-configured network reader
    */  
-  private static TntpNetworkReader createSiouxFallsTntpNetworkReader(Path networkFileLocation, Path nodeFileLocation, double defaultMaxSpeedMpH, IdGroupingToken idToken) {
+  private static TntpNetworkReader createSiouxFallsTntpNetworkReader(
+      Path networkFileLocation, Path nodeFileLocation, double defaultMaxSpeedMpH, IdGroupingToken idToken) {
     var tntpReader = TntpNetworkReaderFactory.create(
         networkFileLocation.toAbsolutePath().toString(), nodeFileLocation.toAbsolutePath().toString(), idToken);
     
@@ -164,7 +175,48 @@ public class TntpConversionTests {
     tntpReader.getSettings().setDefaultMaximumSpeed(defaultMaxSpeedMpH);    
                   
     return tntpReader;
-  }  
+  }
+
+  /** Create TNTP reader suitable for GoldCoast network
+   *
+   * @param networkFileLocation to use
+   * @param nodeFileLocation to use
+   * @param defaultMaxSpeedMpH to use
+   * @param idToken
+   * @return pre-configured network reader
+   */
+  private static TntpNetworkReader createGoldCoastTntpNetworkReader(
+      Path networkFileLocation, Path nodeFileLocation, double defaultMaxSpeedMpH, IdGroupingToken idToken) {
+    var tntpReader = TntpNetworkReaderFactory.create(
+        networkFileLocation.toAbsolutePath().toString(), nodeFileLocation.toAbsolutePath().toString(), idToken);
+
+    // The following arrangement of columns is correct for GoldCoast
+    final Map<NetworkFileColumnType, Integer> networkFileColumns = new HashMap<>();
+    networkFileColumns.put(NetworkFileColumnType.UPSTREAM_NODE_ID, 0);
+    networkFileColumns.put(NetworkFileColumnType.DOWNSTREAM_NODE_ID, 1);
+    networkFileColumns.put(NetworkFileColumnType.CAPACITY_PER_LANE, 2);
+    networkFileColumns.put(NetworkFileColumnType.LENGTH, 3);
+    networkFileColumns.put(NetworkFileColumnType.FREE_FLOW_TRAVEL_TIME, 4);
+    networkFileColumns.put(NetworkFileColumnType.B, 5);
+    networkFileColumns.put(NetworkFileColumnType.POWER, 6);
+    networkFileColumns.put(NetworkFileColumnType.MAXIMUM_SPEED, 7);
+    networkFileColumns.put(NetworkFileColumnType.CRITICAL_SPEED, 8);
+    networkFileColumns.put(NetworkFileColumnType.NUMBER_OF_LANES, 9);
+    tntpReader.getSettings().setNetworkFileColumns(networkFileColumns);
+
+    /* reader configuration */
+    tntpReader.getSettings().setNetworkFileColumns(networkFileColumns);
+    tntpReader.getSettings().setSpeedUnits(SpeedUnits.KM_H);
+    tntpReader.getSettings().setLengthUnits(LengthUnits.KM);
+    tntpReader.getSettings().setCapacityPeriod(1, TimeUnits.HOURS);
+    tntpReader.getSettings().setFreeFlowTravelTimeUnits(TimeUnits.MINUTES);
+    tntpReader.getSettings().setDefaultMaximumSpeed(defaultMaxSpeedMpH);
+
+    /* set CRS */
+    tntpReader.getSettings().setCoordinateReferenceSystem(PlanitCrsUtils.EPSG_CODE_FOR_WGS84);
+
+    return tntpReader;
+  }
     
   /**
    * Test case which parses the TNTP Chicago network, zoning and trips files, loads it into PLANit memory model and persists it as a PLANit network
@@ -178,7 +230,7 @@ public class TntpConversionTests {
             
       /* TNTP reader */
       var idToken = IdGenerator.createIdGroupingToken("testTntp2PlanitNetworkChicago");
-      TntpNetworkReader tntpReader = createChicagoTntpNetworkReader(CHICAGO_NETWORK_FILE, CHICAGO_NODE_FILE, DEFAULT_MAXIMUM_SPEED, idToken );
+      TntpNetworkReader tntpReader = createChicagoTntpNetworkReader(CHICAGO_NETWORK_FILE, CHICAGO_NODE_FILE, DEFAULT_MAXIMUM_SPEED_MPH, idToken );
       
       /* PLANit writer */
       PlanitNetworkWriter planitWriter = PlanitNetworkWriterFactory.create(
@@ -210,7 +262,7 @@ public class TntpConversionTests {
       
       
       var idToken = IdGenerator.createIdGroupingToken("testTntp2PlanitZoningChicago");
-      TntpNetworkReader tntpNetworkReader = createChicagoTntpNetworkReader(CHICAGO_NETWORK_FILE, CHICAGO_NODE_FILE, DEFAULT_MAXIMUM_SPEED, idToken);
+      TntpNetworkReader tntpNetworkReader = createChicagoTntpNetworkReader(CHICAGO_NETWORK_FILE, CHICAGO_NODE_FILE, DEFAULT_MAXIMUM_SPEED_MPH, idToken);
       var planitNetwork = (MacroscopicNetwork) tntpNetworkReader.read();
       
       /* TNTP ZONING reader */
@@ -248,7 +300,7 @@ public class TntpConversionTests {
       /* TNTP network.zoning reader */
       var idToken = IdGenerator.createIdGroupingToken("testTntp2PlanitDemandsChicago");
       TntpNetworkReader tntpNetworkReader = createChicagoTntpNetworkReader(
-          CHICAGO_NETWORK_FILE, CHICAGO_NODE_FILE, DEFAULT_MAXIMUM_SPEED, idToken);
+          CHICAGO_NETWORK_FILE, CHICAGO_NODE_FILE, DEFAULT_MAXIMUM_SPEED_MPH, idToken);
       
       TntpZoningReader tntpZoningReader = TntpZoningReaderFactory.create(tntpNetworkReader);
       tntpZoningReader.getSettings().setNetworkFileLocation(CHICAGO_NETWORK_FILE.toAbsolutePath().toString());
@@ -299,7 +351,7 @@ public class TntpConversionTests {
       /* TNTP network reader */
       var idToken = IdGenerator.createIdGroupingToken("testTntp2PlanitDemandsSiouxFalls");
       var tntpNetworkReader =
-          createSiouxFallsTntpNetworkReader(SIOUXFALLS_NETWORK_FILE, SIOUXFALLS_NODE_FILE, DEFAULT_MAXIMUM_SPEED, idToken);
+          createSiouxFallsTntpNetworkReader(SIOUXFALLS_NETWORK_FILE, SIOUXFALLS_NODE_FILE, DEFAULT_MAXIMUM_SPEED_MPH, idToken);
       tntpNetworkReader.getSettings().setCapacityPeriod(8 /* about 8 hours */, TimeUnits.HOURS);
       var planitNetwork = (MacroscopicNetwork) tntpNetworkReader.read();
       /* PLANit network writer */
@@ -334,6 +386,40 @@ public class TntpConversionTests {
       LOGGER.severe( e.getMessage());
       fail(e.getMessage());
     }    
-  }    
-  
+  }
+
+  /**
+   * Test case which parses the TNTP GoldCoast network, zoning and trips files, loads it into PLANit memory model and
+   * persists it as a PLANit network, demand, and zoning
+   */
+  @Test
+  public void testTntp2PlanitGoldCoast() {
+
+    final Path PLANIT_OUTPUT_DIR = Path.of(RESOURCE_PATH.toString(),"testcases","planit","GoldCoast");
+    final Path PLANIT_REF_DIR = Path.of(RESOURCE_PATH.toString(),"planit","GoldCoast");
+    try {
+
+      /* TNTP reader */
+      var idToken = IdGenerator.createIdGroupingToken("testTntp2PlanitGoldCoast");
+      TntpNetworkReader tntpReader = createGoldCoastTntpNetworkReader(
+          GOLDCOAST_NETWORK_FILE, GOLDCOAST_NODE_FILE, DEFAULT_MAXIMUM_SPEED_KPH, idToken );
+
+      /* PLANit writer */
+      PlanitNetworkWriter planitWriter = PlanitNetworkWriterFactory.create(
+          PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), CountryNames.AUSTRALIA);
+
+      /* convert */
+      NetworkConverter theConverter = NetworkConverterFactory.create(tntpReader, planitWriter);
+      theConverter.convert();
+
+      PlanitAssertionUtils.assertNetworkFilesSimilar(PLANIT_OUTPUT_DIR, PLANIT_REF_DIR);
+
+    } catch (final Exception e) {
+      e.printStackTrace();
+      LOGGER.severe( e.getMessage());
+      fail(e.getMessage());
+    }
+  }
+
+
 }

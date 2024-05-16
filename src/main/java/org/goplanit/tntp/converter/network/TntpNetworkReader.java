@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.goplanit.converter.BaseReaderImpl;
@@ -193,7 +194,6 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     Mode mode = networkLayer.getFirstSupportedMode();
        
     /* LINK SEGMENT*/
-    final int linkSegmentTypeSourceId = Integer.parseInt(cols[supportedColumns.get(NetworkFileColumnType.LINK_TYPE)]);         
     final MacroscopicLinkSegment linkSegment = networkLayer.getLinkSegments().getFactory().registerNew(link, directionAb, true);
     /* XML id */
     linkSegment.setXmlId(link.getExternalId() + "-" + (directionAb ? "AB" : "BA"));
@@ -207,65 +207,91 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     {    
       /* max speed km/h */
       double defaultMaximumSpeed = getSettings().getDefaultMaximumSpeed();
-      double maxSpeedKmH = defaultMaximumSpeed *  speedUnits.getMultiplier();
-      final double speedLimit = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.MAXIMUM_SPEED)]);
-      if (speedLimit > Precision.EPSILON_6 && speedLimit < Double.POSITIVE_INFINITY) {
-        maxSpeedKmH = speedLimit * speedUnits.getMultiplier();
+      double planitMaxSpeedKmH = defaultMaximumSpeed *  speedUnits.getMultiplier();
+      final double tntpSpeedLimit = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.MAXIMUM_SPEED)]);
+
+      /* free flow travel time */
+      double freeFlowTravelTimeH = link.getLengthKm()/planitMaxSpeedKmH;
+      if(supportedColumns.containsKey(NetworkFileColumnType.FREE_FLOW_TRAVEL_TIME)) {
+        double tntpFftt = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.FREE_FLOW_TRAVEL_TIME)]) * settings.getFreeFlowTravelTimeUnits().getMultiplier();
+        freeFlowTravelTimeH = (tntpFftt > Precision.EPSILON_6 && tntpFftt < Double.POSITIVE_INFINITY) ? tntpFftt : freeFlowTravelTimeH;
+      }
+
+      if (tntpSpeedLimit > Precision.EPSILON_6 && tntpSpeedLimit < Double.POSITIVE_INFINITY) {
+        planitMaxSpeedKmH = tntpSpeedLimit * speedUnits.getMultiplier();
+      }else{
+        // no speed limit, derive from free flow travel time instead
+        planitMaxSpeedKmH = link.getLengthKm()/freeFlowTravelTimeH;
+      }
+
+      final AccessGroupProperties modeAccessProperties = createAccessGroupProperties(
+          link, mode, planitMaxSpeedKmH, freeFlowTravelTimeH);
+
+      /* only when capacity is not combined with number of lanes we need to scale it to capacity per lane, otherwise not */
+      boolean numLanesShouldScaleCapacity = !supportedColumns.containsKey(NetworkFileColumnType.NUMBER_OF_LANES);
+
+      /* capacity pcu/h/lane */
+      double capacityPerHourMultiplier =
+          getSettings().getCapacityPeriodUnits().getMultiplier()/getSettings().getCapacityPeriodDuration();
+      double capacityPerLane =
+          Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.CAPACITY_PER_LANE)]) * capacityPerHourMultiplier;
+
+      /* create per lane capacity estimate */
+      int numLanes = -1;
+      if(numLanesShouldScaleCapacity) {
+        numLanes = getNumLaneEstimate(capacityPerLane);
+        capacityPerLane = capacityPerLane / numLanes;
+      }else{
+        numLanes = Integer.parseInt(cols[supportedColumns.get(NetworkFileColumnType.NUMBER_OF_LANES)]);
       }
       
-      /* free flow travel time */
-      final double freeFlowTravelTimeH = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.FREE_FLOW_TRAVEL_TIME)]) * settings.getFreeFlowTravelTimeUnits().getMultiplier();    
-      
-      /* capacity pcu/h/lane */      
-      double capacityPerHourMultiplier = getSettings().getCapacityPeriodUnits().getMultiplier()/getSettings().getCapacityPeriodDuration();      
-      double capacityPerLane = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.CAPACITY_PER_LANE)]) * capacityPerHourMultiplier;       
-          
-      int numLanes = -1;
-      final AccessGroupProperties modeAccessProperties = createAccessGroupProperties(link, mode, maxSpeedKmH, freeFlowTravelTimeH);    
-      
       /** Link segment type **/
-      String linkSegmentTypeSourceIdString = String.valueOf(linkSegmentTypeSourceId);
-      MacroscopicLinkSegmentType linkSegmentType = getBySourceId(MacroscopicLinkSegmentType.class, linkSegmentTypeSourceIdString);
-      if (linkSegmentType == null) {
-        
-        /* create per lane capacity estimate */
-        numLanes = getNumLaneEstimate(capacityPerLane);
-        capacityPerLane = capacityPerLane/numLanes;
-              
-        linkSegmentType = createAndRegisterLinkSegmentType(networkLayer, capacityPerLane, modeAccessProperties, linkSegmentTypeSourceIdString);
-        registerBySourceId(MacroscopicLinkSegmentType.class, linkSegmentType);     
-              
-      }else {
-        /* determine if link type is compatible with link segment type as we require capacity per lane to be the same across all usages of a particular type. IF not we must create a new type or use an existing comaptible type */
-        double numLaneEstimateMod = capacityPerLane % linkSegmentType.getExplicitCapacityPerLane();  
-        if(Precision.nonZero(numLaneEstimateMod) || !linkSegmentType.getAccessProperties(mode).isEqualExceptForModes(modeAccessProperties)) {
-          /* cannot be matched to existing (referenced) TNTP link segment type */
-          numLanes = getNumLaneEstimate(capacityPerLane);  
-          double expectedCapacityPerLane = capacityPerLane / numLanes;
-  
+      MacroscopicLinkSegmentType linkSegmentType = null;
+      String linkSegmentTypeSourceId = String.format("c_%.1f:s_%d", capacityPerLane, (int) Math.round(planitMaxSpeedKmH));
+      String linkSegmentTypeExternalId = "";
+      if(supportedColumns.containsKey(NetworkFileColumnType.LINK_TYPE)) {
+        linkSegmentTypeExternalId = cols[supportedColumns.get(NetworkFileColumnType.LINK_TYPE)];
+      }
+      linkSegmentType = getBySourceId(MacroscopicLinkSegmentType.class, linkSegmentTypeSourceId);
+
+
+
+      if (linkSegmentType != null) {
+        /* make sure that the referenced link type in TNTP definition is compatible with the definition of a link type in PLANit
+         * by verifying the converted capacity per lane equality */
+        /* determine if link type is compatible with link segment type as we require capacity per lane to be the
+         * same across all usages of a particular type. If not we must create a new type or use an existing compatible
+         * type */
+        boolean typeAndLinkCapacityIncompatible = Precision.nonZero(capacityPerLane % linkSegmentType.getExplicitCapacityPerLane());
+        if(typeAndLinkCapacityIncompatible|| !linkSegmentType.getAccessProperties(mode).isEqualExceptForModes(modeAccessProperties)) {
+          /* cannot be matched to existing (referenced) TNTP link segment type search other candidates */
+          linkSegmentType = null;
+
           /* find first match with equal capacity and mode properties */
+          final var finalCapPerLane = capacityPerLane;
           MacroscopicLinkSegmentType match = networkLayer.getLinkSegmentTypes().toCollection().stream().filter(
-              ls -> Precision.equal(ls.getExplicitCapacityPerLane(), expectedCapacityPerLane)).filter(
-                  ls -> ls.getAccessProperties(mode).isEqualExceptForModes(modeAccessProperties)).findFirst().orElse(null);       
+              ls -> Precision.equal(ls.getExplicitCapacityPerLane(), finalCapPerLane)).filter(
+              ls -> ls.getAccessProperties(mode).isEqualExceptForModes(modeAccessProperties)).findFirst().orElse(null);
           if(match != null) {
             linkSegmentType = match;
-            LOGGER.fine(String.format("TNTP Link %s (nodes %s,%s) with capacity %.2f assigned to alternative type (%s) " +
-                            "[%.2f capacity per lane, %.2f speed limit (km/h)] because TNTP type properties vary across links, this is not allowed in PLANit",
-                link.getExternalId(), link.getVertexA().getExternalId(), link.getVertexB().getExternalId(), capacityPerLane,
-                    match.getXmlId(), match.getExplicitCapacityPerLane(), match.getMaximumSpeedKmH(mode)));
-          }else {
-            /* no match exists, create new type */
-            linkSegmentType = createAndRegisterLinkSegmentType(networkLayer, expectedCapacityPerLane, modeAccessProperties, linkSegmentTypeSourceIdString);
-            LOGGER.warning(String.format("TNTP Link %s (nodes %s,%s) with capacity %.2f remains unmatched, created new " +
-                            "type %s [%.2f capacity per lane, %.2f speed limit (km/h)]",
-                link.getExternalId(), link.getVertexA().getExternalId(), link.getVertexB().getExternalId(), capacityPerLane,
-                    linkSegmentType.getXmlId(), linkSegmentType.getExplicitCapacityPerLane(), linkSegmentType.getMaximumSpeedKmH(mode)));
-          }        
-        }else {
-          /* capacity per lane can be matched, determine number of lanes */
-          numLanes = (int) Math.round(capacityPerLane/linkSegmentType.getExplicitCapacityPerLane());
+            if (LOGGER.getLevel() == Level.FINE) {
+              LOGGER.fine(String.format("TNTP Link %s (nodes %s,%s) with capacity %.2f assigned to alternative type (%s) " +
+                      "[%.2f capacity per lane, %.2f speed limit (km/h)] because TNTP type properties vary across links, this is not allowed in PLANit",
+                  link.getExternalId(), link.getVertexA().getExternalId(), link.getVertexB().getExternalId(), capacityPerLane,
+                  match.getXmlId(), match.getExplicitCapacityPerLane(), match.getMaximumSpeedKmH(mode)));
+            }
+          }
         }
-      }    
+      }
+
+      if (linkSegmentType == null) {
+        // we do not register by external id because it is not unique but we want to retain the external id
+        // so we temporarily use our custom external id and then replace it after registration, not pretty but hack fix
+        linkSegmentType = createAndRegisterLinkSegmentType(
+            networkLayer, capacityPerLane, modeAccessProperties, linkSegmentTypeSourceId);
+        registerBySourceId(MacroscopicLinkSegmentType.class, linkSegmentType);
+        linkSegmentType.setExternalId(linkSegmentTypeExternalId);
+      }
       
       linkSegment.setNumberOfLanes(numLanes);
       linkSegment.setLinkSegmentType(linkSegmentType);     
@@ -392,11 +418,25 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
   private void addBprParametersForLinkSegmentAndMode(final LinkSegment linkSegment, final double alpha,
       final double beta) {
     if (bprParametersForLinkSegmentAndMode == null) {
-      bprParametersForLinkSegmentAndMode = new HashMap<LinkSegment, Pair<Double, Double>>();
+      bprParametersForLinkSegmentAndMode = new HashMap<>();
     }
     final Pair<Double, Double> alphaBeta = Pair.of(alpha, beta);
     bprParametersForLinkSegmentAndMode.put(linkSegment, alphaBeta);
-  }  
+  }
+
+  /**
+   * Initialise CRS based on user settings
+   */
+  private void prepareCoordinateReferenceSystem() {
+    if(getSettings().getCoordinateReferenceSystem()!=null) {
+      var sourceCrs = PlanitCrsUtils.createCoordinateReferenceSystem(settings.getCoordinateReferenceSystem());
+      networkToPopulate.setCoordinateReferenceSystem(sourceCrs);
+    }else {
+      LOGGER.warning(String.format("Source CRS not set, assuming cartesian coordinates"));
+      networkToPopulate.setCoordinateReferenceSystem(PlanitJtsCrsUtils.CARTESIANCRS);
+    }
+    LOGGER.info(String.format("Source CRS set to %s : %s", settings.getCoordinateReferenceSystem(), networkToPopulate.getCoordinateReferenceSystem().getName()));
+  }
   
   /**
    * Constructor
@@ -443,15 +483,9 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     if(!networkToPopulate.getTransportLayers().isEmpty()) {
       throw new PlanItRunTimeException("Error cannot populate non-empty network");
     }
-    
-    if(getSettings().getCoordinateReferenceSystem()!=null) {
-      var sourceCrs = PlanitCrsUtils.createCoordinateReferenceSystem(settings.getCoordinateReferenceSystem());
-      networkToPopulate.setCoordinateReferenceSystem(sourceCrs);
-    }else {
-      LOGGER.info(String.format("Source CRS not set, assuming cartesian coordinates"));
-      networkToPopulate.setCoordinateReferenceSystem(PlanitJtsCrsUtils.CARTESIANCRS);
-    }
-    LOGGER.info(String.format("Source CRS set to %s : %s", settings.getCoordinateReferenceSystem(), networkToPopulate.getCoordinateReferenceSystem().getName()));
+
+    /* crs */
+    prepareCoordinateReferenceSystem();
 
     getSettings().logSettings();
 
@@ -509,6 +543,7 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
       }
     }catch (final Exception e) {
       LOGGER.severe(e.getMessage());
+      e.printStackTrace();
       throw new PlanItRunTimeException("Error when populating physical network in TNTP",e);
     }
 
