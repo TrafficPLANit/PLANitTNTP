@@ -90,24 +90,12 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    * @param link to extract length from
    * @param mode to use
    * @param maxSpeedKmH to use in case length is not present
-   * @param freeFlowTravelTime known free flow travel time of link
    * @return
    */
-  private AccessGroupProperties createAccessGroupProperties(Link link, Mode mode, double maxSpeedKmH, double freeFlowTravelTime) {
-    
-    /* mode properties */
-    double freeflowSpeedKmH = maxSpeedKmH;
-    if(Precision.positive(link.getLengthKm()) && Precision.positive(freeFlowTravelTime)){
-      freeflowSpeedKmH = (link.getLengthKm() / freeFlowTravelTime);
-    }       
-    
-    //TODO: Make this configurable -> now we round to the nearest whole number regarding the free flow speed in order to minimise 
-    //      the number of link segment types needed (due to inaccuracy in tntp files, we often get very close free flow speeds but still slightly different
-    //      causing a large number of types to be created.
-    freeflowSpeedKmH = Math.round(freeflowSpeedKmH);
-    
-    final AccessGroupProperties modeAccessProperties = AccessGroupPropertiesFactory.create(freeflowSpeedKmH, freeflowSpeedKmH, mode);
-    modeAccessProperties.setMaximumSpeedKmH(freeflowSpeedKmH);
+  private AccessGroupProperties createAccessGroupProperties(Link link, Mode mode, double maxSpeedKmH) {
+
+    final AccessGroupProperties modeAccessProperties = AccessGroupPropertiesFactory.create(maxSpeedKmH, maxSpeedKmH, mode);
+    modeAccessProperties.setMaximumSpeedKmH(maxSpeedKmH);
     return modeAccessProperties;
   }
 
@@ -204,7 +192,7 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     }
     
     /* LINK SEGMENT TYPE + number of lanes */
-    {    
+    {
       /* max speed km/h */
       double defaultMaximumSpeed = getSettings().getDefaultMaximumSpeed();
       double planitMaxSpeedKmH = defaultMaximumSpeed *  speedUnits.getMultiplier();
@@ -223,9 +211,10 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
         // no speed limit, derive from free flow travel time instead
         planitMaxSpeedKmH = link.getLengthKm()/freeFlowTravelTimeH;
       }
+      planitMaxSpeedKmH = (int) Math.round(planitMaxSpeedKmH); // round to whole number
 
       final AccessGroupProperties modeAccessProperties = createAccessGroupProperties(
-          link, mode, planitMaxSpeedKmH, freeFlowTravelTimeH);
+          link, mode, planitMaxSpeedKmH);
 
       /* only when capacity is not combined with number of lanes we need to scale it to capacity per lane, otherwise not */
       boolean numLanesShouldScaleCapacity = !supportedColumns.containsKey(NetworkFileColumnType.NUMBER_OF_LANES);
@@ -247,7 +236,7 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
       
       /** Link segment type **/
       MacroscopicLinkSegmentType linkSegmentType = null;
-      String linkSegmentTypeSourceId = String.format("c_%.1f:s_%d", capacityPerLane, (int) Math.round(planitMaxSpeedKmH));
+      String linkSegmentTypeSourceId = String.format("c_%.1f:s_%d", capacityPerLane, (int) planitMaxSpeedKmH);
       String linkSegmentTypeExternalId = "";
       if(supportedColumns.containsKey(NetworkFileColumnType.LINK_TYPE)) {
         linkSegmentTypeExternalId = cols[supportedColumns.get(NetworkFileColumnType.LINK_TYPE)];
@@ -280,6 +269,8 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
                   link.getExternalId(), link.getVertexA().getExternalId(), link.getVertexB().getExternalId(), capacityPerLane,
                   match.getXmlId(), match.getExplicitCapacityPerLane(), match.getMaximumSpeedKmH(mode)));
             }
+          }else{
+            int bla = 4;
           }
         }
       }
