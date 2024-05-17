@@ -19,9 +19,8 @@ public class TntpHeaderConstants {
    * @param line the current line in the network file
    * @param header the header to be parsed
    * @return the integer value contained within the specified header section
-   * @throws Exception thrown if the contents of the header cannot be parsed into an integer
    */
-  public static int parseFromHeader(final String line, final String header) throws Exception {
+  public static int parseFromHeader(final String line, final String header) {
     final String subLine = line.substring(header.length()).trim();
     return Integer.parseInt(subLine);
   }  

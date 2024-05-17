@@ -18,7 +18,6 @@ import org.goplanit.tntp.TntpHeaderConstants;
 import org.goplanit.tntp.enums.LengthUnits;
 import org.goplanit.tntp.enums.NetworkFileColumnType;
 import org.goplanit.tntp.enums.SpeedUnits;
-import org.goplanit.utils.exceptions.PlanItException;
 import org.goplanit.utils.exceptions.PlanItRunTimeException;
 import org.goplanit.utils.geo.PlanitCrsUtils;
 import org.goplanit.utils.geo.PlanitJtsCrsUtils;
@@ -90,7 +89,7 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    * @param link to extract length from
    * @param mode to use
    * @param maxSpeedKmH to use in case length is not present
-   * @return
+   * @return created properties
    */
   private AccessGroupProperties createAccessGroupProperties(Link link, Mode mode, double maxSpeedKmH) {
 
@@ -107,8 +106,8 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    * @param externalId externalId to set
    * @return created link segment type
    */
-  private MacroscopicLinkSegmentType createAndRegisterLinkSegmentType(final MacroscopicNetworkLayer networkLayer, double capacityPerLane,
-      final AccessGroupProperties modeAccessProperties, String externalId) {
+  private MacroscopicLinkSegmentType createAndRegisterLinkSegmentType(
+      final MacroscopicNetworkLayer networkLayer, double capacityPerLane, final AccessGroupProperties modeAccessProperties, String externalId) {
     MacroscopicLinkSegmentType linkSegmentType;
     linkSegmentType = networkLayer.getLinkSegmentTypes().getFactory().registerNew(externalId, capacityPerLane, MacroscopicConstants.DEFAULT_MAX_DENSITY_PCU_KM_LANE);
     linkSegmentType.setAccessGroupProperties(modeAccessProperties);
@@ -135,11 +134,10 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    * Create and register a new node if it does not already exist
    *
    * @param network the current physical network
-   * @param cols the columns in the network input file
    * @param nodeSourceId node source id to use
    * @return the node corresponding to this external ID
    */
-  private Node collectOrCreatePlanitNode(final MacroscopicNetworkLayer network, final String[] cols, final String nodeSourceId) {
+  private Node collectOrCreatePlanitNode(final MacroscopicNetworkLayer network, final String nodeSourceId) {
 
     Node node = null;
     if (getBySourceId(Node.class, nodeSourceId) == null) {
@@ -163,13 +161,15 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    * @param networkFileColumn the column in the network file which contains the node external Id
    * @return the node corresponding to this external ID
    */
-  private Node collectOrCreatePlanitNode(final MacroscopicNetworkLayer network, final String[] cols, final NetworkFileColumnType networkFileColumn){
+  private Node collectOrCreatePlanitNode(
+      final MacroscopicNetworkLayer network, final String[] cols, final NetworkFileColumnType networkFileColumn){
         
     final String nodeSourceId = cols[getSettings().getNetworkFileColumns().get(networkFileColumn)];
     if ( Long.parseLong(nodeSourceId) > noPhysicalNodes) {
-      throw new PlanItRunTimeException("Number of nodes is specified as " + noPhysicalNodes + " but found a reference to node " + nodeSourceId);
+      throw new PlanItRunTimeException("Number of nodes is specified as " + noPhysicalNodes + " " +
+          "but found a reference to node " + nodeSourceId);
     }
-    return collectOrCreatePlanitNode(network, cols, nodeSourceId);
+    return collectOrCreatePlanitNode(network, nodeSourceId);
   }
 
   /**
@@ -245,7 +245,7 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
         numLanes = Integer.parseInt(cols[supportedColumns.get(NetworkFileColumnType.NUMBER_OF_LANES)]);
       }
       
-      /** Link segment type **/
+      /* Link segment type */
       MacroscopicLinkSegmentType linkSegmentType = null;
       String linkSegmentTypeSourceId = String.format("c_%.1f:s_%d", capacityPerLane, (int) planitMaxSpeedKmH);
       String linkSegmentTypeExternalId = "";
@@ -280,8 +280,6 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
                   link.getExternalId(), link.getVertexA().getExternalId(), link.getVertexB().getExternalId(), capacityPerLane,
                   match.getXmlId(), match.getExplicitCapacityPerLane(), match.getMaximumSpeedKmH(mode)));
             }
-          }else{
-            int bla = 4;
           }
         }
       }
@@ -321,7 +319,7 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
           Node node = getBySourceId(Node.class, nodeSourceId);
           if(node == null) {
             LOGGER.warning(String.format("Node %s in TNTP node file not use by TNTP links, likely dangling",nodeSourceId));
-            node = collectOrCreatePlanitNode(networkLayer, cols, nodeSourceId);
+            node = collectOrCreatePlanitNode(networkLayer, nodeSourceId);
           }
           Point nodePosition = PlanitJtsUtils.createPoint(Double.parseDouble(cols[1]), Double.parseDouble(cols[2]));          
           node.setPosition(nodePosition);
@@ -337,9 +335,8 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    * Read network metadata from the top of the network input file
    *
    * @param line the current line in the network input file
-   * @throws Exception thrown if the contents of the header cannot be parsed into an integer
    */
-  private void readNetworkMetadata(final String line) throws Exception {
+  private void readNetworkMetadata(final String line) {
    if (line.startsWith(TntpHeaderConstants.NUMBER_OF_NODES_INDICATOR)) {
       noPhysicalNodes = TntpHeaderConstants.parseFromHeader(line, TntpHeaderConstants.NUMBER_OF_NODES_INDICATOR);
     } else if (line.startsWith(TntpHeaderConstants.NUMBER_OF_LINKS_INDICATOR)) {
@@ -354,10 +351,8 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    * @param networkLayer the macroscopic networkLayer object to be populated from the input data
    * @param line the current line in the network input file
    * @param tntpLinkSegmentRowId the row Id for the current Tntp link segment (used as external id)
-   * @throws PlanItException thrown if there is an error
    */
-  private void readLinkData(final MacroscopicNetworkLayer networkLayer, final String line, final long tntpLinkSegmentRowId)
-      throws PlanItException {
+  private void readLinkData(final MacroscopicNetworkLayer networkLayer, final String line, final long tntpLinkSegmentRowId) {
     final String[] cols = line.split("\\s+");
     
     Map<NetworkFileColumnType, Integer> supportedColumns = getSettings().getNetworkFileColumns();
@@ -367,7 +362,7 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     final Node downstreamNode = collectOrCreatePlanitNode(networkLayer, cols, NetworkFileColumnType.DOWNSTREAM_NODE_ID);    
     final double length = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.LENGTH)]) * lengthUnits.getMultiplier();
     
-    /** LINK **/
+    /* LINK */
     MacroscopicLink link = null;
     var oppositeDirectionSegment = (MacroscopicLinkSegment) downstreamNode.getEdgeSegment(upstreamNode);
     boolean directionAb = true;
@@ -389,19 +384,19 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
       link.setExternalId(link.getXmlId());
     }
     
-    /** LINK SEGMENT + TYPE **/    
+    /* LINK SEGMENT + TYPE */
     final MacroscopicLinkSegment linkSegment = createAndRegisterLinkSegment(networkLayer, link, tntpLinkSegmentRowId, directionAb, cols);
   
-    /** MODE PARAMETERS **/
+    /* MODE PARAMETERS */
     double alpha = BprLinkTravelTimeCost.DEFAULT_ALPHA;
     double beta = BprLinkTravelTimeCost.DEFAULT_BETA;
     boolean settingAlpha = false;
-    if (supportedColumns.keySet().contains(NetworkFileColumnType.B)) {
+    if (supportedColumns.containsKey(NetworkFileColumnType.B)) {
       alpha = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.B)]);
       settingAlpha = true;
     }
     boolean settingBeta = false;
-    if (supportedColumns.keySet().contains(NetworkFileColumnType.POWER)) {
+    if (supportedColumns.containsKey(NetworkFileColumnType.POWER)) {
       beta = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.POWER)]);
       settingBeta = true;
     }
@@ -459,13 +454,10 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
   protected TntpNetworkReader(TntpNetworkReaderSettings settings, LayeredNetwork<?, ?> network) {
     this.settings = settings;
     this.networkToPopulate = (MacroscopicNetwork) network;
+    if(!networkToPopulate.hasXmlId()){
+      networkToPopulate.setXmlId(networkToPopulate.getId());
+    }
   }
-
-  public static final int ONE_WAY_AB = 1;
-
-  public static final int ONE_WAY_BA = 2;
-
-  public static final int TWO_WAY = 3;
 
   public static final int DEFAULT_LANE_CAPACITY_PCUH = 2000;
 
@@ -481,7 +473,7 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    * {@inheritDoc}
    */  
   @Override
-  public LayeredNetwork<?, ?> read(){
+  public MacroscopicNetwork read(){
     if(!networkToPopulate.getTransportLayers().isEmpty()) {
       throw new PlanItRunTimeException("Error cannot populate non-empty network");
     }
@@ -513,6 +505,9 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     /* TNTP only compatible with parsing a single network layer, so create it */
     final MacroscopicNetworkLayer networkLayer = networkToPopulate.getTransportLayers().getFactory().registerNew();
     networkLayer.registerSupportedMode(mode);
+    if(!networkLayer.hasXmlId()){
+      networkLayer.setXmlId(networkLayer.getId());
+    }
    
     try (Scanner scanner = new Scanner(networkFile)) {
       boolean readingMetadata = true;

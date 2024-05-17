@@ -215,6 +215,7 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
           "in conjunction with TnTP zoning reader");
       this.referenceNetwork = referenceZoningReader.getReferenceNetwork();
       this.demandsToPopulate = new Demands(referenceNetwork.getNetworkGroupingTokenId());
+      this.demandsToPopulate.setXmlId(demandsToPopulate.getId());
     }
 
     if(!validateSettings()) {

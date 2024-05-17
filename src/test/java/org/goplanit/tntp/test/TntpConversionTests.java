@@ -396,20 +396,25 @@ public class TntpConversionTests {
     final Path PLANIT_REF_DIR = Path.of(RESOURCE_PATH.toString(),"planit","GoldCoast");
     try {
 
-      /* TNTP reader */
+      /* TNTP-->PLANit Network */
       var idToken = IdGenerator.createIdGroupingToken("testTntp2PlanitGoldCoast");
       TntpNetworkReader tntpReader = createGoldCoastTntpNetworkReader(
           GOLDCOAST_NETWORK_FILE, GOLDCOAST_NODE_FILE, DEFAULT_MAXIMUM_SPEED_KPH, idToken );
-
-      /* PLANit writer */
       PlanitNetworkWriter planitWriter = PlanitNetworkWriterFactory.create(
           PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), CountryNames.AUSTRALIA);
+      var network = tntpReader.read();
+      planitWriter.write(network);
 
-      /* convert */
-      NetworkConverter theConverter = NetworkConverterFactory.create(tntpReader, planitWriter);
-      theConverter.convert();
+      /* TNTP-->PLANit Zoning */
+      var tntpZoningReader = TntpZoningReaderFactory.create(
+          GOLDCOAST_NETWORK_FILE.toAbsolutePath().toString(), network, idToken);
+      var zoning = tntpZoningReader.read();
+      var planitZoningWriter = PlanitZoningWriterFactory.create(
+          PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), CountryNames.AUSTRALIA);
+      planitZoningWriter.write(zoning);
 
       PlanitAssertionUtils.assertNetworkFilesSimilar(PLANIT_OUTPUT_DIR, PLANIT_REF_DIR);
+      PlanitAssertionUtils.assertZoningFilesSimilar(PLANIT_OUTPUT_DIR, PLANIT_REF_DIR);
 
     } catch (final Exception e) {
       e.printStackTrace();

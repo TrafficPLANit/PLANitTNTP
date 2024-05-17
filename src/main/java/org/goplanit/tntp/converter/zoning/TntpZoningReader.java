@@ -179,11 +179,17 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
             "use in conjunction with TnTP zoning reader");
       }
       referenceNetwork = (MacroscopicNetwork) readNetwork;
-      zoningToPopulate = new Zoning(referenceNetwork.getIdGroupingToken(), referenceNetwork.getNetworkGroupingTokenId());
-      /*TNTP zoning is always 1:1 to its network, so we may assume that the CRS of the zoning is 1:1 to the network as well */
-      if(zoningToPopulate.getCoordinateReferenceSystem()==null){
-        zoningToPopulate.setCoordinateReferenceSystem(referenceNetwork.getCoordinateReferenceSystem());
+
+      if(zoningToPopulate == null) {
+        zoningToPopulate = new Zoning(referenceNetwork.getIdGroupingToken(), referenceNetwork.getNetworkGroupingTokenId());
+        /*TNTP zoning is always 1:1 to its network, so we may assume that the CRS of the zoning is 1:1 to the network as well */
+        if (zoningToPopulate.getCoordinateReferenceSystem() == null) {
+          zoningToPopulate.setCoordinateReferenceSystem(referenceNetwork.getCoordinateReferenceSystem());
+        }
       }
+    }
+    if(!zoningToPopulate.hasXmlId()){
+      zoningToPopulate.setXmlId(zoningToPopulate.getId());
     }
 
     if(!validateSettings()) {
