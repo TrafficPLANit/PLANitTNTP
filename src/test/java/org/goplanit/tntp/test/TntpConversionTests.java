@@ -413,8 +413,19 @@ public class TntpConversionTests {
           PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), CountryNames.AUSTRALIA);
       planitZoningWriter.write(zoning);
 
+      /* TNTP -->PLANit Demands */
+      var tntpDemandsReader = TntpDemandsReaderFactory.create(GOLDCOAST_DEMAND_FILE.toAbsolutePath().toString(), network, zoning, idToken);
+      tntpDemandsReader.getSettings().setStartTimeSinceMidnight(8, TimeUnits.HOURS);
+      tntpDemandsReader.getSettings().setTimePeriodDuration(1, TimeUnits.HOURS);
+      var demands = tntpDemandsReader.read();
+      /* PLANit DEMAND writer */
+      var planitDemandsWriter = PlanitDemandsWriterFactory.create(
+              PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), zoning);
+      planitDemandsWriter.write(demands);
+
       PlanitAssertionUtils.assertNetworkFilesSimilar(PLANIT_OUTPUT_DIR, PLANIT_REF_DIR);
       PlanitAssertionUtils.assertZoningFilesSimilar(PLANIT_OUTPUT_DIR, PLANIT_REF_DIR);
+      PlanitAssertionUtils.assertDemandsFilesSimilar(PLANIT_OUTPUT_DIR, PLANIT_REF_DIR);
 
     } catch (final Exception e) {
       e.printStackTrace();
