@@ -400,6 +400,8 @@ public class TntpConversionTests {
       var idToken = IdGenerator.createIdGroupingToken("testTntp2PlanitGoldCoast");
       TntpNetworkReader tntpReader = createGoldCoastTntpNetworkReader(
           GOLDCOAST_NETWORK_FILE, GOLDCOAST_NODE_FILE, DEFAULT_MAXIMUM_SPEED_KPH, idToken );
+      tntpReader.getSettings().setSwapNodeCoordinates(true);
+
       PlanitNetworkWriter planitWriter = PlanitNetworkWriterFactory.create(
           PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), CountryNames.AUSTRALIA);
       var network = tntpReader.read();

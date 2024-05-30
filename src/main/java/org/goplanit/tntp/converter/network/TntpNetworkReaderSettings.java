@@ -28,7 +28,12 @@ public class TntpNetworkReaderSettings implements ConverterReaderSettings {
   /**
    * node coordinate data file
    */
-  private String nodeCoordinateFile;   
+  private String nodeCoordinateFile;
+
+  /**
+   * Option to swap node coordinates when processing in case they are provided in non-default order
+   */
+  private boolean swapNodeCoordinates;
   
   /** 
    * coordinate reference system of the source node file
@@ -89,6 +94,7 @@ public class TntpNetworkReaderSettings implements ConverterReaderSettings {
     LOGGER.info(String.format("Capacity period units set to: %s", getCapacityPeriodUnits()));
     LOGGER.info(String.format("Capacity period duration set to: %s", getCapacityPeriodDuration()));
     LOGGER.info(String.format("Default max speed set to: %s", getDefaultMaximumSpeed()));
+    LOGGER.info(String.format("Node coordinates swapping: %s", Boolean.toString(isSwapNodeCoordinates())));
   }
 
 
@@ -159,6 +165,14 @@ public class TntpNetworkReaderSettings implements ConverterReaderSettings {
 
   public void setNodeCoordinateFile(String nodeCoordinateFile) {
     this.nodeCoordinateFile = nodeCoordinateFile;
+  }
+
+  public boolean isSwapNodeCoordinates() {
+    return swapNodeCoordinates;
+  }
+
+  public void setSwapNodeCoordinates(boolean flag){
+    this.swapNodeCoordinates = flag;
   }
 
   public String getCoordinateReferenceSystem() {

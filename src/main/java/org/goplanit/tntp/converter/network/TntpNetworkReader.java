@@ -307,6 +307,7 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    * @param nodeCoordinateFile file used
    */
   private void parseNodeCoordinatesFromFile(final MacroscopicNetworkLayer networkLayer, File nodeCoordinateFile) {
+    boolean swapNodeCoords = getSettings().isSwapNodeCoordinates();
     try (Scanner scanner = new Scanner(nodeCoordinateFile)) {
       while (scanner.hasNextLine()) {
         String line = scanner.nextLine().trim();
@@ -318,10 +319,12 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
   
           Node node = getBySourceId(Node.class, nodeSourceId);
           if(node == null) {
-            LOGGER.warning(String.format("Node %s in TNTP node file not use by TNTP links, likely dangling",nodeSourceId));
+            LOGGER.warning(String.format("Node %s in TNTP node file not used by TNTP links, likely dangling",nodeSourceId));
             node = collectOrCreatePlanitNode(networkLayer, nodeSourceId);
           }
-          Point nodePosition = PlanitJtsUtils.createPoint(Double.parseDouble(cols[1]), Double.parseDouble(cols[2]));          
+          double xCoord = swapNodeCoords ? Double.parseDouble(cols[2]) : Double.parseDouble(cols[1]);
+          double yCoord = swapNodeCoords ? Double.parseDouble(cols[1]) : Double.parseDouble(cols[2]);
+          Point nodePosition = PlanitJtsUtils.createPoint(xCoord, yCoord);
           node.setPosition(nodePosition);
         }
       }
