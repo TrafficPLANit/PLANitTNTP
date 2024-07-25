@@ -201,17 +201,16 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	 *
 	 * @param outputConfiguration OutputConfiguration of the assignment
 	 * @param outputAdapter the outputAdapter
-	 * @throws PlanItException thrown if the the output file cannot be closed
 	 */
 	@Override
-	public void finaliseAfterSimulation(final OutputConfiguration outputConfiguration, OutputAdapter outputAdapter) throws PlanItException {
+	public void finaliseAfterSimulation(final OutputConfiguration outputConfiguration, OutputAdapter outputAdapter) {
 		try {
 		    for(final OutputType outputType : outputConfiguration.getActivatedOutputTypes()) {
 	            printer.get(outputType).close();
 		    }
 		} catch (final IOException e) {
       LOGGER.severe(e.getMessage());
-      throw new PlanItException("Error when finalising after simulation in TNTP",e);
+      throw new PlanItRunTimeException("Error when finalising after simulation in TNTP",e);
 		}
 	}
 
@@ -235,7 +234,9 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 
 	            //In CSVOutputFormatter we can only have one CSV file per output type
 	            final String csvFileName = csvFileNameMap.get(outputType).get(0);
-	            final CSVPrinter csvPrinter = openCsvFileAndWriteHeaders(outputConfiguration.getOutputTypeConfiguration(outputType), csvFileName);
+	            final CSVPrinter csvPrinter = createCsvPrinter(csvFileName);
+							// create the header (first line) of the file
+							csvPrinter.printRecord(generateCsvHeader(outputConfiguration.getOutputTypeConfiguration(outputType)));
 	            printer.put(outputType, csvPrinter);
 		    }
 		} catch (final Exception e) {
