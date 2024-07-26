@@ -201,9 +201,12 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	 *
 	 * @param outputConfiguration OutputConfiguration of the assignment
 	 * @param outputAdapter the outputAdapter
+	 * @param timePeriod the last time period used before simulation ended
+	 * @param iterationIndex the last iteration index of the last time period used before the simulation eneded
 	 */
 	@Override
-	public void finaliseAfterSimulation(final OutputConfiguration outputConfiguration, OutputAdapter outputAdapter) {
+	public void finaliseAfterSimulation(
+					final OutputConfiguration outputConfiguration, OutputAdapter outputAdapter, TimePeriod timePeriod, int iterationIndex) {
 		try {
 		    for(final OutputType outputType : outputConfiguration.getActivatedOutputTypes()) {
 	            printer.get(outputType).close();
