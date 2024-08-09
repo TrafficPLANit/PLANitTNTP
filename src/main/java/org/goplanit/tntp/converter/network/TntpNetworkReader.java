@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.goplanit.converter.BaseReaderImpl;
+import org.goplanit.converter.ConverterReaderUtils;
 import org.goplanit.converter.network.NetworkReader;
 import org.goplanit.cost.physical.BprLinkTravelTimeCost;
 import org.goplanit.network.MacroscopicNetwork;
@@ -25,6 +26,7 @@ import org.goplanit.utils.geo.PlanitJtsUtils;
 import org.goplanit.utils.id.IdGroupingToken;
 import org.goplanit.utils.macroscopic.MacroscopicConstants;
 import org.goplanit.utils.math.Precision;
+import org.goplanit.utils.misc.FileUtils;
 import org.goplanit.utils.misc.LoggingUtils;
 import org.goplanit.utils.misc.Pair;
 import org.goplanit.utils.mode.Mode;
@@ -301,6 +303,43 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
   }
 
   /**
+   * parse the network file using the scanner provided
+   *
+   * @param scanner to use
+   * @param networkLayer the physical network object to be populated from the input data
+   */
+  private void parseTntNetworkFile(Scanner scanner, MacroscopicNetworkLayer networkLayer) {
+    boolean readingMetadata = true;
+    boolean readingLinkData = false;
+    long tntpLinkSegmentRowId = 0;
+
+    while (scanner.hasNextLine()) {
+      final String line = scanner.nextLine().trim();
+      final char firstChar = (line.isEmpty()) ? 'x' : line.charAt(0);
+      final boolean atEndOfMetadata = line.equals(TntpHeaderConstants.END_OF_METADATA_INDICATOR);
+      if (atEndOfMetadata) {
+        readingMetadata = false;
+      }
+      if (readingMetadata) {
+        readNetworkMetadata(line);
+      } else if (!atEndOfMetadata) {
+        if (firstChar == '~') {
+          readingLinkData = true;
+        } else if (readingLinkData) {
+          tntpLinkSegmentRowId++;
+          readLinkData(networkLayer, line, tntpLinkSegmentRowId);
+        }
+      }
+    }
+
+    if (tntpLinkSegmentRowId != noLinks) {
+      final String errorMessage = "Header says " + noLinks + " links but " + tntpLinkSegmentRowId+ " were actually defined.";
+      LOGGER.severe(errorMessage);
+      throw new PlanItRunTimeException(errorMessage);
+    }
+  }
+
+  /**
    * Update the node coordinates from the node coordinate file
    *
    * @param networkLayer the physical network object to be populated from the input data
@@ -428,14 +467,10 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    * Initialise CRS based on user settings
    */
   private void prepareCoordinateReferenceSystem() {
-    if(getSettings().getCoordinateReferenceSystem()!=null) {
-      var sourceCrs = PlanitCrsUtils.createCoordinateReferenceSystem(settings.getCoordinateReferenceSystem());
-      networkToPopulate.setCoordinateReferenceSystem(sourceCrs);
-    }else {
-      LOGGER.warning(String.format("Source CRS not set, assuming cartesian coordinates"));
-      networkToPopulate.setCoordinateReferenceSystem(PlanitJtsCrsUtils.CARTESIANCRS);
-    }
-    LOGGER.info(String.format("Source CRS set to %s : %s", settings.getCoordinateReferenceSystem(), networkToPopulate.getCoordinateReferenceSystem().getName()));
+    var sourceCrs = ConverterReaderUtils.createCoordinateReferenceSystemCartesianIfFail(
+            settings.getCoordinateReferenceSystem(), null);
+    networkToPopulate.setCoordinateReferenceSystem(sourceCrs);
+    LOGGER.info(String.format("Source CRS set to %s : %s", sourceCrs.getName(), networkToPopulate.getCoordinateReferenceSystem().getName()));
   }
   
   /**
@@ -511,41 +546,9 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     if(!networkLayer.hasXmlId()){
       networkLayer.setXmlId(networkLayer.getId());
     }
-   
-    try (Scanner scanner = new Scanner(networkFile)) {
-      boolean readingMetadata = true;
-      boolean readingLinkData = false;
-      long tntpLinkSegmentRowId = 0;
 
-      while (scanner.hasNextLine()) {
-        final String line = scanner.nextLine().trim();
-        final char firstChar = (line.isEmpty()) ? 'x' : line.charAt(0);
-        final boolean atEndOfMetadata = line.equals(TntpHeaderConstants.END_OF_METADATA_INDICATOR);
-        if (atEndOfMetadata) {
-          readingMetadata = false;
-        }
-        if (readingMetadata) {
-          readNetworkMetadata(line);
-        } else if (!atEndOfMetadata) {
-          if (firstChar == '~') {
-            readingLinkData = true;
-          } else if (readingLinkData) {
-            tntpLinkSegmentRowId++;
-            readLinkData(networkLayer, line, tntpLinkSegmentRowId);
-          }
-        }
-      }
-
-      if (tntpLinkSegmentRowId != noLinks) {
-        final String errorMessage = "Header says " + noLinks + " links but " + tntpLinkSegmentRowId+ " were actually defined.";
-        LOGGER.severe(errorMessage);
-        throw new PlanItRunTimeException(errorMessage);
-      }
-    }catch (final Exception e) {
-      LOGGER.severe(e.getMessage());
-      e.printStackTrace();
-      throw new PlanItRunTimeException("Error when populating physical network in TNTP",e);
-    }
+    // parse network file
+    FileUtils.wrapFileScanner(networkFile, scanner -> parseTntNetworkFile(scanner, networkLayer));
 
     if (nodeCoordinateFile != null) {
       parseNodeCoordinatesFromFile(networkLayer, nodeCoordinateFile);
@@ -553,6 +556,7 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     
     return networkToPopulate;
   }
+
 
   /**
    * {@inheritDoc}

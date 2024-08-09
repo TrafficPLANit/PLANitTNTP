@@ -175,10 +175,20 @@ public class TntpNetworkReaderSettings implements ConverterReaderSettings {
     this.swapNodeCoordinates = flag;
   }
 
+  /**
+   * CRS set
+   *
+   * @return coordinateReferenceSystem crs
+   */
   public String getCoordinateReferenceSystem() {
     return coordinateReferenceSystem;
   }
 
+  /**
+   * CRS in EPSG format to use
+   *
+   * @param coordinateReferenceSystem crs, e.g., "EPSG:26971"
+   */
   public void setCoordinateReferenceSystem(String coordinateReferenceSystem) {
     this.coordinateReferenceSystem = coordinateReferenceSystem;
   }
