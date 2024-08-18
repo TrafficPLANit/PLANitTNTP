@@ -23,7 +23,9 @@ import org.goplanit.utils.exceptions.PlanItRunTimeException;
 import org.goplanit.utils.geo.PlanitCrsUtils;
 import org.goplanit.utils.geo.PlanitJtsCrsUtils;
 import org.goplanit.utils.geo.PlanitJtsUtils;
+import org.goplanit.utils.graph.directed.EdgeSegmentUtils;
 import org.goplanit.utils.id.IdGroupingToken;
+import org.goplanit.utils.id.IdMapperType;
 import org.goplanit.utils.macroscopic.MacroscopicConstants;
 import org.goplanit.utils.math.Precision;
 import org.goplanit.utils.misc.FileUtils;
@@ -197,7 +199,8 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     /* LINK SEGMENT*/
     final MacroscopicLinkSegment linkSegment = networkLayer.getLinkSegments().getFactory().registerNew(link, directionAb, true);
     /* XML id */
-    linkSegment.setXmlId(link.getExternalId() + "-" + (directionAb ? "AB" : "BA"));
+    linkSegment.setXmlId(
+        EdgeSegmentUtils.createParentLinkDerivedId(linkSegment, IdMapperType.EXTERNAL_ID));
     /* external id */    
     linkSegment.setExternalId(String.valueOf(tntpLinkSegmentRowId));
     if (linkSegment.getExternalId() != null) {
@@ -427,7 +430,8 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     }
     
     /* LINK SEGMENT + TYPE */
-    final MacroscopicLinkSegment linkSegment = createAndRegisterLinkSegment(networkLayer, link, tntpLinkSegmentRowId, directionAb, cols);
+    final MacroscopicLinkSegment linkSegment = createAndRegisterLinkSegment(
+        networkLayer, link, tntpLinkSegmentRowId, directionAb, cols);
   
     /* MODE PARAMETERS */
     double alpha = BprLinkTravelTimeCost.DEFAULT_ALPHA;
