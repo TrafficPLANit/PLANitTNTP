@@ -1,15 +1,5 @@
 package org.goplanit.tntp.output.formatter;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.logging.Logger;
-
 import org.apache.commons.csv.CSVPrinter;
 import org.goplanit.output.adapter.MacroscopicLinkOutputTypeAdapter;
 import org.goplanit.output.adapter.OutputAdapter;
@@ -25,8 +15,11 @@ import org.goplanit.utils.exceptions.PlanItRunTimeException;
 import org.goplanit.utils.id.IdGroupingToken;
 import org.goplanit.utils.mode.Mode;
 import org.goplanit.utils.network.layer.macroscopic.MacroscopicLinkSegment;
-import org.goplanit.utils.output.OutputUtils;
 import org.goplanit.utils.time.TimePeriod;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * Output formatter for CSV output, i.e. this class is capable of persisting
@@ -85,18 +78,18 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 		try {
 			for (final Mode mode : modes) {
 			  Optional<Long> layerId = linkOutputTypeAdapter.getInfrastructureLayerIdForMode(mode);
-			  layerId.orElseThrow(() -> new PlanItException("unable to retrieve layer id for mode"));
+			  layerId.orElseThrow(() -> new PlanItRunTimeException("Unable to retrieve layer id for mode"));
 			  
 				for (final MacroscopicLinkSegment linkSegment : linkOutputTypeAdapter.getPhysicalLinkSegments(layerId.get())) {
 				  Optional<Boolean> flowPositive = linkOutputTypeAdapter.isFlowPositive(linkSegment, mode);
-				  flowPositive.orElseThrow(() -> new PlanItException("unable to determine if flow is positive for link segment and mode"));
+				  flowPositive.orElseThrow(() -> new PlanItRunTimeException("Unable to determine if flow is positive for link segment and mode"));
 				  
 					if (outputConfiguration.isPersistZeroFlow() || flowPositive.get()) {
-					  final List<Object> rowValues = new ArrayList<Object>();						
+					  final List<Object> rowValues = new ArrayList<>();
 					  for (final OutputProperty outputProperty : outputProperties) {
               rowValues.add(
-                  OutputUtils.formatObject(
-                      linkOutputTypeAdapter.getLinkSegmentOutputPropertyValue(outputProperty, linkSegment, mode, timePeriod).get()));
+                  outputProperty.formatValue(
+                      linkOutputTypeAdapter.getLinkSegmentOutputPropertyValue(outputProperty, linkSegment, mode, timePeriod)));
  						}
 						printer.get(outputTypeConfiguration.getOutputType()).printRecord(rowValues);
 					}
