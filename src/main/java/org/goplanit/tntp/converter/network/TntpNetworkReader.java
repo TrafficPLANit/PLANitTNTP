@@ -97,7 +97,8 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    */
   private AccessGroupProperties createAccessGroupProperties(Link link, Mode mode, double maxSpeedKmH) {
 
-    final AccessGroupProperties modeAccessProperties = AccessGroupPropertiesFactory.create(maxSpeedKmH, maxSpeedKmH, mode);
+    final AccessGroupProperties modeAccessProperties =
+        AccessGroupPropertiesFactory.create(maxSpeedKmH, maxSpeedKmH, mode);
     modeAccessProperties.setMaximumSpeedKmH(maxSpeedKmH);
     return modeAccessProperties;
   }
