@@ -63,7 +63,8 @@ public class TntpAssignmentTest {
    *
    *
    * The published results can be found at
-   * https://github.com/bstabler/TransportationNetworks/blob/master/Chicago-Sketch/ChicagoSketch_flow.tntp.
+   * <a href="https://github.com/bstabler/TransportationNetworks/blob/master/Chicago-Sketch/ChicagoSketch_flow.tntp">
+   *   Chicago sketch</a>.
    */
   @Test
   public void ChicagoSketchTest() {
@@ -81,7 +82,7 @@ public class TntpAssignmentTest {
       /* PREP */
       final TntpInputBuilder tntp = new TntpInputBuilder(NETWORK_FILE, NODE_FILE, DEMANDS_FILE);
             
-      // TODO - The following arrangement of columns is correct for Chicago Sketch and Philadelphia.
+      // The following arrangement of columns is correct for Chicago Sketch and Philadelphia.
       // For some other cities the arrangement is different.
       final Map<NetworkFileColumnType, Integer> networkFileColumns = new HashMap<NetworkFileColumnType, Integer>();
       networkFileColumns.put(NetworkFileColumnType.UPSTREAM_NODE_ID, 0);
@@ -127,9 +128,9 @@ public class TntpAssignmentTest {
       final int downstreamNodeExternalIdPosition = memoryOutputFormatter.getPositionOfOutputKeyProperty(OutputType.LINK, OutputPropertyType.DOWNSTREAM_NODE_EXTERNAL_ID);
       final int upstreamNodeExternalIdPosition = memoryOutputFormatter.getPositionOfOutputKeyProperty(OutputType.LINK, OutputPropertyType.UPSTREAM_NODE_EXTERNAL_ID);
       
-      // NOTE: when running +- 300 iterations the flows get very close generally, so it appears to be working correctly however,      
-      //TODO: to compare against results of TNTP we need to include generalised cost with distance penalty. This is not yet supported
-      //      in PLANit, so we can;t compare properly. 
+      // TODO: when running +- 300 iterations the flows get very close generally, however,
+      //  to compare against results of TNTP we need to include generalised cost with distance penalty.
+      //  This is not yet supported in PLANit, so we can't compare properly.
       final MemoryOutputIterator memoryOutputIterator = memoryOutputFormatter.getIterator(mode, timePeriod, iterationIndex, OutputType.LINK);
       while (memoryOutputIterator.hasNext()) {
           memoryOutputIterator.next();

@@ -2,6 +2,7 @@ package org.goplanit.tntp.converter.zoning;
 
 import org.goplanit.converter.network.NetworkReader;
 import org.goplanit.network.MacroscopicNetwork;
+import org.goplanit.tntp.converter.network.TntpNetworkReader;
 import org.goplanit.utils.id.IdGroupingToken;
 import org.goplanit.zoning.Zoning;
 
@@ -73,7 +74,7 @@ public class TntpZoningReaderFactory {
     return new TntpZoningReader(zoningSettings, referenceNetwork, zoningToPopulate);
   }
 
-  /** Factory method
+  /** Factory method to create
    *
    * @param referenceNetworkReader to use
    * @return created TNTP zoning reader
@@ -82,9 +83,21 @@ public class TntpZoningReaderFactory {
     return create(new TntpZoningReaderSettings(), referenceNetworkReader);
   }
 
-  /** Factory method
+  /** Factory method to create a TNTP Zoning reader using a TNTP network reader information to minimise configuration
+   * overhead
    *
-   * @param zoningSettings to use
+   * @param tntpNetworkReader to use
+   * @return created TNTP zoning reader
+   */
+  public static TntpZoningReader createFromTntpNetworkReader(final TntpNetworkReader tntpNetworkReader) {
+    var tntpZoningReader =  create(new TntpZoningReaderSettings(), tntpNetworkReader);
+    tntpZoningReader.getSettings().setNetworkFileLocation(tntpNetworkReader.getSettings().getNetworkFile());
+    return tntpZoningReader;
+  }
+
+  /** Factory method allowing use of any network reader compatible with this TNTP zoning reader
+   *
+   * @param zoningSettings to use (assumes explicit configuration of TNTP file location on these settings)
    * @param referenceNetworkReader to use
    * @return created TNTP zoning reader
    */

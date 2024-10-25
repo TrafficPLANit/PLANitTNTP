@@ -42,7 +42,7 @@ import java.util.logging.Logger;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * JUnit test cases for converting Chicago network from TNTP format to another
+ * JUnit test cases for converting various test networks from TNTP format to another format
  * 
  * @author markr
  *
@@ -136,7 +136,7 @@ public class TntpConversionTests {
     return tntpReader;
   }
 
-  /** Create TNTP reader suitable for Chicago network
+  /** Create TNTP reader suitable for Sioux Falls network
    * 
    * @param networkFileLocation to use
    * @param nodeFileLocation to use
@@ -436,5 +436,56 @@ public class TntpConversionTests {
     }
   }
 
+
+  /**
+   * Test case which parses the TNTP Leuven network, zoning and trips files, loads it into PLANit memory model and
+   * persists it as a PLANit network, demand, and zoning
+   */
+  @Test
+  public void testTntp2PlanitLeuven() {
+
+    final Path PLANIT_OUTPUT_DIR = Path.of(RESOURCE_PATH.toString(),"testcases","planit","GoldCoast");
+    final Path PLANIT_REF_DIR = Path.of(RESOURCE_PATH.toString(),"planit","GoldCoast");
+    try {
+
+      /* TNTP-->PLANit Network */
+      var idToken = IdGenerator.createIdGroupingToken("testTntp2PlanitGoldCoast");
+      TntpNetworkReader tntpReader = createGoldCoastTntpNetworkReader(
+              GOLDCOAST_NETWORK_FILE, GOLDCOAST_NODE_FILE, DEFAULT_MAXIMUM_SPEED_KPH, idToken );
+      tntpReader.getSettings().setSwapNodeCoordinates(true);
+
+      PlanitNetworkWriter planitWriter = PlanitNetworkWriterFactory.create(
+              PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), CountryNames.AUSTRALIA);
+      var network = tntpReader.read();
+      planitWriter.write(network);
+
+      /* TNTP-->PLANit Zoning */
+      var tntpZoningReader = TntpZoningReaderFactory.create(
+              GOLDCOAST_NETWORK_FILE.toAbsolutePath().toString(), network, idToken);
+      var zoning = tntpZoningReader.read();
+      var planitZoningWriter = PlanitZoningWriterFactory.create(
+              PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), CountryNames.AUSTRALIA);
+      planitZoningWriter.write(zoning);
+
+      /* TNTP -->PLANit Demands */
+      var tntpDemandsReader = TntpDemandsReaderFactory.create(GOLDCOAST_DEMAND_FILE.toAbsolutePath().toString(), network, zoning, idToken);
+      tntpDemandsReader.getSettings().setStartTimeSinceMidnight(8, TimeUnits.HOURS);
+      tntpDemandsReader.getSettings().setTimePeriodDuration(1, TimeUnits.HOURS);
+      var demands = tntpDemandsReader.read();
+      /* PLANit DEMAND writer */
+      var planitDemandsWriter = PlanitDemandsWriterFactory.create(
+              PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), zoning);
+      planitDemandsWriter.write(demands);
+
+      PlanitAssertionUtils.assertNetworkFilesSimilar(PLANIT_OUTPUT_DIR, PLANIT_REF_DIR);
+      PlanitAssertionUtils.assertZoningFilesSimilar(PLANIT_OUTPUT_DIR, PLANIT_REF_DIR);
+      PlanitAssertionUtils.assertDemandsFilesSimilar(PLANIT_OUTPUT_DIR, PLANIT_REF_DIR);
+
+    } catch (final Exception e) {
+      e.printStackTrace();
+      LOGGER.severe( e.getMessage());
+      fail(e.getMessage());
+    }
+  }
 
 }
