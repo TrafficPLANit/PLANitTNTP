@@ -20,8 +20,6 @@ import org.goplanit.tntp.enums.LengthUnits;
 import org.goplanit.tntp.enums.NetworkFileColumnType;
 import org.goplanit.tntp.enums.SpeedUnits;
 import org.goplanit.utils.exceptions.PlanItRunTimeException;
-import org.goplanit.utils.geo.PlanitCrsUtils;
-import org.goplanit.utils.geo.PlanitJtsCrsUtils;
 import org.goplanit.utils.geo.PlanitJtsUtils;
 import org.goplanit.utils.graph.directed.EdgeSegmentUtils;
 import org.goplanit.utils.id.IdGroupingToken;
@@ -87,18 +85,44 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     }
     return 1;
   }
+
+  /**
+   * Convert a raw TNTP speed into a speed in km/h units. If no valid value is provided it is assumed we
+   * should use the fallback option to convert to a maximum speed based on free flow travel time.
+   *
+   * @param tntpSpeed to parse
+   * @param freeFlowTravelTimeH to use in case of fallback required
+   * @param link to extract length from if needed
+   * @param roundToWholeNumber flag to choose if result should be rounded to nearest integer value
+   * @return speed in km/h
+   */
+  private double extractPlanitSpeedInKmH(
+          double tntpSpeed, double freeFlowTravelTimeH, MacroscopicLink link, boolean roundToWholeNumber) {
+    double planitSpeedKmH;
+    if (tntpSpeed > Precision.EPSILON_6 && tntpSpeed < Double.POSITIVE_INFINITY) {
+      planitSpeedKmH = tntpSpeed * getSettings().getSpeedUnits().getMultiplier();
+    }else{
+      // no valid input speed, derive from (known) PLANit free flow travel time instead as fallback (so effectively
+      // becomes a max speed)
+      planitSpeedKmH = link.getLengthKm()/freeFlowTravelTimeH;
+    }
+    // round to whole number if desired
+    planitSpeedKmH = roundToWholeNumber ? (int) Math.round(planitSpeedKmH) : planitSpeedKmH;
+    return planitSpeedKmH;
+  }
   
   /** Create mode access properties based on provided information
    * 
-   * @param link to extract length from
    * @param mode to use
-   * @param maxSpeedKmH to use in case length is not present
+   * @param maxSpeedKmH to use
+   * @param criticalSpeedKmH to use
    * @return created properties
    */
-  private AccessGroupProperties createAccessGroupProperties(Link link, Mode mode, double maxSpeedKmH) {
+  private AccessGroupProperties createAccessGroupProperties(
+          Mode mode, double maxSpeedKmH, double criticalSpeedKmH) {
 
     final AccessGroupProperties modeAccessProperties =
-        AccessGroupPropertiesFactory.create(maxSpeedKmH, maxSpeedKmH, mode);
+        AccessGroupPropertiesFactory.create(maxSpeedKmH, criticalSpeedKmH, mode);
     modeAccessProperties.setMaximumSpeedKmH(maxSpeedKmH);
     return modeAccessProperties;
   }
@@ -112,9 +136,14 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    * @return created link segment type
    */
   private MacroscopicLinkSegmentType createAndRegisterLinkSegmentType(
-      final MacroscopicNetworkLayer networkLayer, double capacityPerLane, final AccessGroupProperties modeAccessProperties, String externalId) {
+      final MacroscopicNetworkLayer networkLayer,
+      double capacityPerLane,
+      final AccessGroupProperties modeAccessProperties,
+      String externalId) {
+
     MacroscopicLinkSegmentType linkSegmentType;
-    linkSegmentType = networkLayer.getLinkSegmentTypes().getFactory().registerNew(externalId, capacityPerLane, MacroscopicConstants.DEFAULT_MAX_DENSITY_PCU_KM_LANE);
+    linkSegmentType = networkLayer.getLinkSegmentTypes().getFactory().registerNew(
+            externalId, capacityPerLane, MacroscopicConstants.DEFAULT_MAX_DENSITY_PCU_KM_LANE);
     linkSegmentType.setAccessGroupProperties(modeAccessProperties);
     
     /* XML id */
@@ -213,25 +242,33 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
       /* max speed km/h */
       double defaultMaximumSpeed = getSettings().getDefaultMaximumSpeed();
       double planitMaxSpeedKmH = defaultMaximumSpeed *  speedUnits.getMultiplier();
-      final double tntpSpeedLimit = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.MAXIMUM_SPEED)]);
 
       /* free flow travel time */
       double freeFlowTravelTimeH = link.getLengthKm()/planitMaxSpeedKmH;
       if(supportedColumns.containsKey(NetworkFileColumnType.FREE_FLOW_TRAVEL_TIME)) {
         double tntpFftt = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.FREE_FLOW_TRAVEL_TIME)]) * settings.getFreeFlowTravelTimeUnits().getMultiplier();
-        freeFlowTravelTimeH = (tntpFftt > Precision.EPSILON_6 && tntpFftt < Double.POSITIVE_INFINITY) ? tntpFftt : freeFlowTravelTimeH;
+        freeFlowTravelTimeH = (tntpFftt > Precision.EPSILON_6 && tntpFftt < Double.POSITIVE_INFINITY) ?
+                tntpFftt : freeFlowTravelTimeH;
       }
 
-      if (tntpSpeedLimit > Precision.EPSILON_6 && tntpSpeedLimit < Double.POSITIVE_INFINITY) {
-        planitMaxSpeedKmH = tntpSpeedLimit * speedUnits.getMultiplier();
-      }else{
-        // no speed limit, derive from free flow travel time instead
-        planitMaxSpeedKmH = link.getLengthKm()/freeFlowTravelTimeH;
+      final double tntpSpeedLimit = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.MAXIMUM_SPEED)]);
+      double tntpCriticalSpeed = tntpSpeedLimit;
+      if(supportedColumns.containsKey(NetworkFileColumnType.CRITICAL_SPEED)) {
+        tntpCriticalSpeed = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.CRITICAL_SPEED)]);
+        if(Precision.greaterEqual(tntpCriticalSpeed, tntpSpeedLimit)){
+          LOGGER.warning(String.format(
+                  "Critical speed (%.2f) >= free speed (%.2f), " +
+                          "verify correctness of entry (node A [%s] - node B [%s])",
+                  tntpCriticalSpeed, tntpSpeedLimit, link.getVertexA().getExternalId(), link.getVertexB().getExternalId()));
+        }
       }
-      planitMaxSpeedKmH = (int) Math.round(planitMaxSpeedKmH); // round to whole number
+
+      planitMaxSpeedKmH = extractPlanitSpeedInKmH(tntpSpeedLimit, freeFlowTravelTimeH, link, true);
+      double planitCriticalSpeedKmH = extractPlanitSpeedInKmH(
+              tntpCriticalSpeed, freeFlowTravelTimeH, link, true);
 
       final AccessGroupProperties modeAccessProperties = createAccessGroupProperties(
-          link, mode, planitMaxSpeedKmH);
+          mode, planitMaxSpeedKmH, planitCriticalSpeedKmH);
 
       /* only when capacity is not combined with number of lanes we need to scale it to capacity per lane, otherwise not */
       boolean numLanesShouldScaleCapacity = !supportedColumns.containsKey(NetworkFileColumnType.NUMBER_OF_LANES);
@@ -253,7 +290,9 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
       
       /* Link segment type */
       MacroscopicLinkSegmentType linkSegmentType = null;
-      String linkSegmentTypeSourceId = String.format("c_%.1f:s_%d", capacityPerLane, (int) planitMaxSpeedKmH);
+      // unique identifier for each link segment type also doubles as (fabricated) external id
+      String linkSegmentTypeSourceId = String.format(
+              "c_%.1f:s_%d:cs_%d", capacityPerLane, (int) planitMaxSpeedKmH, (int) planitCriticalSpeedKmH);
       String linkSegmentTypeExternalId = "";
       if(supportedColumns.containsKey(NetworkFileColumnType.LINK_TYPE)) {
         linkSegmentTypeExternalId = cols[supportedColumns.get(NetworkFileColumnType.LINK_TYPE)];
@@ -263,8 +302,9 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
 
 
       if (linkSegmentType != null) {
-        /* make sure that the referenced link type in TNTP definition is compatible with the definition of a link type in PLANit
-         * by verifying the converted capacity per lane equality */
+        /* make sure that the referenced link type in TNTP definition is compatible with the definition of a link
+         * type in PLANit by verifying the converted capacity per lane equality */
+
         /* determine if link type is compatible with link segment type as we require capacity per lane to be the
          * same across all usages of a particular type. If not we must create a new type or use an existing compatible
          * type */
@@ -453,7 +493,7 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
   }
   
   /**
-   * Add BPR parameters for a specified link segmen
+   * Add BPR parameters for a specified link segment
    *
    * @param linkSegment the specified link segment
    * @param alpha the BPR alpha parameter

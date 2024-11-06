@@ -348,15 +348,18 @@ public class TntpConversionTests {
       /* TNTP network reader */
       var idToken = IdGenerator.createIdGroupingToken("testTntp2PlanitDemandsSiouxFalls");
       var tntpNetworkReader =
-          createSiouxFallsTntpNetworkReader(SIOUXFALLS_NETWORK_FILE, SIOUXFALLS_NODE_FILE, DEFAULT_MAXIMUM_SPEED_MPH, idToken);
+          createSiouxFallsTntpNetworkReader(
+                  SIOUXFALLS_NETWORK_FILE, SIOUXFALLS_NODE_FILE, DEFAULT_MAXIMUM_SPEED_MPH, idToken);
       tntpNetworkReader.getSettings().setCapacityPeriod(8 /* about 8 hours */, TimeUnits.HOURS);
       var planitNetwork = (MacroscopicNetwork) tntpNetworkReader.read();
       /* PLANit network writer */
-      var planitNetworkWriter = PlanitNetworkWriterFactory.create(PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), CountryNames.UNITED_STATES_OF_AMERICA);
+      var planitNetworkWriter = PlanitNetworkWriterFactory.create(
+              PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), CountryNames.UNITED_STATES_OF_AMERICA);
       planitNetworkWriter.write(planitNetwork);      
       
       /* TNTP zoning reader */
-      var tntpZoningReader = TntpZoningReaderFactory.create(SIOUXFALLS_NETWORK_FILE.toAbsolutePath().toString(), planitNetwork, idToken);
+      var tntpZoningReader = TntpZoningReaderFactory.create(
+              SIOUXFALLS_NETWORK_FILE.toAbsolutePath().toString(), planitNetwork, idToken);
       var zoning = tntpZoningReader.read();
       /* PLANit ZONING writer */
       var planitZoningWriter = PlanitZoningWriterFactory.create(
@@ -364,7 +367,8 @@ public class TntpConversionTests {
       planitZoningWriter.write(zoning);      
       
       /* TNTP DEMAND reader */
-      var tntpDemandsReader = TntpDemandsReaderFactory.create(SIOUXFALLS_DEMAND_FILE.toAbsolutePath().toString(), planitNetwork, zoning, idToken);
+      var tntpDemandsReader = TntpDemandsReaderFactory.create(
+              SIOUXFALLS_DEMAND_FILE.toAbsolutePath().toString(), planitNetwork, zoning, idToken);
       tntpDemandsReader.getSettings().setStartTimeSinceMidnight(8, TimeUnits.HOURS);
       tntpDemandsReader.getSettings().setTimePeriodDuration(12*0.1 /* 10% of daily flow/capacity as per github readme*/, TimeUnits.HOURS);           
       /* PLANit DEMAND writer */

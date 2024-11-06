@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<macroscopicnetwork xmlns:gml="http://www.opengis.net/gml" xmlns:ns3="http://www.w3.org/1999/xlink" xmlns:ns4="http://www.w3.org/2001/SMIL20/" xmlns:ns5="http://www.w3.org/2001/SMIL20/Language" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://trafficplanit.github.io/PLANitManual/xsd/macroscopicnetworkinput.xsd">
+<macroscopicnetwork xmlns:gml="http://www.opengis.net/gml" xmlns:ns3="http://www.w3.org/1999/xlink" xmlns:ns4="http://www.w3.org/2001/SMIL20/" xmlns:ns5="http://www.w3.org/2001/SMIL20/Language" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://www.goplanit.org/xsd/macroscopicnetworkinput.xsd">
     <id>0</id>
     <configuration>
         <modes>
@@ -23,7 +23,7 @@
             <layerconfiguration>
                 <linksegmenttypes>
                     <linksegmenttype id="0" externalid="1">
-                        <name>c_1618.8:s_97</name>
+                        <name>c_1618.8:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>1618.76254</capacitylane>
                         <access>
@@ -34,7 +34,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="1" externalid="1">
-                        <name>c_1462.7:s_97</name>
+                        <name>c_1462.7:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>1462.717074375</capacitylane>
                         <access>
@@ -45,7 +45,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="10" externalid="1">
-                        <name>c_631.3:s_97</name>
+                        <name>c_631.3:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>631.2741445</capacitylane>
                         <access>
@@ -56,7 +56,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="11" externalid="1">
-                        <name>c_630.7:s_97</name>
+                        <name>c_630.7:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>630.727822875</capacitylane>
                         <access>
@@ -67,7 +67,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="12" externalid="1">
-                        <name>c_1739.5:s_97</name>
+                        <name>c_1739.5:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>1739.4735525</capacitylane>
                         <access>
@@ -78,7 +78,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="13" externalid="1">
-                        <name>c_1689.0:s_97</name>
+                        <name>c_1689.0:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>1689.00019375</capacitylane>
                         <access>
@@ -89,7 +89,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="14" externalid="1">
-                        <name>c_606.9:s_97</name>
+                        <name>c_606.9:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>606.864714625</capacitylane>
                         <access>
@@ -100,7 +100,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="15" externalid="1">
-                        <name>c_624.2:s_97</name>
+                        <name>c_624.2:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>624.18883675</capacitylane>
                         <access>
@@ -111,7 +111,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="16" externalid="1">
-                        <name>c_609.6:s_97</name>
+                        <name>c_609.6:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>609.563535875</capacitylane>
                         <access>
@@ -122,7 +122,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="17" externalid="1">
-                        <name>c_636.4:s_97</name>
+                        <name>c_636.4:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>636.407019</capacitylane>
                         <access>
@@ -133,7 +133,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="18" externalid="1">
-                        <name>c_640.9:s_97</name>
+                        <name>c_640.9:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>640.940764875</capacitylane>
                         <access>
@@ -144,7 +144,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="19" externalid="1">
-                        <name>c_615.6:s_97</name>
+                        <name>c_615.6:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>615.598825625</capacitylane>
                         <access>
@@ -155,7 +155,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="2" externalid="1">
-                        <name>c_619.8:s_97</name>
+                        <name>c_619.8:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>619.772616</capacitylane>
                         <access>
@@ -166,7 +166,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="20" externalid="1">
-                        <name>c_1820.6:s_97</name>
+                        <name>c_1820.6:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>1820.59414375</capacitylane>
                         <access>
@@ -177,7 +177,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="21" externalid="1">
-                        <name>c_1199.9:s_97</name>
+                        <name>c_1199.9:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>1199.897570625</capacitylane>
                         <access>
@@ -188,7 +188,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="22" externalid="1">
-                        <name>c_653.7:s_97</name>
+                        <name>c_653.7:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>653.738757875</capacitylane>
                         <access>
@@ -199,7 +199,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="23" externalid="1">
-                        <name>c_1230.0:s_97</name>
+                        <name>c_1230.0:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>1229.993544375</capacitylane>
                         <access>
@@ -210,7 +210,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="24" externalid="1">
-                        <name>c_603.0:s_97</name>
+                        <name>c_603.0:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>602.993853875</capacitylane>
                         <access>
@@ -221,7 +221,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="25" externalid="1">
-                        <name>c_625.3:s_97</name>
+                        <name>c_625.3:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>625.325945375</capacitylane>
                         <access>
@@ -232,7 +232,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="26" externalid="1">
-                        <name>c_632.5:s_97</name>
+                        <name>c_632.5:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>632.4890425</capacitylane>
                         <access>
@@ -243,7 +243,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="27" externalid="1">
-                        <name>c_634.5:s_97</name>
+                        <name>c_634.5:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>634.462149125</capacitylane>
                         <access>
@@ -254,7 +254,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="28" externalid="1">
-                        <name>c_610.7:s_97</name>
+                        <name>c_610.7:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>610.6696955</capacitylane>
                         <access>
@@ -265,7 +265,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="29" externalid="1">
-                        <name>c_625.0:s_97</name>
+                        <name>c_625.0:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>625.0</capacitylane>
                         <access>
@@ -276,7 +276,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="3" externalid="1">
-                        <name>c_1069.4:s_97</name>
+                        <name>c_1069.4:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>1069.4077325</capacitylane>
                         <access>
@@ -287,7 +287,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="30" externalid="1">
-                        <name>c_634.8:s_97</name>
+                        <name>c_634.8:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>634.8135545</capacitylane>
                         <access>
@@ -298,7 +298,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="4" externalid="1">
-                        <name>c_1111.4:s_97</name>
+                        <name>c_1111.4:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>1111.42463125</capacitylane>
                         <access>
@@ -309,7 +309,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="5" externalid="1">
-                        <name>c_613.6:s_97</name>
+                        <name>c_613.6:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>613.60334125</capacitylane>
                         <access>
@@ -320,7 +320,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="6" externalid="1">
-                        <name>c_618.5:s_97</name>
+                        <name>c_618.5:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>618.499433625</capacitylane>
                         <access>
@@ -331,7 +331,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="7" externalid="1">
-                        <name>c_1250.0:s_97</name>
+                        <name>c_1250.0:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>1250.0</capacitylane>
                         <access>
@@ -342,7 +342,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="8" externalid="1">
-                        <name>c_612.3:s_97</name>
+                        <name>c_612.3:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>612.32345575</capacitylane>
                         <access>
@@ -353,7 +353,7 @@
                         </access>
                     </linksegmenttype>
                     <linksegmenttype id="9" externalid="1">
-                        <name>c_980.2:s_97</name>
+                        <name>c_980.2:s_97:cs_97</name>
                         <maxdensitylane>180.0</maxdensitylane>
                         <capacitylane>980.22641375</capacitylane>
                         <access>
