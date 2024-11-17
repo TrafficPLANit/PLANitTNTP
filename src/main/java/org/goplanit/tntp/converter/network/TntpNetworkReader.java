@@ -454,16 +454,19 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     boolean directionAb = true;
     if(oppositeDirectionSegment != null) {
       /* link already exists */
-      if(!Precision.equal(oppositeDirectionSegment.getParentLink().getLengthKm(),length)){
-        LOGGER.warning(String.format("Identified bi-directional TNTP link (node %s,node %s) with unequal lengths depending on direction, split in separate PLANit links",upstreamNode.getExternalId(), downstreamNode.getExternalId()));
+      if(!Precision.equal(oppositeDirectionSegment.getParent().getLengthKm(),length)){
+        LOGGER.warning(String.format("Identified bi-directional TNTP link (node %s,node %s) with unequal " +
+            "lengths depending on direction, split in separate PLANit links",
+            upstreamNode.getExternalId(), downstreamNode.getExternalId()));
       }else {
-        link = oppositeDirectionSegment.getParentLink();
+        link = oppositeDirectionSegment.getParent();
         directionAb = false;
       }
     }
     
     if(link==null) {
-      link = networkLayer.getLinks().getFactory().registerNew(upstreamNode, downstreamNode, length, true /* register on node */);
+      link = networkLayer.getLinks().getFactory().registerNew(
+          upstreamNode, downstreamNode, length, true /* register on node */);
       /* XML id */
       link.setXmlId(link.getId());
       /* External id */
@@ -515,7 +518,8 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     var sourceCrs = ConverterReaderUtils.createCoordinateReferenceSystemCartesianIfFail(
             settings.getCoordinateReferenceSystem(), null);
     networkToPopulate.setCoordinateReferenceSystem(sourceCrs);
-    LOGGER.info(String.format("Source CRS set to %s : %s", sourceCrs.getName(), networkToPopulate.getCoordinateReferenceSystem().getName()));
+    LOGGER.info(String.format("Source CRS set to %s : %s",
+        sourceCrs.getName(), networkToPopulate.getCoordinateReferenceSystem().getName()));
   }
   
   /**
@@ -575,7 +579,9 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     File nodeCoordinateFile = null;
     try {
       networkFile = new File(settings.getNetworkFile()).getCanonicalFile();
-      nodeCoordinateFile = (settings.getNodeCoordinateFile() == null) ? null : new File(settings.getNodeCoordinateFile()).getCanonicalFile();            
+      nodeCoordinateFile =
+          (settings.getNodeCoordinateFile() == null) ?
+              null : new File(settings.getNodeCoordinateFile()).getCanonicalFile();
     } catch (final Exception e) {
       LOGGER.severe(e.getMessage());
       throw new PlanItRunTimeException("Error in constructing files from network and node file location settings of TNTP",e);
