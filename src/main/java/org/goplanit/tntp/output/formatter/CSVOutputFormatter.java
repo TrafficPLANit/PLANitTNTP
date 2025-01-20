@@ -80,7 +80,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 			  Optional<Long> layerId = linkOutputTypeAdapter.getInfrastructureLayerIdForMode(mode);
 			  layerId.orElseThrow(() -> new PlanItRunTimeException("Unable to retrieve layer id for mode"));
 			  
-				for (final MacroscopicLinkSegment linkSegment : linkOutputTypeAdapter.getPhysicalLinkSegments(layerId.get())) {
+				for (final MacroscopicLinkSegment linkSegment : linkOutputTypeAdapter.getLinkSegmentsForLayer(layerId.get())) {
 				  Optional<Boolean> flowPositive = linkOutputTypeAdapter.isFlowPositive(linkSegment, mode);
 				  flowPositive.orElseThrow(() -> new PlanItRunTimeException("Unable to determine if flow is positive for link segment and mode"));
 				  
