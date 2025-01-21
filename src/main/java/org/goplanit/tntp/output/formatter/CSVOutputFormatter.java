@@ -1,6 +1,7 @@
 package org.goplanit.tntp.output.formatter;
 
 import org.apache.commons.csv.CSVPrinter;
+import org.goplanit.output.adapter.BushLinkOutputTypeAdapter;
 import org.goplanit.output.adapter.MacroscopicLinkOutputTypeAdapter;
 import org.goplanit.output.adapter.OutputAdapter;
 import org.goplanit.output.configuration.OutputConfiguration;
@@ -115,7 +116,9 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	@Override
 	protected void writeOdResultsForCurrentTimePeriod(final OutputConfiguration outputConfiguration,
             final OutputTypeConfiguration outputTypeConfiguration, final OutputTypeEnum currentOutputType, final OutputAdapter outputAdapter, final Set<Mode> modes, final TimePeriod timePeriod, final int iterationIndex) {
-		final PlanItException pe = writeOdResultsForCurrentTimePeriodToCsvPrinter(outputConfiguration, outputTypeConfiguration, currentOutputType, outputAdapter, modes, timePeriod, printer.get(outputTypeConfiguration.getOutputType()));
+		final PlanItException pe =
+				writeOdResultsForCurrentTimePeriodToCsvPrinter(
+						outputConfiguration, outputTypeConfiguration, currentOutputType, outputAdapter, modes, timePeriod, printer.get(outputTypeConfiguration.getOutputType()));
 		if (pe != null) {
 			throw new PlanItRunTimeException(pe);
 		}
@@ -135,9 +138,61 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	@Override
 	protected void writePathResultsForCurrentTimePeriod(final OutputConfiguration outputConfiguration,
 	            final OutputTypeConfiguration outputTypeConfiguration, final OutputTypeEnum currentOutputType, final OutputAdapter outputAdapter, final Set<Mode> modes, final TimePeriod timePeriod, final int iterationIndex){
-		final PlanItException pe = writePathResultsForCurrentTimePeriodToCsvPrinter(outputConfiguration, outputTypeConfiguration, currentOutputType, outputAdapter, modes, timePeriod, printer.get(outputTypeConfiguration.getOutputType()));
+		final PlanItException pe =
+				writePathResultsForCurrentTimePeriodToCsvPrinter(
+						outputConfiguration,
+						outputTypeConfiguration,
+						currentOutputType,
+						outputAdapter,
+						modes,
+						timePeriod,
+						printer.get(outputTypeConfiguration.getOutputType()));
 		if (pe != null) {
 			throw new PlanItRunTimeException(pe);
+		}
+	}
+
+	/**
+	 * Write Bush results for the time period to the CSV file
+	 *
+	 * @param outputConfiguration output configuration
+	 * @param outputTypeConfiguration OutputTypeConfiguration for current  persistence
+	 * @param currentOutputType active OutputTypeEnum of the configuration we are persisting for (can be a SubOutputTypeEnum or an OutputType)
+	 * @param outputAdapter OutputAdapter for current persistence
+	 * @param modes                   Set of modes of travel
+	 * @param timePeriod              current time period
+	 * @param iterationIndex current iteration index
+	 */
+	@Override
+	protected void writeBushResultsForCurrentTimePeriod(
+			final OutputConfiguration outputConfiguration,
+			final OutputTypeConfiguration outputTypeConfiguration,
+			final OutputTypeEnum currentOutputType,
+			final OutputAdapter outputAdapter,
+			final Set<Mode> modes,
+			final TimePeriod timePeriod,
+			final int iterationIndex){
+
+		/* invoke a file per bush, so unlike other formats we call write method multiple times, once per bush */
+		OutputType outputType = (OutputType) currentOutputType;
+		BushLinkOutputTypeAdapter bushLinkOutputTypeAdapter =
+				(BushLinkOutputTypeAdapter) outputAdapter.getOutputTypeAdapter(outputType);
+
+		var bushes = bushLinkOutputTypeAdapter.getBushes();
+		for(var bush : bushes) {
+			final PlanItException pe =
+					writeBushResultsForCurrentTimePeriodToCsvPrinter(
+							outputConfiguration,
+							outputTypeConfiguration,
+							currentOutputType,
+							outputAdapter,
+							modes,
+							timePeriod,
+							bush,
+							printer.get(outputTypeConfiguration.getOutputType()));
+			if (pe != null) {
+				throw new PlanItRunTimeException(pe);
+			}
 		}
 	}
 
@@ -153,8 +208,14 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	 * @param iterationIndex current iteration index
 	 */
 	@Override
-     protected void writeGeneralResultsForCurrentTimePeriod(final OutputConfiguration outputConfiguration,
-	            final OutputTypeConfiguration outputTypeConfiguration, final OutputTypeEnum currentOutputType, final OutputAdapter outputAdapter, final Set<Mode> modes, final TimePeriod timePeriod, final int iterationIndex) {
+  protected void writeGeneralResultsForCurrentTimePeriod(
+			final OutputConfiguration outputConfiguration,
+			final OutputTypeConfiguration outputTypeConfiguration,
+			final OutputTypeEnum currentOutputType,
+			final OutputAdapter outputAdapter,
+			final Set<Mode> modes,
+			final TimePeriod timePeriod,
+			final int iterationIndex) {
 	  LOGGER.info("CSV Output for OutputType GENERAL has not been implemented yet.");
 	}
 
@@ -224,7 +285,7 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 		try {
 		    for(final OutputType outputType : outputConfiguration.getActivatedOutputTypes()) {
 	            if (!csvFileNameMap.containsKey(outputType)) {
-	                final String csvFileName = generateAbsoluteOutputFileName(csvOutputDirectory, csvNameRoot, csvNameExtension, null, outputType, runId);
+	                final String csvFileName = generateAbsoluteCsvFileName(csvOutputDirectory, csvNameRoot, csvNameExtension, null, outputType, runId);
 	                addCsvFileNamePerOutputType(outputType, csvFileName);
 	            }
 
