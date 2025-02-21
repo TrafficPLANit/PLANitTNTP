@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import org.goplanit.converter.BaseReaderImpl;
 import org.goplanit.converter.ConverterReaderUtils;
+import org.goplanit.converter.network.NetworkConverterReaderUtils;
 import org.goplanit.converter.network.NetworkReader;
 import org.goplanit.cost.physical.BprLinkTravelTimeCost;
 import org.goplanit.network.MacroscopicNetwork;
@@ -73,18 +74,6 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    * network file (null if default values are being used)
    */
   private Map<LinkSegment, Pair<Double, Double>> bprParametersForLinkSegmentAndMode;    
-  
-  /** Create an estimate for the number of lanes given a certain capacity using {@link #DEFAULT_LANE_CAPACITY_PCUH} and rounding upward 
-   * 
-   * @param capacityPcuH to use
-   * @return number of lanes estimate
-   */
-  private static int getNumLaneEstimate(double capacityPcuH) {
-    if(capacityPcuH > DEFAULT_LANE_CAPACITY_PCUH) {
-      return (int) Math.ceil(capacityPcuH/(double)DEFAULT_LANE_CAPACITY_PCUH);
-    }
-    return 1;
-  }
 
   /**
    * Convert a raw TNTP speed into a speed in km/h units. If no valid value is provided it is assumed we
@@ -220,14 +209,19 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
    * @return the macroscopic link segment which has been created
    */
   private MacroscopicLinkSegment createAndRegisterLinkSegment(
-      final MacroscopicNetworkLayer networkLayer, final MacroscopicLink link, final long tntpLinkSegmentRowId, boolean directionAb, final String[] cols) {
+      final MacroscopicNetworkLayer networkLayer,
+      final MacroscopicLink link,
+      final long tntpLinkSegmentRowId,
+      boolean directionAb,
+      final String[] cols) {
     
     Map<NetworkFileColumnType, Integer> supportedColumns = getSettings().getNetworkFileColumns();
     SpeedUnits speedUnits = getSettings().getSpeedUnits();
     Mode mode = networkLayer.getFirstSupportedMode();
        
     /* LINK SEGMENT*/
-    final MacroscopicLinkSegment linkSegment = networkLayer.getLinkSegments().getFactory().registerNew(link, directionAb, true);
+    final MacroscopicLinkSegment linkSegment =
+            networkLayer.getLinkSegments().getFactory().registerNew(link, directionAb, true);
     /* XML id */
     linkSegment.setXmlId(
         EdgeSegmentUtils.createParentLinkDerivedId(linkSegment, IdMapperType.EXTERNAL_ID));
@@ -246,7 +240,9 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
       /* free flow travel time */
       double freeFlowTravelTimeH = link.getLengthKm()/planitMaxSpeedKmH;
       if(supportedColumns.containsKey(NetworkFileColumnType.FREE_FLOW_TRAVEL_TIME)) {
-        double tntpFftt = Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.FREE_FLOW_TRAVEL_TIME)]) * settings.getFreeFlowTravelTimeUnits().getMultiplier();
+        double tntpFftt = Double.parseDouble(
+                cols[supportedColumns.get(NetworkFileColumnType.FREE_FLOW_TRAVEL_TIME)]) *
+                settings.getFreeFlowTravelTimeUnits().getMultiplier();
         freeFlowTravelTimeH = (tntpFftt > Precision.EPSILON_6 && tntpFftt < Double.POSITIVE_INFINITY) ?
                 tntpFftt : freeFlowTravelTimeH;
       }
@@ -276,13 +272,13 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
       /* capacity pcu/h/lane */
       double capacityPerHourMultiplier =
           getSettings().getCapacityPeriodUnits().getMultiplier()/getSettings().getCapacityPeriodDuration();
-      double capacityPerLane =
-          Double.parseDouble(cols[supportedColumns.get(NetworkFileColumnType.CAPACITY_PER_LANE)]) * capacityPerHourMultiplier;
+      double capacityPerLane = Double.parseDouble(
+              cols[supportedColumns.get(NetworkFileColumnType.CAPACITY_PER_LANE)]) * capacityPerHourMultiplier;
 
       /* create per lane capacity estimate */
       int numLanes = -1;
       if(numLanesShouldScaleCapacity) {
-        numLanes = getNumLaneEstimate(capacityPerLane);
+        numLanes = NetworkConverterReaderUtils.computeNumLaneEstimate(capacityPerLane);
         capacityPerLane = capacityPerLane / numLanes;
       }else{
         numLanes = Integer.parseInt(cols[supportedColumns.get(NetworkFileColumnType.NUMBER_OF_LANES)]);
@@ -545,8 +541,6 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
       networkToPopulate.setXmlId(networkToPopulate.getId());
     }
   }
-
-  public static final int DEFAULT_LANE_CAPACITY_PCUH = 2000;
 
   /**
    * {@inheritDoc}
