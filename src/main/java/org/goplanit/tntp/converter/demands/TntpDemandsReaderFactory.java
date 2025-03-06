@@ -65,7 +65,7 @@ public class TntpDemandsReaderFactory {
    * @param referenceNetwork to use
    * @param referenceZoning to use
    * @param demandsToPopulate to use
-   * @return created PLANit zoning reader
+   * @return created TNTP demands reader
    */
   public static TntpDemandsReader create(
       final TntpDemandsReaderSettings demandsSettings, final MacroscopicNetwork referenceNetwork, final Zoning referenceZoning, final Demands demandsToPopulate) {
@@ -75,7 +75,7 @@ public class TntpDemandsReaderFactory {
   /** Factory method
    *
    * @param referenceZoningReader to use
-   * @return created PLANit zoning reader
+   * @return created TNTP demands reader
    */
   public static TntpDemandsReader create(final TntpZoningReader referenceZoningReader) {
     return create(new TntpDemandsReaderSettings(), referenceZoningReader);
@@ -85,7 +85,7 @@ public class TntpDemandsReaderFactory {
      *
      * @param demandsSettings to use
      * @param referenceZoningReader to use
-     * @return created PLANit zoning reader
+     * @return created TNTP demands reader
      */
     public static TntpDemandsReader create(
         final TntpDemandsReaderSettings demandsSettings, final TntpZoningReader referenceZoningReader) {

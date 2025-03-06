@@ -236,7 +236,7 @@ public class TntpDemandsReader extends BaseReaderImpl<Demands> implements Demand
     
     /* user class */
     var userClass = creatAndRegistereDefaultUserClass(travellerType);
-    LOGGER.info("TNTP traveller type: "+ userClass);
+    LOGGER.info("TNTP user class: "+ userClass);
     
     var mode = referenceNetwork.getTransportLayers().getFirst().getFirstSupportedMode();
         
