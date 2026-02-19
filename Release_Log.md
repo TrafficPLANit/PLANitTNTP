@@ -4,6 +4,16 @@ PLANitTNTP releases.  PLANit reader for TNTP input files.  First released as par
 
 ## 0.5.0
 
+**Enhancements**
+#29 node coordinates can now be flagged to be parsed in an inverted way
+#30 critical speed column is now supported
+[GENERAL] added demands test
+[GENERAL] improved formatting of CSVs
+
+**Bug fixes**
+#27 fixed an issue where capacity was not interpreted as lane based even if a lanes column is present
+#28 fixed an issue where PLANit link types where not inferred if link type column was absent
+
 ## 0.4.0
 
 **Enhancements**
@@ -17,7 +27,6 @@ PLANitTNTP releases.  PLANit reader for TNTP input files.  First released as par
 * #8 Add networkreaderfactory to created network readers in line with other repos
 
 **Bug fixes**
-
 * #23 Update mode uses to predefined modes properly
 * #21 Capacity column did not support double values when parsing
 * #19 Bug in parsing of standard test results as zero flows are skipped but they need to be included as well
