@@ -2,6 +2,8 @@
 
 PLANitTNTP releases.  PLANit reader for TNTP input files.  First released as part of Release 0.0.3
 
+## 0.5.0
+
 ## 0.4.0
 
 **Enhancements**

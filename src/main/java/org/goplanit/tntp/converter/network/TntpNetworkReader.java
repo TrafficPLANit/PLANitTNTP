@@ -1,10 +1,7 @@
 package org.goplanit.tntp.converter.network;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,6 +27,7 @@ import org.goplanit.utils.math.Precision;
 import org.goplanit.utils.misc.FileUtils;
 import org.goplanit.utils.misc.LoggingUtils;
 import org.goplanit.utils.misc.Pair;
+import org.goplanit.utils.misc.UriUtils;
 import org.goplanit.utils.mode.Mode;
 import org.goplanit.utils.mode.PredefinedModeType;
 import org.goplanit.utils.network.layer.MacroscopicNetworkLayer;
@@ -40,6 +38,7 @@ import org.goplanit.utils.network.layer.macroscopic.MacroscopicLinkSegmentType;
 import org.goplanit.utils.network.layer.physical.Link;
 import org.goplanit.utils.network.layer.physical.LinkSegment;
 import org.goplanit.utils.network.layer.physical.Node;
+import org.goplanit.utils.resource.ResourceUtils;
 import org.locationtech.jts.geom.Point;
 
 /**
@@ -572,10 +571,10 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
     File networkFile = null;
     File nodeCoordinateFile = null;
     try {
-      networkFile = new File(settings.getNetworkFile()).getCanonicalFile();
-      nodeCoordinateFile =
-          (settings.getNodeCoordinateFile() == null) ?
-              null : new File(settings.getNodeCoordinateFile()).getCanonicalFile();
+      networkFile = FileUtils.resolveFileFromAbsoluteOrRelativeString(settings.getNetworkFile());
+      if(settings.getNodeCoordinateFile() != null){
+        nodeCoordinateFile = FileUtils.resolveFileFromAbsoluteOrRelativeString(settings.getNodeCoordinateFile());
+      }
     } catch (final Exception e) {
       LOGGER.severe(e.getMessage());
       throw new PlanItRunTimeException("Error in constructing files from network and node file location settings of TNTP",e);
