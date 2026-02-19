@@ -62,9 +62,9 @@ public class TntpConversionTests {
   private static final Path SIOUXFALLS_NODE_FILE = Path.of(RESOURCE_PATH.toString(),"SiouxFalls","SiouxFalls_node.tntp");
   private static final Path SIOUXFALLS_DEMAND_FILE = Path.of(RESOURCE_PATH.toString(),"SiouxFalls","SiouxFalls_trips.tntp");
 
-  private static final Path GOLDCOAST_NETWORK_FILE = Path.of(RESOURCE_PATH.toString(),"GoldCoast","GoldCoast_network_2016_01.tntp");
-  private static final Path GOLDCOAST_NODE_FILE = Path.of(RESOURCE_PATH.toString(),"GoldCoast","GoldCoast_nodes_2016_01.tntp");
-  private static final Path GOLDCOAST_DEMAND_FILE = Path.of(RESOURCE_PATH.toString(),"GoldCoast","GoldCoast_trips_2016_01.tntp");
+  private static final Path GOLDCOAST_NETWORK_FILE = Path.of(RESOURCE_PATH.toString(),"GoldCoast","Goldcoast_network_2016_01.tntp");
+  private static final Path GOLDCOAST_NODE_FILE = Path.of(RESOURCE_PATH.toString(),"GoldCoast","Goldcoast_nodes_2016_01.tntp");
+  private static final Path GOLDCOAST_DEMAND_FILE = Path.of(RESOURCE_PATH.toString(),"GoldCoast","Goldcoast_trips_2016_01.tntp");
 
   public static final double DEFAULT_MAXIMUM_SPEED_MPH = 25.0;
 
