@@ -397,7 +397,7 @@ public class TntpConversionTests {
   public void testTntp2PlanitGoldCoast() {
 
     final Path PLANIT_OUTPUT_DIR = Path.of(RESOURCE_PATH.toString(),"testcases","planit","GoldCoast");
-    final Path PLANIT_REF_DIR = Path.of(RESOURCE_PATH.toString(),"planit","GoldCoast");
+    final Path PLANIT_REF_DIR = Path.of(RESOURCE_PATH.toString(),"planit","goldcoast");
     try {
 
       /* TNTP-->PLANit Network */
