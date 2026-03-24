@@ -227,7 +227,8 @@ public class TntpConversionTests {
             
       /* TNTP reader */
       var idToken = IdGenerator.createIdGroupingToken("testTntp2PlanitNetworkChicago");
-      TntpNetworkReader tntpReader = createChicagoTntpNetworkReader(CHICAGO_NETWORK_FILE, CHICAGO_NODE_FILE, DEFAULT_MAXIMUM_SPEED_MPH, idToken );
+      TntpNetworkReader tntpReader = createChicagoTntpNetworkReader(
+              CHICAGO_NETWORK_FILE, CHICAGO_NODE_FILE, DEFAULT_MAXIMUM_SPEED_MPH, idToken );
       
       /* PLANit writer */
       PlanitNetworkWriter planitWriter = PlanitNetworkWriterFactory.create(
@@ -259,7 +260,8 @@ public class TntpConversionTests {
       
       
       var idToken = IdGenerator.createIdGroupingToken("testTntp2PlanitZoningChicago");
-      TntpNetworkReader tntpNetworkReader = createChicagoTntpNetworkReader(CHICAGO_NETWORK_FILE, CHICAGO_NODE_FILE, DEFAULT_MAXIMUM_SPEED_MPH, idToken);
+      TntpNetworkReader tntpNetworkReader = createChicagoTntpNetworkReader(
+              CHICAGO_NETWORK_FILE, CHICAGO_NODE_FILE, DEFAULT_MAXIMUM_SPEED_MPH, idToken);
       var planitNetwork = (MacroscopicNetwork) tntpNetworkReader.read();
       
       /* TNTP ZONING reader */
@@ -370,7 +372,8 @@ public class TntpConversionTests {
       var tntpDemandsReader = TntpDemandsReaderFactory.create(
               SIOUXFALLS_DEMAND_FILE.toAbsolutePath().toString(), planitNetwork, zoning, idToken);
       tntpDemandsReader.getSettings().setStartTimeSinceMidnight(8, TimeUnits.HOURS);
-      tntpDemandsReader.getSettings().setTimePeriodDuration(12*0.1 /* 10% of daily flow/capacity as per github readme*/, TimeUnits.HOURS);           
+      tntpDemandsReader.getSettings().setTimePeriodDuration(
+              12*0.1 /* 10% of daily flow/capacity as per github readme*/, TimeUnits.HOURS);
       /* PLANit DEMAND writer */
       var planitWriter = PlanitDemandsWriterFactory.create(PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), zoning);
       
@@ -420,7 +423,8 @@ public class TntpConversionTests {
       planitZoningWriter.write(zoning);
 
       /* TNTP -->PLANit Demands */
-      var tntpDemandsReader = TntpDemandsReaderFactory.create(GOLDCOAST_DEMAND_FILE.toAbsolutePath().toString(), network, zoning, idToken);
+      var tntpDemandsReader = TntpDemandsReaderFactory.create(
+              GOLDCOAST_DEMAND_FILE.toAbsolutePath().toString(), network, zoning, idToken);
       tntpDemandsReader.getSettings().setStartTimeSinceMidnight(8, TimeUnits.HOURS);
       tntpDemandsReader.getSettings().setTimePeriodDuration(1, TimeUnits.HOURS);
       var demands = tntpDemandsReader.read();
