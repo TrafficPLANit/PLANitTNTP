@@ -270,7 +270,7 @@ public class TntpConversionTests {
       
       /* PLANit ZONING writer */
       PlanitZoningWriter planitWriter = PlanitZoningWriterFactory.create(
-          PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), CountryNames.UNITED_STATES_OF_AMERICA);
+          PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), CountryNames.UNITED_STATES_OF_AMERICA, planitNetwork);
       
       /* convert */
       ZoningConverter theConverter = ZoningConverterFactory.create(tntpZoningReader, planitWriter);
@@ -327,7 +327,7 @@ public class TntpConversionTests {
       PlanitZoningWriter zoningWriter =
           PlanitZoningWriterFactory.create(
               PLANIT_OUTPUT_DIR.toAbsolutePath().toString(),
-              CountryNames.UNITED_STATES_OF_AMERICA);
+              CountryNames.UNITED_STATES_OF_AMERICA, tntpDemandsReader.getReferenceNetwork());
       zoningWriter.write(tntpDemandsReader.getReferenceZoning());
       PlanitAssertionUtils.assertZoningFilesSimilar(PLANIT_OUTPUT_DIR, PLANIT_REF_DIR);
 
@@ -365,7 +365,7 @@ public class TntpConversionTests {
       var zoning = tntpZoningReader.read();
       /* PLANit ZONING writer */
       var planitZoningWriter = PlanitZoningWriterFactory.create(
-          PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), CountryNames.UNITED_STATES_OF_AMERICA);
+          PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), CountryNames.UNITED_STATES_OF_AMERICA, planitNetwork);
       planitZoningWriter.write(zoning);      
       
       /* TNTP DEMAND reader */
@@ -419,7 +419,7 @@ public class TntpConversionTests {
           GOLDCOAST_NETWORK_FILE.toAbsolutePath().toString(), network, idToken);
       var zoning = tntpZoningReader.read();
       var planitZoningWriter = PlanitZoningWriterFactory.create(
-          PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), CountryNames.AUSTRALIA);
+          PLANIT_OUTPUT_DIR.toAbsolutePath().toString(), CountryNames.AUSTRALIA, network);
       planitZoningWriter.write(zoning);
 
       /* TNTP -->PLANit Demands */
