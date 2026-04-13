@@ -281,11 +281,12 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	 * @throws PlanItException thrown if output file or directory cannot be opened
 	 */
 	@Override
-	public void initialiseBeforeSimulation(final OutputConfiguration outputConfiguration, final long runId) throws PlanItException {
+	public void initialiseBeforeSimulation(final OutputConfiguration outputConfiguration, final long runId){
 		try {
 		    for(final OutputType outputType : outputConfiguration.getActivatedOutputTypes()) {
 	            if (!csvFileNameMap.containsKey(outputType)) {
-	                final String csvFileName = generateAbsoluteCsvFileName(csvOutputDirectory, csvNameRoot, csvNameExtension, null, outputType, runId);
+	                final String csvFileName = generateAbsoluteCsvFileName(
+							csvOutputDirectory, csvNameRoot, csvNameExtension, null, outputType, runId);
 	                addCsvFileNamePerOutputType(outputType, csvFileName);
 	            }
 
@@ -293,12 +294,13 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 	            final String csvFileName = csvFileNameMap.get(outputType).get(0);
 	            final CSVPrinter csvPrinter = createCsvPrinter(csvFileName);
 							// create the header (first line) of the file
-							csvPrinter.printRecord(generateCsvHeader(outputConfiguration.getOutputTypeConfiguration(outputType)));
+							csvPrinter.printRecord(
+									generateCsvHeader(outputConfiguration.getOutputTypeConfiguration(outputType)));
 	            printer.put(outputType, csvPrinter);
 		    }
 		} catch (final Exception e) {
       LOGGER.severe(e.getMessage());
-      throw new PlanItException("Error when initialising before simulation in TNTP",e);
+      throw new PlanItRunTimeException("Error when initialising before simulation in TNTP",e);
     }
 	}
 
