@@ -69,7 +69,8 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
    * @param referenceNetwork to use
    * @param zoningToPopulate to use
    */
-  protected TntpZoningReader(TntpZoningReaderSettings zoningSettings, MacroscopicNetwork referenceNetwork, Zoning zoningToPopulate) {
+  protected TntpZoningReader(
+          TntpZoningReaderSettings zoningSettings, MacroscopicNetwork referenceNetwork, Zoning zoningToPopulate) {
     this.settings = zoningSettings;
     this.referenceNetworkReader = null;
 
@@ -91,16 +92,19 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
       return false;
     }    
     if(zoningToPopulate==null) {
-      LOGGER.severe("PLANit zoning instance is not available to populate with TNTP zoning information, unable to create zoning");
+      LOGGER.severe("PLANit zoning instance is not available to populate with TNTP zoning " +
+              "information, unable to create zoning");
       return false;
     }
     if(zoningToPopulate.getCoordinateReferenceSystem() == null){
       var networkCrs = referenceNetwork.getCoordinateReferenceSystem();
       if(networkCrs == null){
-        LOGGER.severe("Zoning instance to populate and related network are expected to be initialised with a valid coordinate reference system");
+        LOGGER.severe("Zoning instance to populate and related network are expected to be " +
+                "initialised with a valid coordinate reference system");
         return false;
       }
-      LOGGER.info(String.format("Zoning instance's expected coordinate reference system synced to network coordinate reference system: %s",networkCrs.getName()));
+      LOGGER.info(String.format("Zoning instance's expected coordinate reference system synced" +
+              " to network coordinate reference system: %s",networkCrs.getName()));
       zoningToPopulate.setCoordinateReferenceSystem(networkCrs);
     }
     return true;
@@ -113,9 +117,11 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
    */
   private void initialiseParentNetworkSourceIdTrackers() {    
     initialiseSourceIdMap(Node.class, Node::getExternalId);
-    referenceNetwork.getTransportLayers().forEach( layer -> getSourceIdContainer(Node.class).addAll(layer.getNodes()));    
+    referenceNetwork.getTransportLayers().forEach(
+            layer -> getSourceIdContainer(Node.class).addAll(layer.getNodes()));
     initialiseSourceIdMap(MacroscopicLinkSegment.class, MacroscopicLinkSegment::getExternalId);
-    referenceNetwork.getTransportLayers().forEach( layer -> getSourceIdContainer(MacroscopicLinkSegment.class).addAll(layer.getLinkSegments()));
+    referenceNetwork.getTransportLayers().forEach(
+            layer -> getSourceIdContainer(MacroscopicLinkSegment.class).addAll(layer.getLinkSegments()));
   }  
   
   /**
@@ -175,14 +181,17 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
     if(referenceNetworkReader != null){
       var readNetwork = referenceNetworkReader.read();
       if( readNetwork == null || !(readNetwork instanceof MacroscopicNetwork)){
-        throw new PlanItRunTimeException("Unable to read network, or network not an instance of MacroscopicNetwork for " +
+        throw new PlanItRunTimeException("Unable to read network, or network not an " +
+                "instance of MacroscopicNetwork for " +
             "use in conjunction with TnTP zoning reader");
       }
       referenceNetwork = (MacroscopicNetwork) readNetwork;
 
       if(zoningToPopulate == null) {
-        zoningToPopulate = new Zoning(referenceNetwork.getIdGroupingToken(), referenceNetwork.getNetworkGroupingTokenId());
-        /*TNTP zoning is always 1:1 to its network, so we may assume that the CRS of the zoning is 1:1 to the network as well */
+        zoningToPopulate =
+                new Zoning(referenceNetwork.getIdGroupingToken(), referenceNetwork.getNetworkGroupingTokenId());
+        /*TNTP zoning is always 1:1 to its network, so we may assume that the CRS of the zoning is 1:1
+         to the network as well */
         if (zoningToPopulate.getCoordinateReferenceSystem() == null) {
           zoningToPopulate.setCoordinateReferenceSystem(referenceNetwork.getCoordinateReferenceSystem());
         }
@@ -216,11 +225,13 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
       final Node node = getBySourceId(Node.class, zone.getExternalId());      
       
       /*
-       *  connectoid length set to zero as connectors are parsed as physical links in network due to limit flexibility in TNTP format itself,
+       *  connectoid length set to zero as connectors are parsed as physical links in network due to limit
+       * flexibility in TNTP format itself,
        *  Zone/centroid is placed on top of connectoid which in turn is placed on top of the node in the network
        */
       final double connectoidLength = 0.0;
-      Connectoid connectoid = zoningToPopulate.getOdConnectoids().getFactory().registerNew(node, zone, connectoidLength);
+      Connectoid connectoid =
+              zoningToPopulate.getOdConnectoids().getFactory().registerNew(zone, node, connectoidLength);
       zone.getCentroid().setPosition(node.getPosition());
       
       /* XML id */
