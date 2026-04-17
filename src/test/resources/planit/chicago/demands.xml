@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<macroscopicdemand xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://trafficplanit.github.io/PLANitManual/xsd/macroscopiczoninginput.xsd">
+<macroscopicdemand xmlns="http://goplanit.org/v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://goplanit.org/v2 https://www.goplanit.org/xsd/v2/macroscopicdemandinput.xsd">
     <id>0</id>
     <demandconfiguration>
         <travellertypes>
