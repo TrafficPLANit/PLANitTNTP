@@ -273,12 +273,10 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 
 	/**
 	 * Open output CSV file for specified output type configuration.
-	 *
 	 * This method also creates the output file directory if it does not already
 	 * exist.
 	 *
 	 * @param outputConfiguration OutputConfiguration of the assignment
-	 * @throws PlanItException thrown if output file or directory cannot be opened
 	 */
 	@Override
 	public void initialiseBeforeSimulation(final OutputConfiguration outputConfiguration, final long runId){
@@ -347,7 +345,6 @@ public class CSVOutputFormatter extends CsvFileOutputFormatter implements CsvTex
 
 	/**
 	 * Flag to indicate whether an implementation can handle multiple iterations
-	 *
 	 * If this returns false, acts as though OutputConfiguration.setPersistOnlyFinalIteration() is set to true
 	 *
 	 * @return flag to indicate whether the OutputFormatter can handle multiple iterations

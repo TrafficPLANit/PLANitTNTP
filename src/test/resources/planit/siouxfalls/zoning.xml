@@ -9,7 +9,7 @@
                 </gml:Point>
             </centroid>
             <connectoids>
-                <connectoid type="traveller_access" id="0" externalid="1" noderef="1">
+                <connectoid type="access_egress" id="0" externalid="1" noderef="1">
                     <length>0.0</length>
                 </connectoid>
             </connectoids>
@@ -21,7 +21,7 @@
                 </gml:Point>
             </centroid>
             <connectoids>
-                <connectoid type="traveller_access" id="1" externalid="2" noderef="2">
+                <connectoid type="access_egress" id="1" externalid="2" noderef="2">
                     <length>0.0</length>
                 </connectoid>
             </connectoids>
@@ -33,7 +33,7 @@
                 </gml:Point>
             </centroid>
             <connectoids>
-                <connectoid type="traveller_access" id="10" externalid="11" noderef="11">
+                <connectoid type="access_egress" id="10" externalid="11" noderef="11">
                     <length>0.0</length>
                 </connectoid>
             </connectoids>
@@ -45,7 +45,7 @@
                 </gml:Point>
             </centroid>
             <connectoids>
-                <connectoid type="traveller_access" id="11" externalid="12" noderef="12">
+                <connectoid type="access_egress" id="11" externalid="12" noderef="12">
                     <length>0.0</length>
                 </connectoid>
             </connectoids>
@@ -57,7 +57,7 @@
                 </gml:Point>
             </centroid>
             <connectoids>
-                <connectoid type="traveller_access" id="12" externalid="13" noderef="13">
+                <connectoid type="access_egress" id="12" externalid="13" noderef="13">
                     <length>0.0</length>
                 </connectoid>
             </connectoids>
@@ -69,7 +69,7 @@
                 </gml:Point>
             </centroid>
             <connectoids>
-                <connectoid type="traveller_access" id="13" externalid="14" noderef="14">
+                <connectoid type="access_egress" id="13" externalid="14" noderef="14">
                     <length>0.0</length>
                 </connectoid>
             </connectoids>
@@ -81,7 +81,7 @@
                 </gml:Point>
             </centroid>
             <connectoids>
-                <connectoid type="traveller_access" id="14" externalid="15" noderef="15">
+                <connectoid type="access_egress" id="14" externalid="15" noderef="15">
                     <length>0.0</length>
                 </connectoid>
             </connectoids>
@@ -93,7 +93,7 @@
                 </gml:Point>
             </centroid>
             <connectoids>
-                <connectoid type="traveller_access" id="15" externalid="16" noderef="16">
+                <connectoid type="access_egress" id="15" externalid="16" noderef="16">
                     <length>0.0</length>
                 </connectoid>
             </connectoids>
@@ -105,7 +105,7 @@
                 </gml:Point>
             </centroid>
             <connectoids>
-                <connectoid type="traveller_access" id="16" externalid="17" noderef="17">
+                <connectoid type="access_egress" id="16" externalid="17" noderef="17">
                     <length>0.0</length>
                 </connectoid>
             </connectoids>
@@ -117,7 +117,7 @@
                 </gml:Point>
             </centroid>
             <connectoids>
-                <connectoid type="traveller_access" id="17" externalid="18" noderef="18">
+                <connectoid type="access_egress" id="17" externalid="18" noderef="18">
                     <length>0.0</length>
                 </connectoid>
             </connectoids>
@@ -129,7 +129,7 @@
                 </gml:Point>
             </centroid>
             <connectoids>
-                <connectoid type="traveller_access" id="18" externalid="19" noderef="19">
+                <connectoid type="access_egress" id="18" externalid="19" noderef="19">
                     <length>0.0</length>
                 </connectoid>
             </connectoids>
@@ -141,7 +141,7 @@
                 </gml:Point>
             </centroid>
             <connectoids>
-                <connectoid type="traveller_access" id="19" externalid="20" noderef="20">
+                <connectoid type="access_egress" id="19" externalid="20" noderef="20">
                     <length>0.0</length>
                 </connectoid>
             </connectoids>
@@ -153,7 +153,7 @@
                 </gml:Point>
             </centroid>
             <connectoids>
-                <connectoid type="traveller_access" id="2" externalid="3" noderef="3">
+                <connectoid type="access_egress" id="2" externalid="3" noderef="3">
                     <length>0.0</length>
                 </connectoid>
             </connectoids>
@@ -165,7 +165,7 @@
                 </gml:Point>
             </centroid>
             <connectoids>
-                <connectoid type="traveller_access" id="20" externalid="21" noderef="21">
+                <connectoid type="access_egress" id="20" externalid="21" noderef="21">
                     <length>0.0</length>
                 </connectoid>
             </connectoids>
@@ -177,7 +177,7 @@
                 </gml:Point>
             </centroid>
             <connectoids>
-                <connectoid type="traveller_access" id="21" externalid="22" noderef="22">
+                <connectoid type="access_egress" id="21" externalid="22" noderef="22">
                     <length>0.0</length>
                 </connectoid>
             </connectoids>
@@ -189,7 +189,7 @@
                 </gml:Point>
             </centroid>
             <connectoids>
-                <connectoid type="traveller_access" id="22" externalid="23" noderef="23">
+                <connectoid type="access_egress" id="22" externalid="23" noderef="23">
                     <length>0.0</length>
                 </connectoid>
             </connectoids>
@@ -201,7 +201,7 @@
                 </gml:Point>
             </centroid>
             <connectoids>
-                <connectoid type="traveller_access" id="23" externalid="24" noderef="24">
+                <connectoid type="access_egress" id="23" externalid="24" noderef="24">
                     <length>0.0</length>
                 </connectoid>
             </connectoids>
@@ -213,7 +213,7 @@
                 </gml:Point>
             </centroid>
             <connectoids>
-                <connectoid type="traveller_access" id="3" externalid="4" noderef="4">
+                <connectoid type="access_egress" id="3" externalid="4" noderef="4">
                     <length>0.0</length>
                 </connectoid>
             </connectoids>
@@ -225,7 +225,7 @@
                 </gml:Point>
             </centroid>
             <connectoids>
-                <connectoid type="traveller_access" id="4" externalid="5" noderef="5">
+                <connectoid type="access_egress" id="4" externalid="5" noderef="5">
                     <length>0.0</length>
                 </connectoid>
             </connectoids>
@@ -237,7 +237,7 @@
                 </gml:Point>
             </centroid>
             <connectoids>
-                <connectoid type="traveller_access" id="5" externalid="6" noderef="6">
+                <connectoid type="access_egress" id="5" externalid="6" noderef="6">
                     <length>0.0</length>
                 </connectoid>
             </connectoids>
@@ -249,7 +249,7 @@
                 </gml:Point>
             </centroid>
             <connectoids>
-                <connectoid type="traveller_access" id="6" externalid="7" noderef="7">
+                <connectoid type="access_egress" id="6" externalid="7" noderef="7">
                     <length>0.0</length>
                 </connectoid>
             </connectoids>
@@ -261,7 +261,7 @@
                 </gml:Point>
             </centroid>
             <connectoids>
-                <connectoid type="traveller_access" id="7" externalid="8" noderef="8">
+                <connectoid type="access_egress" id="7" externalid="8" noderef="8">
                     <length>0.0</length>
                 </connectoid>
             </connectoids>
@@ -273,7 +273,7 @@
                 </gml:Point>
             </centroid>
             <connectoids>
-                <connectoid type="traveller_access" id="8" externalid="9" noderef="9">
+                <connectoid type="access_egress" id="8" externalid="9" noderef="9">
                     <length>0.0</length>
                 </connectoid>
             </connectoids>
@@ -285,7 +285,7 @@
                 </gml:Point>
             </centroid>
             <connectoids>
-                <connectoid type="traveller_access" id="9" externalid="10" noderef="10">
+                <connectoid type="access_egress" id="9" externalid="10" noderef="10">
                     <length>0.0</length>
                 </connectoid>
             </connectoids>

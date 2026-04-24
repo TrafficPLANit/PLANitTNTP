@@ -9,15 +9,14 @@ import org.goplanit.converter.network.NetworkReader;
 import org.goplanit.converter.zoning.ZoningReader;
 import org.goplanit.network.MacroscopicNetwork;
 import org.goplanit.tntp.TntpHeaderConstants;
-import org.goplanit.utils.exceptions.PlanItException;
 import org.goplanit.utils.exceptions.PlanItRunTimeException;
-import org.goplanit.utils.id.IdGenerator;
 import org.goplanit.utils.misc.LoggingUtils;
 import org.goplanit.utils.network.layer.macroscopic.MacroscopicLinkSegment;
 import org.goplanit.utils.network.layer.physical.Node;
 import org.goplanit.utils.zoning.Connectoid;
 import org.goplanit.utils.zoning.OdZone;
 import org.goplanit.utils.zoning.Zone;
+import org.goplanit.utils.zoning.ZoneConnectoidType;
 import org.goplanit.zoning.Zoning;
 
 /**
@@ -231,7 +230,8 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
        */
       final double connectoidLength = 0.0;
       Connectoid connectoid =
-              zoningToPopulate.getOdConnectoids().getFactory().registerNew(zone, node, connectoidLength);
+              zoningToPopulate.getOdConnectoids().getFactory().registerNewWithUndirectedEntry(
+                  zone, node, ZoneConnectoidType.ZONE_ACCESS_EGRESS, connectoidLength);
       zone.getCentroid().setPosition(node.getPosition());
       
       /* XML id */
