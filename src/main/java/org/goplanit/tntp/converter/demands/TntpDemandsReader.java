@@ -10,7 +10,7 @@ import org.goplanit.converter.BaseReaderImpl;
 import org.goplanit.converter.demands.DemandsReader;
 import org.goplanit.demands.Demands;
 import org.goplanit.network.MacroscopicNetwork;
-import org.goplanit.od.demand.OdDemandMatrix;
+import org.goplanit.zoning.zonetozone.OdDemandMatrix;
 import org.goplanit.tntp.TntpHeaderConstants;
 import org.goplanit.tntp.converter.zoning.TntpZoningReader;
 import org.goplanit.userclass.TravellerType;

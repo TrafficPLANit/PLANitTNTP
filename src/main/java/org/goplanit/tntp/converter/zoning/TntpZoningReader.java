@@ -13,10 +13,10 @@ import org.goplanit.utils.exceptions.PlanItRunTimeException;
 import org.goplanit.utils.misc.LoggingUtils;
 import org.goplanit.utils.network.layer.macroscopic.MacroscopicLinkSegment;
 import org.goplanit.utils.network.layer.physical.Node;
-import org.goplanit.utils.zoning.Connectoid;
+import org.goplanit.utils.zoning.connectoid.Connectoid;
 import org.goplanit.utils.zoning.OdZone;
 import org.goplanit.utils.zoning.Zone;
-import org.goplanit.utils.zoning.ZoneConnectoidType;
+import org.goplanit.utils.zoning.connectoid.ZoneConnectoidType;
 import org.goplanit.zoning.Zoning;
 
 /**
