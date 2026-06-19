@@ -20,10 +20,11 @@ import org.goplanit.utils.zoning.connectoid.ZoneConnectoidType;
 import org.goplanit.zoning.Zoning;
 
 /**
- * Zoning reader component for TNTP data format. Note that zones are implicitly defined with a single connector in this format, meaning
- * that the first X entries of the links in the network file represent the connector links to X zones (in metadata). to still accomodate
- * this in PLANit, we treat the connector links as physical links (as often they are given a physical capacity in TNTP), and in front of it
- * create a connectoid with a zero length connectoid segment. This also requires one to use a fixed cost connectoid setup since the connectoid
+ * Zoning reader component for TNTP data format. Note that zones are implicitly defined with a single connector in
+ * this format, meaning that the first X entries of the links in the network file represent the connector links to X
+ * zones (in metadata). to still accommodate this in PLANit, we treat the connector links as physical links
+ * (as often they are given a physical capacity in TNTP), and in front of it create a connectoid with a zero
+ * length connectoid segment. This also requires one to use a fixed cost connectoid setup since the connectoid
  * has no length in TNTP.
  * 
  * @author gman, markr
@@ -48,7 +49,94 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
   private final NetworkReader referenceNetworkReader;
   
   /** the zoning to populate */
-  private Zoning zoningToPopulate;  
+  private Zoning zoningToPopulate;
+
+  /** Validate settings and log found issue
+   *
+   * @return true when ok, false otherwise
+   */
+  private boolean validateSettings() {
+    if(settings.getNetworkFileLocation()==null) {
+      LOGGER.severe("TNTP network file location is not provided, unable to create zoning");
+      return false;
+    }
+    if(referenceNetwork==null || referenceNetwork.getTransportLayers().isEmpty()) {
+      LOGGER.severe("PLANit network is not provided or empty, unable to create zoning");
+      return false;
+    }
+    if(zoningToPopulate==null) {
+      LOGGER.severe("PLANit zoning instance is not available to populate with TNTP zoning " +
+          "information, unable to create zoning");
+      return false;
+    }
+    if(zoningToPopulate.getCoordinateReferenceSystem() == null){
+      var networkCrs = referenceNetwork.getCoordinateReferenceSystem();
+      if(networkCrs == null){
+        LOGGER.severe("Zoning instance to populate and related network are expected to be " +
+            "initialised with a valid coordinate reference system");
+        return false;
+      }
+      LOGGER.info(String.format("Zoning instance's expected coordinate reference system synced" +
+          " to network coordinate reference system: %s",networkCrs.getName()));
+      zoningToPopulate.setCoordinateReferenceSystem(networkCrs);
+    }
+    return true;
+  }
+
+  /**
+   * initialise the source id trackers and populate them for the network references,
+   * so we can lay indices on the source id as well for quick lookups
+   *
+   */
+  private void initialiseParentNetworkSourceIdTrackers() {
+    initialiseSourceIdMap(Node.class, Node::getExternalId);
+    referenceNetwork.getTransportLayers().forEach(
+        layer -> getSourceIdContainer(Node.class).addAll(layer.getNodes()));
+    initialiseSourceIdMap(MacroscopicLinkSegment.class, MacroscopicLinkSegment::getExternalId);
+    referenceNetwork.getTransportLayers().forEach(
+        layer -> getSourceIdContainer(MacroscopicLinkSegment.class).addAll(layer.getLinkSegments()));
+  }
+
+  /**
+   * initialise the source id trackers for the to be populated zoning entities, so we can lay indices on the XML
+   * id as well for quick lookups
+   */
+  private void initialiseSourceIdTrackers() {
+    initialiseSourceIdMap(Zone.class, Zone::getExternalId);
+    initialiseSourceIdMap(Connectoid.class, Connectoid::getExternalId);
+  }
+
+  /**
+   * Read network metadata from the top of the network input file
+   *
+   * @param line the current line in the network input file
+   * @throws Exception thrown if the contents of the header cannot be parsed into an integer
+   */
+  private void readMetadataEntry(final String line) throws Exception {
+    if (line.startsWith(TntpHeaderConstants.NUMBER_OF_ZONES_INDICATOR)) {
+      numZones = TntpHeaderConstants.parseFromHeader(line, TntpHeaderConstants.NUMBER_OF_ZONES_INDICATOR);
+    }
+  }
+
+  /** Read meta data in order to now how many zones are to be expected
+   */
+  private void readMetaData() {
+    try (Scanner scanner = new Scanner(new File(settings.getNetworkFileLocation()).getCanonicalFile())) {
+      while (scanner.hasNextLine()) {
+        final String line = scanner.nextLine().trim();
+        final boolean atEndOfMetadata = line.equals(TntpHeaderConstants.END_OF_METADATA_INDICATOR);
+        if (atEndOfMetadata) {
+          break;
+        }else {
+          readMetadataEntry(line);
+        }
+      }
+    } catch (final Exception e) {
+      LOGGER.severe(e.getMessage());
+      throw new PlanItRunTimeException("Error when populating physical network in TNTP",e);
+    }
+  }
+
     
   /** Constructor
    * @param zoningSettings to use
@@ -75,91 +163,6 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
 
     this.referenceNetwork = referenceNetwork;
     this.zoningToPopulate = zoningToPopulate;
-  }
-
-  /** Validate settings and log found issue
-   * 
-   * @return true when ok, false otherwise
-   */
-  private boolean validateSettings() {
-    if(settings.getNetworkFileLocation()==null) {
-      LOGGER.severe("TNTP network file location is not provided, unable to create zoning");
-      return false;
-    }
-    if(referenceNetwork==null || referenceNetwork.getTransportLayers().isEmpty()) {
-      LOGGER.severe("PLANit network is not provided or empty, unable to create zoning");
-      return false;
-    }    
-    if(zoningToPopulate==null) {
-      LOGGER.severe("PLANit zoning instance is not available to populate with TNTP zoning " +
-              "information, unable to create zoning");
-      return false;
-    }
-    if(zoningToPopulate.getCoordinateReferenceSystem() == null){
-      var networkCrs = referenceNetwork.getCoordinateReferenceSystem();
-      if(networkCrs == null){
-        LOGGER.severe("Zoning instance to populate and related network are expected to be " +
-                "initialised with a valid coordinate reference system");
-        return false;
-      }
-      LOGGER.info(String.format("Zoning instance's expected coordinate reference system synced" +
-              " to network coordinate reference system: %s",networkCrs.getName()));
-      zoningToPopulate.setCoordinateReferenceSystem(networkCrs);
-    }
-    return true;
-  }
-
-  /**
-   * initialise the source id trackers and populate them for the network references, 
-   * so we can lay indices on the source id as well for quick lookups
-   * 
-   */
-  private void initialiseParentNetworkSourceIdTrackers() {    
-    initialiseSourceIdMap(Node.class, Node::getExternalId);
-    referenceNetwork.getTransportLayers().forEach(
-            layer -> getSourceIdContainer(Node.class).addAll(layer.getNodes()));
-    initialiseSourceIdMap(MacroscopicLinkSegment.class, MacroscopicLinkSegment::getExternalId);
-    referenceNetwork.getTransportLayers().forEach(
-            layer -> getSourceIdContainer(MacroscopicLinkSegment.class).addAll(layer.getLinkSegments()));
-  }  
-  
-  /**
-   * initialise the source id trackers for the to be populated zoning entities, so we can lay indices on the XML id as well for quick lookups
-   */
-  private void initialiseSourceIdTrackers() {
-    initialiseSourceIdMap(Zone.class, Zone::getExternalId);
-    initialiseSourceIdMap(Connectoid.class, Connectoid::getExternalId);
-  }   
-  
-  /**
-   * Read network metadata from the top of the network input file
-   *
-   * @param line the current line in the network input file
-   * @throws Exception thrown if the contents of the header cannot be parsed into an integer
-   */
-  private void readMetadataEntry(final String line) throws Exception {
-    if (line.startsWith(TntpHeaderConstants.NUMBER_OF_ZONES_INDICATOR)) {
-      numZones = TntpHeaderConstants.parseFromHeader(line, TntpHeaderConstants.NUMBER_OF_ZONES_INDICATOR);
-    } 
-  }  
-
-  /** Read meta data in order to now how many zones are to be expected
-   */
-  private void readMetaData() {
-    try (Scanner scanner = new Scanner(new File(settings.getNetworkFileLocation()).getCanonicalFile())) {
-      while (scanner.hasNextLine()) {
-        final String line = scanner.nextLine().trim();
-        final boolean atEndOfMetadata = line.equals(TntpHeaderConstants.END_OF_METADATA_INDICATOR);
-        if (atEndOfMetadata) {
-          break;
-        }else {
-          readMetadataEntry(line);
-        }
-      }      
-    } catch (final Exception e) {
-      LOGGER.severe(e.getMessage());
-      throw new PlanItRunTimeException("Error when populating physical network in TNTP",e);
-    }
   }
 
   /**
@@ -207,7 +210,7 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
     initialiseSourceIdTrackers();
     initialiseParentNetworkSourceIdTrackers();
     
-    /** read meta data to obtain number of zones in network */
+    /* read meta data to obtain number of zones in network */
     readMetaData();
     
     LOGGER.fine(LoggingUtils.getClassNameWithBrackets(this)+"populating zoning");
