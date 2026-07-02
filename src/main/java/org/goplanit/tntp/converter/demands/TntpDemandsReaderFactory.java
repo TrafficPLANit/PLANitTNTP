@@ -13,28 +13,30 @@ import org.goplanit.zoning.Zoning;
  *
  */
 public class TntpDemandsReaderFactory {
-  
-  /** Factory method, will create Demands based on idToken provided and use it to populate when reading in TNTP demand, , requires user to set input file
-   * 
-   * @param network to extract references from (if any)
-   * @param zoning to extract references from (if any)
-   * @param idToken to use when generating demands instance
-   * @return created TNTP demands reader
-   */
-  public static TntpDemandsReader create(final MacroscopicNetwork network, final Zoning zoning, final IdGroupingToken idToken){
-    return create(new TntpDemandsReaderSettings(),network, zoning, new Demands(idToken));
-  }    
-  
+
   /** Factory method using global id token to create instance of demands, requires user to set input file
-   * 
+   *
    * @param network to extract references from (if any)
    * @param zoning to extract references from (if any)
    * @return created TNTP demands reader
    */
   public static TntpDemandsReader create(final MacroscopicNetwork network, final Zoning zoning){
     return create(network, zoning, IdGroupingToken.collectGlobalToken());
-  }  
-    
+  }
+
+  /** Factory method, will create Demands based on idToken provided and use it to populate when reading in TNTP demand,
+   *  requires user to set input file
+   * 
+   * @param network to extract references from (if any)
+   * @param zoning to extract references from (if any)
+   * @param idToken to use when generating demands instance
+   * @return created TNTP demands reader
+   */
+  public static TntpDemandsReader create(
+      final MacroscopicNetwork network, final Zoning zoning, final IdGroupingToken idToken){
+    return create(new TntpDemandsReaderSettings(),network, zoning, new Demands(idToken));
+  }    
+
   /** Factory method using global id token to create instance of demands
    * 
    * @param demandInputFile to use (should contain the trips)
@@ -55,7 +57,8 @@ public class TntpDemandsReaderFactory {
    * @param idToken to use for the demands instance
    * @return created TNTP demands reader
    */  
-  public static TntpDemandsReader create(String demandInputFile, final MacroscopicNetwork network, final Zoning zoning, final IdGroupingToken idToken) {
+  public static TntpDemandsReader create(
+      String demandInputFile, final MacroscopicNetwork network, final Zoning zoning, final IdGroupingToken idToken) {
     return create(new TntpDemandsReaderSettings(demandInputFile), network, zoning, new Demands(idToken));
   }
 
@@ -68,7 +71,10 @@ public class TntpDemandsReaderFactory {
    * @return created TNTP demands reader
    */
   public static TntpDemandsReader create(
-      final TntpDemandsReaderSettings demandsSettings, final MacroscopicNetwork referenceNetwork, final Zoning referenceZoning, final Demands demandsToPopulate) {
+      final TntpDemandsReaderSettings demandsSettings,
+      final MacroscopicNetwork referenceNetwork,
+      final Zoning referenceZoning,
+      final Demands demandsToPopulate) {
     return new TntpDemandsReader(demandsSettings, referenceNetwork, referenceZoning, demandsToPopulate);
   }
 
