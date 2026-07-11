@@ -55,10 +55,18 @@ public class TntpZoningReaderSettings implements ConverterReaderSettings {
     LOGGER.info(String.format("Parsing TNTP zoning from: %s", networkFileLocation));
   }
 
+  /**
+   * Get network file location
+   * @return location
+   */
   public String getNetworkFileLocation() {
     return networkFileLocation;
   }
 
+  /**
+   * Set location
+   * @param networkFileLocation to set
+   */
   public void setNetworkFileLocation(String networkFileLocation) {
     this.networkFileLocation = networkFileLocation;
   }
