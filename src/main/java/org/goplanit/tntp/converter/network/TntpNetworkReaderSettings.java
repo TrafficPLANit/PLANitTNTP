@@ -8,6 +8,7 @@ import org.goplanit.tntp.enums.LengthUnits;
 import org.goplanit.tntp.enums.NetworkFileColumnType;
 import org.goplanit.tntp.enums.SpeedUnits;
 import org.goplanit.tntp.enums.TimeUnits;
+import org.goplanit.utils.misc.LoggingUtils;
 import org.goplanit.utils.misc.Pair;
 
 /**
@@ -86,15 +87,17 @@ public class TntpNetworkReaderSettings implements ConverterReaderSettings {
    */
   @Override
   public void logSettings() {
-    LOGGER.info(String.format("Parsing TNTP network from: %s", getNetworkFile()));
-    LOGGER.info(String.format("Parsing TNTP network nodes from: %s", getNodeCoordinateFile()));
-    LOGGER.info(String.format("Speed units set to: %s", getSpeedUnits()));
-    LOGGER.info(String.format("Length units set to: %s", getLengthUnits()));
-    LOGGER.info(String.format("Free flow travel time units set to: %s", getFreeFlowTravelTimeUnits()));
-    LOGGER.info(String.format("Capacity period units set to: %s", getCapacityPeriodUnits()));
-    LOGGER.info(String.format("Capacity period duration set to: %s", getCapacityPeriodDuration()));
-    LOGGER.info(String.format("Default max speed set to: %s", getDefaultMaximumSpeed()));
-    LOGGER.info(String.format("Node coordinates swapping: %s", Boolean.toString(isSwapNodeCoordinates())));
+    LOGGER.info(LoggingUtils.settingsHeader("TNTP Network Reader Settings"));
+    LOGGER.info(LoggingUtils.settingsValue("Network file", getNetworkFile(), 0));
+    LOGGER.info(LoggingUtils.settingsValue("Node coordinate file", getNodeCoordinateFile(), 0));
+    LOGGER.info(LoggingUtils.settingsValue("Coordinate reference system", getCoordinateReferenceSystem(), 0));
+    LOGGER.info(LoggingUtils.settingsValue("Speed units", getSpeedUnits(), 0));
+    LOGGER.info(LoggingUtils.settingsValue("Length units", getLengthUnits(), 0));
+    LOGGER.info(LoggingUtils.settingsValue("Free flow travel time units", getFreeFlowTravelTimeUnits(), 0));
+    LOGGER.info(LoggingUtils.settingsValue("Capacity period units", getCapacityPeriodUnits(), 0));
+    LOGGER.info(LoggingUtils.settingsValue("Capacity period duration", getCapacityPeriodDuration(), 0));
+    LOGGER.info(LoggingUtils.settingsValue("Default max speed", getDefaultMaximumSpeed(), 0));
+    LOGGER.info(LoggingUtils.settingsValue("Swap node coordinates", isSwapNodeCoordinates(), 0));
   }
 
 

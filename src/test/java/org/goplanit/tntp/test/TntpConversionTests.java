@@ -96,7 +96,10 @@ public class TntpConversionTests {
   private static TntpNetworkReader createChicagoTntpNetworkReader(
       Path networkFileLocation, Path nodeFileLocation, double defaultMaxSpeedMpH, IdGroupingToken idToken) {
     return createChicagoTntpNetworkReader(
-        networkFileLocation.toAbsolutePath().toString(),nodeFileLocation.toAbsolutePath().toString(), defaultMaxSpeedMpH, idToken);
+        networkFileLocation.toAbsolutePath().toString(),
+        nodeFileLocation.toAbsolutePath().toString(),
+        defaultMaxSpeedMpH,
+        idToken);
   }
   
   /** Create TNTP reader suitable for Chicago network
@@ -111,7 +114,8 @@ public class TntpConversionTests {
       String networkFileLocation, String nodeFileLocation, double defaultMaxSpeedMpH, IdGroupingToken idToken) {
     var tntpReader = TntpNetworkReaderFactory.create(networkFileLocation, nodeFileLocation, idToken);
     
-    // The following arrangement of columns is correct for Chicago Sketch (and Philadelphia), for other cities the arrangement can be different.
+    // The following arrangement of columns is correct for Chicago Sketch (and Philadelphia), for other cities
+    // the arrangement can be different.
     final Map<NetworkFileColumnType, Integer> networkFileColumns = new HashMap<>();
     networkFileColumns.put(NetworkFileColumnType.UPSTREAM_NODE_ID, 0);
     networkFileColumns.put(NetworkFileColumnType.DOWNSTREAM_NODE_ID, 1);
@@ -216,7 +220,8 @@ public class TntpConversionTests {
   }
     
   /**
-   * Test case which parses the TNTP Chicago network, zoning and trips files, loads it into PLANit memory model and persists it as a PLANit network
+   * Test case which parses the TNTP Chicago network, zoning and trips files, loads it into PLANit memory model
+   * and persists it as a PLANit network
    */
   @Test
   public void testTntp2PlanitNetworkChicago() {
@@ -248,7 +253,8 @@ public class TntpConversionTests {
   }
    
   /**
-   * Test case which parses the TNTP Chicago network, zoning and trips files, loads it into PLANit memory model and persists it as a PLANit network
+   * Test case which parses the TNTP Chicago network, zoning and trips files, loads it into PLANit memory model
+   * and persists it as a PLANit network
    */
   @Test
   public void testTntp2PlanitZoningChicago() {
@@ -286,7 +292,8 @@ public class TntpConversionTests {
   }  
   
   /**
-   * Test case which parses the TNTP Chicago network, zoning and trips files, loads it into PLANit memory model and persists it as a PLANit network
+   * Test case which parses the TNTP Chicago network, zoning and trips files, loads it into PLANit memory model
+   * and persists it as a PLANit network
    */
   @Test
   public void testTntp2PlanitDemandsChicago() {
@@ -339,7 +346,8 @@ public class TntpConversionTests {
   }  
   
   /**
-   * Test case which parses the TNTP SiouxFalls network, zoning and trips files, loads it into PLANit memory model and persists it as a PLANit network, demand, and zoning
+   * Test case which parses the TNTP SiouxFalls network, zoning and trips files, loads it into PLANit memory model
+   * and persists it as a PLANit network, demand, and zoning
    */
   @Test
   public void testTntp2PlanitSiouxFalls() {

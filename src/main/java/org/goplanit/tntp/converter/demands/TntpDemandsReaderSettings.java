@@ -4,6 +4,7 @@ import java.util.logging.Logger;
 
 import org.goplanit.converter.ConverterReaderSettings;
 import org.goplanit.tntp.enums.TimeUnits;
+import org.goplanit.utils.misc.LoggingUtils;
 import org.goplanit.utils.misc.Pair;
 /**
  * Settings for the TNTP demands reader
@@ -89,12 +90,18 @@ public class TntpDemandsReaderSettings implements ConverterReaderSettings {
   /**
    * Log the current settings
    */
+  @Override
   public void logSettings() {
-    LOGGER.info("TNTP demand file: " + demandFileLocation);
-    LOGGER.info(String.format("TNTP start time of period set to: %.2f (%s)",
-        this.getStartTimeSinceMidNight(), this.getStartTimeSinceMidNightUnit().name()));
-    LOGGER.info(String.format("TNTP duration of time period set to: %.2f (%s)",
-        this.getTimePeriodDuration(), this.getTimePeriodDurationUnit().name()));
+    LOGGER.info(LoggingUtils.settingsHeader("TNTP Demands Reader Settings"));
+    LOGGER.info(LoggingUtils.settingsValue("Demand file", getDemandFileLocation(), 0));
+    LOGGER.info(LoggingUtils.settingsValue(
+        "Start time of period",
+        String.format("%.2f (%s)", getStartTimeSinceMidNight(), getStartTimeSinceMidNightUnit().name()),
+        0));
+    LOGGER.info(LoggingUtils.settingsValue(
+        "Duration of time period",
+        String.format("%.2f (%s)", getTimePeriodDuration(), getTimePeriodDurationUnit().name()),
+        0));
   }
 
   /**

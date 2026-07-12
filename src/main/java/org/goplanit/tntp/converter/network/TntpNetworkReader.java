@@ -558,10 +558,10 @@ public class TntpNetworkReader extends BaseReaderImpl<LayeredNetwork<?,?>> imple
       throw new PlanItRunTimeException("Error cannot populate non-empty network");
     }
 
+    getSettings().logSettings();
+
     /* crs */
     prepareCoordinateReferenceSystem();
-
-    getSettings().logSettings();
 
     LOGGER.fine(LoggingUtils.getClassNameWithBrackets(this)+"populating Physical Network");
     
