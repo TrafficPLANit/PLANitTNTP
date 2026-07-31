@@ -91,17 +91,17 @@ public class TntpDemandsReaderSettings implements ConverterReaderSettings {
    * Log the current settings
    */
   @Override
-  public void logSettings() {
+  public void logSettings(int level) {
     LOGGER.info(LoggingUtils.settingsHeader("TNTP Demands Reader Settings"));
-    LOGGER.info(LoggingUtils.settingsValue("Demand file", getDemandFileLocation(), 0));
+    LOGGER.info(LoggingUtils.settingsValue("Demand file", getDemandFileLocation(), level));
     LOGGER.info(LoggingUtils.settingsValue(
         "Start time of period",
         String.format("%.2f (%s)", getStartTimeSinceMidNight(), getStartTimeSinceMidNightUnit().name()),
-        0));
+        level));
     LOGGER.info(LoggingUtils.settingsValue(
         "Duration of time period",
         String.format("%.2f (%s)", getTimePeriodDuration(), getTimePeriodDurationUnit().name()),
-        0));
+        level));
   }
 
   /**

@@ -52,9 +52,9 @@ public class TntpZoningReaderSettings implements ConverterReaderSettings {
    * {@inheritDoc}
    */
   @Override
-  public void logSettings() {
+  public void logSettings(int level) {
     LOGGER.info(LoggingUtils.settingsHeader("TNTP Zoning Reader Settings"));
-    LOGGER.info(LoggingUtils.settingsValue("Network file location", getNetworkFileLocation(), 0));
+    LOGGER.info(LoggingUtils.settingsValue("Network file location", getNetworkFileLocation(), level));
   }
 
   /**

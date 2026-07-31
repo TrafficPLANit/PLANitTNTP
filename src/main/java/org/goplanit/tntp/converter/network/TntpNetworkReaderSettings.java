@@ -86,18 +86,18 @@ public class TntpNetworkReaderSettings implements ConverterReaderSettings {
    * {@inheritDoc}
    */
   @Override
-  public void logSettings() {
+  public void logSettings(int level) {
     LOGGER.info(LoggingUtils.settingsHeader("TNTP Network Reader Settings"));
-    LOGGER.info(LoggingUtils.settingsValue("Network file", getNetworkFile(), 0));
-    LOGGER.info(LoggingUtils.settingsValue("Node coordinate file", getNodeCoordinateFile(), 0));
-    LOGGER.info(LoggingUtils.settingsValue("Coordinate reference system", getCoordinateReferenceSystem(), 0));
-    LOGGER.info(LoggingUtils.settingsValue("Speed units", getSpeedUnits(), 0));
-    LOGGER.info(LoggingUtils.settingsValue("Length units", getLengthUnits(), 0));
-    LOGGER.info(LoggingUtils.settingsValue("Free flow travel time units", getFreeFlowTravelTimeUnits(), 0));
-    LOGGER.info(LoggingUtils.settingsValue("Capacity period units", getCapacityPeriodUnits(), 0));
-    LOGGER.info(LoggingUtils.settingsValue("Capacity period duration", getCapacityPeriodDuration(), 0));
-    LOGGER.info(LoggingUtils.settingsValue("Default max speed", getDefaultMaximumSpeed(), 0));
-    LOGGER.info(LoggingUtils.settingsValue("Swap node coordinates", isSwapNodeCoordinates(), 0));
+    LOGGER.info(LoggingUtils.settingsValue("Network file", getNetworkFile(), level));
+    LOGGER.info(LoggingUtils.settingsValue("Node coordinate file", getNodeCoordinateFile(), level));
+    LOGGER.info(LoggingUtils.settingsValue("Coordinate reference system", getCoordinateReferenceSystem(), level));
+    LOGGER.info(LoggingUtils.settingsValue("Speed units", getSpeedUnits(), level));
+    LOGGER.info(LoggingUtils.settingsValue("Length units", getLengthUnits(), level));
+    LOGGER.info(LoggingUtils.settingsValue("Free flow travel time units", getFreeFlowTravelTimeUnits(), level));
+    LOGGER.info(LoggingUtils.settingsValue("Capacity period units", getCapacityPeriodUnits(), level));
+    LOGGER.info(LoggingUtils.settingsValue("Capacity period duration", getCapacityPeriodDuration(), level));
+    LOGGER.info(LoggingUtils.settingsValue("Default max speed", getDefaultMaximumSpeed(), level));
+    LOGGER.info(LoggingUtils.settingsValue("Swap node coordinates", isSwapNodeCoordinates(), level));
   }
 
 
