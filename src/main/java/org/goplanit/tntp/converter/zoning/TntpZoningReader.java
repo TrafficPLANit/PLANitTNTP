@@ -102,8 +102,8 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
    * id as well for quick lookups
    */
   private void initialiseSourceIdTrackers() {
-    initialiseSourceIdMap(Zone.class, Zone::getExternalId);
-    initialiseSourceIdMap(Connectoid.class, Connectoid::getExternalId);
+    initialiseSourceIdMap(OdZone.getOdZoneIdClass(), Zone::getExternalId);
+    initialiseSourceIdMap(Connectoid.getConnectoidIdClass(), Connectoid::getExternalId);
   }
 
   /**
@@ -221,7 +221,7 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
       zone.setXmlId(Long.toString(zone.getId()));      
       /* external id */
       zone.setExternalId(String.valueOf(zoneSourceId));
-      registerBySourceId(Zone.class, zone);
+      registerBySourceId(OdZone.getOdZoneIdClass(), zone);
       
       /* CONNECTOID */
       final Node node = getBySourceId(Node.class, zone.getExternalId());      
@@ -241,7 +241,7 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
       connectoid.setXmlId(Long.toString(connectoid.getId()));
       /* external id */
       connectoid.setExternalId(zone.getExternalId());
-      registerBySourceId(Connectoid.class, connectoid);
+      registerBySourceId(Connectoid.getConnectoidIdClass(), connectoid);
     }
     
     return zoningToPopulate;
