@@ -5,3 +5,5 @@
 /.idea
 /docs
 
+# Generated conversion test outputs
+/src/test/resources/testcases/
