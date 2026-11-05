@@ -14,6 +14,7 @@
                 </physicalfeatures>
                 <usabilityfeatures>
                     <usedtotype>private</usedtotype>
+                    <drivertype>traveller</drivertype>
                 </usabilityfeatures>
             </mode>
         </modes>
