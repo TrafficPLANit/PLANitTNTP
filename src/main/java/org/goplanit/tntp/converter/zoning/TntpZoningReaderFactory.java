@@ -21,7 +21,7 @@ public class TntpZoningReaderFactory {
    * @return created TNTP zoning reader
    */
   public static TntpZoningReader create(final MacroscopicNetwork network, final IdGroupingToken idToken){
-    var zoning = new Zoning(idToken, network.getNetworkGroupingTokenId());
+    var zoning = new Zoning(idToken, network);
     zoning.setCoordinateReferenceSystem(network.getCoordinateReferenceSystem());
     return create(new TntpZoningReaderSettings(),network, zoning);
   }    
@@ -56,7 +56,7 @@ public class TntpZoningReaderFactory {
    * @return created TNTP zoning reader
    */  
   public static TntpZoningReader create(String networkInputFile, MacroscopicNetwork network, IdGroupingToken idToken) {
-    var zoning = new Zoning(idToken, network.getNetworkGroupingTokenId());
+    var zoning = new Zoning(idToken, network);
     zoning.setCoordinateReferenceSystem(network.getCoordinateReferenceSystem());
     return create(networkInputFile, network, zoning);
   }
