@@ -41,7 +41,7 @@ public class TntpAssignmentTest {
   /** the logger */
   private static Logger LOGGER = null;
 
-  private static final Path projectPath = Path.of("src","test","resources");
+  private static final Path projectPath = Path.of("src", "test","resources");
   private static final Path chicagoPath = Path.of(projectPath.toString(),"ChicagoSketch");
   private static final Path siouxFallsPath = Path.of(projectPath.toString(),"SiouxFalls");
 
