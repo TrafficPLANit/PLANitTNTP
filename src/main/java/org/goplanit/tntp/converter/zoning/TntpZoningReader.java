@@ -246,6 +246,10 @@ public class TntpZoningReader extends BaseReaderImpl<Zoning> implements ZoningRe
     return zoningToPopulate;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public MacroscopicNetwork getReferenceNetwork(){
     return referenceNetwork;
   }
