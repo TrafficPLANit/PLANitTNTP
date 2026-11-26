@@ -20,12 +20,11 @@ import org.goplanit.utils.zoning.connectoid.ZoneConnectoidType;
 import org.goplanit.zoning.Zoning;
 
 /**
- * Zoning reader component for TNTP data format. Note that zones are implicitly defined with a single connector in
- * this format, meaning that the first X entries of the links in the network file represent the connector links to X
- * zones (in metadata). to still accommodate this in PLANit, we treat the connector links as physical links
- * (as often they are given a physical capacity in TNTP), and in front of it create a connectoid with a zero
- * length connectoid segment. This also requires one to use a fixed cost connectoid setup since the connectoid
- * has no length in TNTP.
+ * Zoning reader for the TNTP data format. TNTP defines zones implicitly, each with a single connector: the first X
+ * links in the network file are the connector links to the X zones (in the metadata). To fit this in PLANit, this
+ * reader treats the connector links as physical links, as TNTP often gives them a physical capacity, and creates a
+ * connectoid with a zero length connectoid segment in front of each. As the connectoid has no length in TNTP, a fixed
+ * cost connectoid setup is needed.
  * 
  * @author gman, markr
  *

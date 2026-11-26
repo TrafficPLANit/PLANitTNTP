@@ -59,10 +59,7 @@ public class TntpAssignmentTest {
   }
   
   /**
-   * Compare the results for Chicago-Sketch TNTP network with previous results.
-   *
-   *
-   * The published results can be found at
+   * Compare the results for the Chicago-Sketch TNTP network with previous results, published at
    * <a href="https://github.com/bstabler/TransportationNetworks/blob/master/Chicago-Sketch/ChicagoSketch_flow.tntp">
    *   Chicago sketch</a>.
    */
